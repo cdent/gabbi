@@ -1,10 +1,1 @@
-pep8>=1.4.5
-pyflakes>=0.7.2,<0.7.4
-flake8>=2.1.0
-discover
-sphinx>=1.1.2,<1.2
-python-subunit
-testrepository>=0.0.17
 testtools>=0.9.32
-testscenarios>=0.4
-coverage>=3.6
