@@ -1,0 +1,14 @@
+# By default the root of the API is an HTML page that provides
+# links to the bag and recipe collections. This can be changed
+# by either overriding tiddlyweb.web.handler:root or by changing
+# / in the selector map in a plugin. Only HTML is returned at
+# this time, which is probably a bug.
+- name: test one 
+  url: /
+
+- name: test two
+  url: /
+
+- name: test three
+  url: /recipes
+
