@@ -1,0 +1,109 @@
+# By default the root of the API is an HTML page that provides
+# links to the bag and recipe collections. This can be changed
+# by either overriding tiddlyweb.web.handler:root or by changing
+# / in the selector map in a plugin. Only HTML is returned at
+# this time, which is probably a bug.
+- name: Get Root Page
+  desc: Get and display the root page
+  expected:
+  - bags
+  - recipes
+  response_headers: 
+    content-type: text/html; charset=UTF-8
+  url: /
+
+# The root page again, this time using basic authentication
+# and faking the request to look like a browser. This causes two
+# things to happen: The page includes the framework presented by
+# tiddlyweb.web.wsgi:HTMLPresenter and the username of the 
+# current username.
+- name: Authenticated Root Page
+  desc: Pass in auth info when getting root page
+  expected:
+  - bags
+  - recipes
+  - User cdent
+  request_headers: 
+    Authorization: Basic Y2RlbnQ6Y293cGln
+    User-Agent: Mozilla/5
+  url: /
+
+# The recipes collection, which is simply a list of all
+# the recipes on the system that can be read by the current
+# user (in this case GUEST), according to the policy set
+# on each recipe.
+- name: List of recipes
+  desc: Get the list of all readable recipes
+  expected: 
+  - id="recipes"
+  - long
+  url: /recipes
+
+# The bags collection, which is simply a list of all
+# the bags on the system that can be read by the current
+# user (in this case GUEST), according to the policy set
+# on each bag.
+- name: List of bags
+  desc: Get the list of all readable bags
+  expected:
+  - id="bags"
+  - bag0
+  - bag20
+  url: /bags
+
+# The HTML of a single recipe. The recipe presents its
+# description and the list of bags and filters which make
+# it up and a link to the contained tiddlers.
+- name: Get HTML recipe
+  desc: Get the HTML of a recipe
+  url: /recipes/long
+  expected:
+  - "bag:"
+  - "filter:"
+  - Tiddlers in Recipe
+  response_headers:
+    content-type: text/html; charset=UTF-8
+
+# The JSON representation of a single recipe, which is
+# a dictionary with recipe, desc and policy keys.
+- name: Get JSON recipe
+  desc: Get the JSON of a recipe
+  url: /recipes/long.json
+  status: 200
+  expected:
+  - '"policy":'
+  - '["bag24", "select=title:tiddler4"]'
+  response_headers:
+    content-type: application/json
+
+# The Text representation of a single recipe.
+- name: Get Text recipe
+  desc: Get the Test of a recipe
+  url: /recipes/long.txt
+  expected:
+  - "desc:"
+  - "policy:"
+  - select=title:tiddler6
+
+# PUT a recipe using JSON. Any key not set will be
+# given defaults. Creating a recipe is controlled by
+# the settings on tiddlyweb.config:config['recipe_create_policy'].
+# Modifying a recipe is controlled by the recipe's policy.
+- name: Put a recipe
+  desc: Put a sample recipe
+  url: /recipes/sample
+  method: PUT
+  data: '{"recipe":[["bag0",""]] ,"desc":"hiya desc" ,"policy":{}}'
+  request_headers:
+    content-type: application/json
+  status: 204
+  response_headers:
+    location: "http://our_test_domain:8001/recipes/sample"
+
+# Confirm the recipe we just created.
+- name: Get the sample recipe
+  desc: Should have a hiya desc
+  url: /recipes/sample
+  expected:
+  - hiya desc
+
