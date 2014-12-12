@@ -1,15 +1,9 @@
 
 import glob
 import os
-import unittest
 
+import testresources
 import yaml
-
-
-def build_test_method(test):
-    def test(self):
-        self.http_test(test)
-    return test
 
 
 def load_yaml(yaml_file):
@@ -17,39 +11,54 @@ def load_yaml(yaml_file):
         return yaml.safe_load(source.read())
 
 
-
 class Builder(type):
 
     def __new__(cls, name, bases, d):
-
-        test_data = load_yaml(d['data_file'])
-
-        for test in test_data:
-            test_name = test['name'].lower().replace(' ', '_')
-            d['test_%s' % test_name] = build_test_method(test)
-
         return type.__new__(cls, name, bases, d)
 
 
-class HTTPTestCase(unittest.TestCase):
+class HTTPTestCase(testresources.ResourcedTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        print 'setup called', cls.data_file
+    def runTest(self):
+        self.assertTrue(self.test_data['url'])
 
-    def http_test(self, test):
-        self.assertTrue(test)
+
+class PriorTest(testresources.TestResourceManager):
+
+    def __init__(self, suite, prior):
+        self.suite = suite
+        self.prior = prior
+        super(PriorTest, self).__init__()
+
+    def make(self, dependency):
+        self.prior.run(testresources._get_result())
+
+    def isDirty(self):
+        return False
 
 
 def build_tests(path, loader, tests, pattern):
-    suite = unittest.TestSuite()
+    top_suite = testresources.OptimisingTestSuite()
 
     path = '%s/*.yaml' % path
 
     for test_file in glob.iglob(path):
-        test_name = os.path.splitext(os.path.basename(test_file))[0]
-        klass = Builder(test_name, (HTTPTestCase,), {'data_file': test_file})
-        tests = loader.loadTestsFromTestCase(klass)
-        suite.addTests(tests)
+        file_suite = testresources.OptimisingTestSuite()
+        test_data = load_yaml(test_file)
+        test_base_name = os.path.splitext(os.path.basename(test_file))[0]
+        prior_test = None
+        for test in test_data:
+            test_name = '%s_%s' % (test_base_name,
+                                   test['name'].lower().replace(' ', '_'))
+            klass = Builder(test_name, (HTTPTestCase,),
+                            {'test_data': test})
+            if prior_test:
+                klass.resources = [('prior',
+                                    PriorTest(file_suite, prior_test))]
+            tests = loader.loadTestsFromTestCase(klass)
+            this_test = tests._tests[0]
+            file_suite.addTest(this_test)
+            prior_test = this_test
+        top_suite.addTest(file_suite)
 
-    return suite
+    return top_suite
