@@ -35,24 +35,6 @@ import testtools
 import yaml
 
 
-def load_yaml(yaml_file):
-    """Read and parse any YAML file. Let exceptions flow where they may.
-    """
-    with open(yaml_file) as source:
-        return yaml.safe_load(source.read())
-
-
-class TestBuilder(type):
-    """Metaclass to munge a dynamically created test.
-    """
-
-    required_attributes = {'has_run': False}
-
-    def __new__(mcs, name, bases, attributes):
-        attributes.update(mcs.required_attributes)
-        return type.__new__(mcs, name, bases, attributes)
-
-
 class HTTPTestCase(testtools.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
@@ -82,6 +64,17 @@ class HTTPTestCase(testtools.TestCase):
         if self.prior and not self.prior.has_run:
             self.prior.run()
         self.assertTrue(self.test_data['url'])
+
+
+class TestBuilder(type):
+    """Metaclass to munge a dynamically created test.
+    """
+
+    required_attributes = {'has_run': False}
+
+    def __new__(mcs, name, bases, attributes):
+        attributes.update(mcs.required_attributes)
+        return type.__new__(mcs, name, bases, attributes)
 
 
 def build_tests(path, loader, tests, pattern):
@@ -116,3 +109,10 @@ def build_tests(path, loader, tests, pattern):
         top_suite.addTest(file_suite)
 
     return top_suite
+
+
+def load_yaml(yaml_file):
+    """Read and parse any YAML file. Let exceptions flow where they may.
+    """
+    with open(yaml_file) as source:
+        return yaml.safe_load(source.read())
