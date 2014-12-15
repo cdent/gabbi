@@ -2,3 +2,5 @@ pbr>=0.6,!=0.7,<1.0
 six>=1.7.0
 PyYAML
 testtools>=0.9.32
+httplib2
+wsgi-intercept

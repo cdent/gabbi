@@ -39,7 +39,7 @@ and automated CI systems.
 To Do
 -----
 
-* [ ] Do the actual HTTP requesting and response evaluation.
+* [x] Do the actual HTTP requesting and response evaluation.
 * [ ] Enable optional use of wsgi-intercept so no web server is required.
 * [ ] Consider fixture management (data store) per YAML file.
 * [ ] Dealing with driving authN and authZ.

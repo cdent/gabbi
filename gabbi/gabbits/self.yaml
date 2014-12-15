@@ -1,0 +1,26 @@
+#
+# Tests for testing gabbi, using the built in SimpleWsgi app.
+#
+
+- name: get simple page
+  url: /
+
+- name: bogus method
+  url: /
+  method: DIE
+  status: 405
+  response_headers:
+      allow: GET, PUT, POST, DELETE, PATCH
+      x-gabbi-method: DIE
+
+- name: query returned
+  url: /somewhere?foo=1&bar=2&bar=3
+  expected:
+      - "\"bar\": [\"2\", \"3\"]"
+
+- name: json query returned
+  url: /somewhere?foo=1&bar=2&bar=3
+  expected_json:
+      bar:
+          - "2"
+          - "3"
