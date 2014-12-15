@@ -15,6 +15,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+"""A sample test module to exercise the code.
+
+For the sake of exploratory development.
+"""
+
+
 import os
 
 from gabbi.driver import build_tests
@@ -24,5 +30,6 @@ TESTS_DIR = 'gabbits'
 
 
 def load_tests(loader, tests, pattern):
+    """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return build_tests(test_dir, loader, tests, pattern)

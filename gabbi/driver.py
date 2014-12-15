@@ -42,10 +42,15 @@ def load_yaml(yaml_file):
         return yaml.safe_load(source.read())
 
 
-class Builder(type):
+class TestBuilder(type):
+    """Metaclass to munge a dynamically created test.
+    """
 
-    def __new__(mcs, name, bases, d):
-        return type.__new__(mcs, name, bases, d)
+    required_attributes = {'has_run': False}
+
+    def __new__(mcs, name, bases, attributes):
+        attributes.update(mcs.required_attributes)
+        return type.__new__(mcs, name, bases, attributes)
 
 
 class HTTPTestCase(testtools.TestCase):
@@ -68,6 +73,10 @@ class HTTPTestCase(testtools.TestCase):
         self.has_run = True
 
     def test_request(self):
+        """Run this request if it has not yet run.
+
+        If there is a prior test in the sequence, run it first.
+        """
         if self.has_run:
             return
         if self.prior and not self.prior.has_run:
@@ -95,10 +104,9 @@ def build_tests(path, loader, tests, pattern):
                                    test['name'].lower().replace(' ', '_'))
             # Use metaclasses to build a class of the necessary type
             # with relevant arguments.
-            klass = Builder(test_name, (HTTPTestCase,),
-                            {'test_data': test,
-                             'prior': prior_test,
-                             'has_run': False})
+            klass = TestBuilder(test_name, (HTTPTestCase,),
+                                {'test_data': test,
+                                 'prior': prior_test})
 
             tests = loader.loadTestsFromTestCase(klass)
             this_test = tests._tests[0]
