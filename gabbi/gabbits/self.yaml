@@ -1,6 +1,8 @@
 #
 # Tests for testing gabbi, using the built in SimpleWsgi app.
 #
+# TODO(chdent): This probably needs a top level of some kind, so testwide settings
+# can be made.
 
 - name: get simple page
   url: /
@@ -24,3 +26,10 @@
       bar:
           - "2"
           - "3"
+
+- name: google
+  url: https://google.com/
+
+- name: get ssl page
+  url: /
+  ssl: True

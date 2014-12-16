@@ -34,6 +34,7 @@ from unittest import suite
 import uuid
 
 import httplib2
+from six.moves.urllib import parse as urlparse
 import testtools
 import wsgi_intercept
 from wsgi_intercept import httplib2_intercept
@@ -44,6 +45,7 @@ import yaml
 BASE_TEST = {
     'name': '',
     'desc': '',
+    'ssl': False,
     'method': 'GET',
     'url': '',
     'status': '200',
@@ -91,14 +93,34 @@ class HTTPTestCase(testtools.TestCase):
             self.prior.run()
         self._run_test()
 
+    def _parse_url(self, url, ssl=False):
+        """Create a url from test data.
+
+        If provided with a full URL, just return that. If SSL is requested
+        set the scheme appropriately.
+        """
+        parsed_url = urlparse.urlsplit(url)
+        url_scheme = parsed_url[0]
+        scheme = 'http'
+        netloc = self.host
+
+        if not url_scheme:
+            if self.port:
+                netloc = '%s:%s' % (self.host, self.port)
+            if ssl:
+                scheme = 'https'
+            full_url = urlparse.urlunsplit((scheme, netloc, parsed_url[2],
+                                            parsed_url[3], ''))
+        else:
+            full_url = url
+        return full_url
+
     def _run_test(self):
         """Make an HTTP request."""
         test = self.test_data
         http = self.http
 
-        # TODO(chdent): pass fully qualified straight through
-        # TODO(chdent): use urljoin
-        full_url = 'http://%s:%s/%s' % (self.host, self.port, test['url'])
+        full_url = self._parse_url(test['url'], test['ssl'])
         method = test['method'].upper()
         headers = test['request_headers']
         if method == 'GET' or method == 'DELETE':
