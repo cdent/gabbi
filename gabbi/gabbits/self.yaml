@@ -4,6 +4,7 @@
 # TODO(chdent): This probably needs a top level of some kind, so testwide settings
 # can be made.
 
+tests:
 - name: get simple page
   url: /
 

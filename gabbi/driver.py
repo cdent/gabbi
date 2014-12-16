@@ -200,7 +200,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
 
     for test_file in glob.iglob(path):
         file_suite = suite.TestSuite()
-        test_data = load_yaml(test_file)
+        test_yaml = load_yaml(test_file)
+        test_data = test_yaml['tests']
         test_base_name = os.path.splitext(os.path.basename(test_file))[0]
 
         prior_test = None
