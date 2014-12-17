@@ -36,6 +36,20 @@ The features mean that it is possible to create tests that are
 useful for both humans (as tools for improving and developing APIs)
 and automated CI systems.
 
+Testing
+-------
+
+To run the built in tests (the YAML files are in the directory
+``gabbi/gabbits`` and loaded by the file ``gabbi/test_test.py``),
+you can use ``tox``:
+
+    tox -epep8,py27,py33
+
+Or if you prefer a bit more visibility you can run things a bit more
+manually:
+
+    python -m subunit.run discover gabbi |subunit2pyunit
+
 To Do
 -----
 
