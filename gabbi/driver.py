@@ -98,6 +98,8 @@ class HTTPTestCase(testtools.TestCase):
 
         If provided with a full URL, just return that. If SSL is requested
         set the scheme appropriately.
+
+        Scheme and netloc are saved for later use in comparisons.
         """
         parsed_url = urlparse.urlsplit(url)
         url_scheme = parsed_url[0]
@@ -111,16 +113,26 @@ class HTTPTestCase(testtools.TestCase):
                 scheme = 'https'
             full_url = urlparse.urlunsplit((scheme, netloc, parsed_url[2],
                                             parsed_url[3], ''))
+            self.scheme = scheme
+            self.netloc = netloc
         else:
             full_url = url
+            self.scheme = url_scheme
+            self.netloc = parsed_url[1]
+
         return full_url
 
     def _run_test(self):
         """Make an HTTP request."""
         test = self.test_data
         http = self.http
+        base_url = test['url']
 
-        full_url = self._parse_url(test['url'], test['ssl'])
+        if '$LOCATION' in base_url:
+            # Let AttributeError raise
+            base_url = base_url.replace('$LOCATION', self.prior.location)
+
+        full_url = self._parse_url(base_url, test['ssl'])
         method = test['method'].upper()
         headers = test['request_headers']
         if method == 'GET' or method == 'DELETE':
@@ -137,6 +149,11 @@ class HTTPTestCase(testtools.TestCase):
                 headers=headers,
                 body=body
             )
+
+        # Set location attribute for follow on requests
+        if 'location' in response:
+            self.location = response['location']
+
         self._assert_response(response, content, test['status'],
                               headers=test['response_headers'],
                               expected=test['expected'],
@@ -152,7 +169,11 @@ class HTTPTestCase(testtools.TestCase):
 
         if headers:
             for header in headers:
-                self.assertEqual(headers[header], response[header])
+                header_value = headers[header].replace('$SCHEME', self.scheme)
+                header_value = header_value.replace('$NETLOC', self.netloc)
+                self.assertEqual(header_value, response[header],
+                                 'Expect header %s with value %s, got %s' %
+                                 (header, header_value, response[header]))
 
         output = content.decode('utf-8')
         # Compare strings in response body

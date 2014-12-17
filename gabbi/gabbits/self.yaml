@@ -1,8 +1,6 @@
 #
 # Tests for testing gabbi, using the built in SimpleWsgi app.
 #
-# TODO(chdent): This probably needs a top level of some kind, so testwide settings
-# can be made.
 
 tests:
 - name: get simple page
@@ -15,6 +13,7 @@ tests:
   response_headers:
       allow: GET, PUT, POST, DELETE, PATCH
       x-gabbi-method: DIE
+      x-gabbi-url: $SCHEME://$NETLOC/
 
 - name: query returned
   url: /somewhere?foo=1&bar=2&bar=3
@@ -27,6 +26,17 @@ tests:
       bar:
           - "2"
           - "3"
+
+- name: simple post
+  url: /named/thing
+  method: POST
+  response_headers:
+      location: $SCHEME://$NETLOC/named/thing
+
+- name: use prior location
+  url: $LOCATION
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/named/thing
 
 - name: google
   url: https://google.com/

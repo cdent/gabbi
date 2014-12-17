@@ -41,9 +41,25 @@ class SimpleWsgi(object):
         query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
         query_output = json.dumps(query_data)
 
+        request_url = environ.get('REQUEST_URI',
+                                  environ.get('RAW_URI', 'unknown'))
+
+        path, query, fragment = urlparse.urlsplit(request_url)[2:]
+        server_name = environ.get('SERVER_NAME')
+        server_port = environ.get('SERVER_PORT')
+        server_scheme = environ.get('wsgi.url_scheme')
+        if server_port not in ['80', '443']:
+            netloc = '%s:%s' % (server_name, server_port)
+        else:
+            netloc = server_name
+
+        request_url = urlparse.urlunsplit((server_scheme, netloc, path,
+                                           query, fragment))
+
         headers = [
             ('X-Gabbi-method', request_method),
-            ('Content-Type', 'application/json')
+            ('Content-Type', 'application/json'),
+            ('X-Gabbi-url', request_url),
         ]
 
         if request_method not in METHODS:
@@ -51,6 +67,9 @@ class SimpleWsgi(object):
                 ('Allow', ', '.join(METHODS)))
             start_response('405 Method Not Allowed', headers)
             return []
+
+        if request_method.startswith('P'):
+            headers.append(('Location', request_url))
 
         start_response('200 OK', headers)
 
