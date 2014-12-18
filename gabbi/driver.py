@@ -165,7 +165,8 @@ class HTTPTestCase(testtools.TestCase):
         if response['status'] == '500':
             raise ServerError(content)
 
-        self.assertEqual(response['status'], str(status))
+        # Always test status
+        self._test_status(status, response['status'])
 
         if headers:
             self._test_headers(headers, response)
@@ -217,6 +218,19 @@ class HTTPTestCase(testtools.TestCase):
             self.assertEqual(header_value, response[header],
                              'Expect header %s with value %s, got %s' %
                              (header, header_value, response[header]))
+
+    def _test_status(self, expected_status, observed_status):
+        """Confirm we got the expected status.
+
+        If the status contains one or more || then it is treated as a
+        list of acceptable statuses.
+        """
+        expected_status = str(expected_status)
+        if '||' in expected_status:
+            statii = [stat.strip() for stat in expected_status.split('||')]
+        else:
+            statii = [expected_status.strip()]
+        self.assertIn(observed_status, statii)
 
 
 class TestBuilder(type):

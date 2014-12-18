@@ -2,9 +2,8 @@
 tests:
 - name: google
   url: https://google.com/
-  status: 302
+  status: 302 || 301
 
 - name: google russia
   desc: Test handling of non-utf-8 encoding
   url: https://www.google.ru/
-
