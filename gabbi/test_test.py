@@ -56,9 +56,16 @@ class SimpleWsgi(object):
         request_url = urlparse.urlunsplit((server_scheme, netloc, path,
                                            query, fragment))
 
+        accept_header = environ.get('HTTP_ACCEPT')
+
+        if accept_header:
+            content_type = accept_header
+        else:
+            content_type = 'application/json'
+
         headers = [
             ('X-Gabbi-method', request_method),
-            ('Content-Type', 'application/json'),
+            ('Content-Type', content_type),
             ('X-Gabbi-url', request_url),
         ]
 

@@ -38,9 +38,15 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/named/thing
 
-- name: google
-  url: https://google.com/
-
 - name: get ssl page
   url: /
   ssl: True
+  response_headers:
+      x-gabbi-url: https://$NETLOC/
+
+- name: test binary handling
+  url: /
+  request_headers:
+      accept: image/png
+  response_headers:
+      content-type: image/png

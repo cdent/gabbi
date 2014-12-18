@@ -168,26 +168,55 @@ class HTTPTestCase(testtools.TestCase):
         self.assertEqual(response['status'], str(status))
 
         if headers:
-            for header in headers:
-                header_value = headers[header].replace('$SCHEME', self.scheme)
-                header_value = header_value.replace('$NETLOC', self.netloc)
-                self.assertEqual(header_value, response[header],
-                                 'Expect header %s with value %s, got %s' %
-                                 (header, header_value, response[header]))
+            self._test_headers(headers, response)
 
-        output = content.decode('utf-8')
+        decoded_output = self._decode_content(response, content)
+
         # Compare strings in response body
         if expected:
             for expect in expected:
-                self.assertIn(expect, output)
+                self.assertIn(expect, decoded_output)
 
         # Decode body as JSON and compare.
         # NOTE(chdent): This just here for now to see if it is workable.
         if expected_json:
-            response_data = json.loads(output)
+            response_data = json.loads(decoded_output)
             for expect in expected_json:
                 self.assertIn(expect, response_data)
                 self.assertEqual(expected_json[expect], response_data[expect])
+
+    def _decode_content(self, response, content):
+        """Decode content to a proper string."""
+        content_type = response.get('content-type',
+                                    'application/binary').lower()
+        if ';' in content_type:
+            content_type, charset = (attr.strip() for attr in
+                                     content_type.split(';'))
+            charset = charset.split('=')[1].strip()
+        else:
+            charset = 'utf-8'
+
+        if self._not_binary(content_type):
+            return content.decode(charset)
+        else:
+            return content
+
+    def _not_binary(self, content_type):
+        """Decide if something is content we'd like to treat as a string."""
+        return (content_type.startswith('text/')
+                or content_type.endswith('+xml')
+                or content_type.endswith('+json')
+                or content_type == 'application/javascript'
+                or content_type == 'application/json')
+
+    def _test_headers(self, headers, response):
+        """Compare expected headers with actual headers."""
+        for header in headers:
+            header_value = headers[header].replace('$SCHEME', self.scheme)
+            header_value = header_value.replace('$NETLOC', self.netloc)
+            self.assertEqual(header_value, response[header],
+                             'Expect header %s with value %s, got %s' %
+                             (header, header_value, response[header]))
 
 
 class TestBuilder(type):
@@ -208,6 +237,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
     """
     top_suite = suite.TestSuite()
     http = httplib2.Http()
+    http.follow_redirects = False
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
@@ -218,6 +248,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
         host = install_intercept(intercept, port)
 
     path = '%s/*.yaml' % path
+
+    key_test = set(BASE_TEST.keys())
 
     for test_file in glob.iglob(path):
         file_suite = suite.TestSuite()
@@ -231,6 +263,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
             test.update(test_datum)
             test_name = '%s_%s' % (test_base_name,
                                    test['name'].lower().replace(' ', '_'))
+            if set(test.keys()) != key_test:
+                raise ValueError('Invalid Keys in test %s' % test_name)
             # Use metaclasses to build a class of the necessary type
             # with relevant arguments.
             klass = TestBuilder(test_name, (HTTPTestCase,),
