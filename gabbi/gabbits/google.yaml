@@ -7,3 +7,9 @@ tests:
 - name: google russia
   desc: Test handling of non-utf-8 encoding
   url: https://www.google.ru/
+
+- name: follow redirects
+  desc: Confirm redirects are followed when we ask
+  url: https://google.com
+  redirects: True
+  status: 200

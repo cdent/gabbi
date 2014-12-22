@@ -47,6 +47,7 @@ BASE_TEST = {
     'name': '',
     'desc': '',
     'ssl': False,
+    'redirects': False,
     'method': 'GET',
     'url': '',
     'status': '200',
@@ -60,7 +61,6 @@ BASE_TEST = {
 
 class ServerError(Exception):
     """A catchall ServerError."""
-    # TODO(chdent): Make a test WSGI app that will cause a 500.
     pass
 
 
@@ -129,6 +129,11 @@ class HTTPTestCase(testtools.TestCase):
         http = self.http
         base_url = test['url']
 
+        # Reset follow_redirects with every go.
+        http.follow_redirects = False
+        if test['redirects']:
+            http.follow_redirects = True
+
         if '$LOCATION' in base_url:
             # Let AttributeError raise
             base_url = base_url.replace('$LOCATION', self.prior.location)
@@ -163,6 +168,8 @@ class HTTPTestCase(testtools.TestCase):
     def _assert_response(self, response, content, status, headers=None,
                          expected=None, json_paths=None):
         """Compare the results with expected data."""
+
+        # Never accept a 500
         if response['status'] == '500':
             raise ServerError(content)
 
@@ -254,7 +261,6 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
     """
     top_suite = suite.TestSuite()
     http = httplib2.Http()
-    http.follow_redirects = False
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
