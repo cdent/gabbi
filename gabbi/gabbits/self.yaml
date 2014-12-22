@@ -12,9 +12,9 @@ tests:
 - name: inheritance of defaults
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/cow?alpha=1
-  expected:
+  response_strings:
       - '"alpha": ["1"]'
-  expected_json:
+  response_json_paths:
       alpha[0]: "1"
 
 - name: bogus method
@@ -28,9 +28,9 @@ tests:
 
 - name: query returned
   url: /somewhere?foo=1&bar=2&bar=3
-  expected:
+  response_strings:
       - "\"bar\": [\"2\", \"3\"]"
-  expected_json:
+  response_json_paths:
       bar:
           - "2"
           - "3"

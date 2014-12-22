@@ -52,8 +52,8 @@ BASE_TEST = {
     'status': '200',
     'request_headers': {},
     'response_headers': {},
-    'expected': None,
-    'expected_json': None,
+    'response_strings': None,
+    'response_json_paths': None,
     'data': '',
 }
 
@@ -157,11 +157,11 @@ class HTTPTestCase(testtools.TestCase):
 
         self._assert_response(response, content, test['status'],
                               headers=test['response_headers'],
-                              expected=test['expected'],
-                              expected_json=test['expected_json'])
+                              expected=test['response_strings'],
+                              json_paths=test['response_json_paths'])
 
     def _assert_response(self, response, content, status, headers=None,
-                         expected=None, expected_json=None):
+                         expected=None, json_paths=None):
         """Compare the results with expected data."""
         if response['status'] == '500':
             raise ServerError(content)
@@ -181,13 +181,13 @@ class HTTPTestCase(testtools.TestCase):
 
         # Decode body as JSON and compare.
         # NOTE(chdent): This just here for now to see if it is workable.
-        if expected_json:
-            for expect in expected_json:
-                response_data = json.loads(decoded_output)
-                path_expr = jsonpath_rw.parse(expect)
+        if json_paths:
+            response_data = json.loads(decoded_output)
+            for path in json_paths:
+                path_expr = jsonpath_rw.parse(path)
                 matches = [match.value for match
                            in path_expr.find(response_data)]
-                self.assertEqual(expected_json[expect], matches[0])
+                self.assertEqual(json_paths[path], matches[0])
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""
