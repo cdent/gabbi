@@ -51,8 +51,8 @@ BASE_TEST = {
     'status': '200',
     'request_headers': {},
     'response_headers': {},
-    'expected': [],
-    'expected_json': [],
+    'expected': None,
+    'expected_json': None,
     'data': '',
 }
 
@@ -271,9 +271,14 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
         test_data = test_yaml['tests']
         test_base_name = os.path.splitext(os.path.basename(test_file))[0]
 
+        # Set defaults from BASE_TESTS the update those defaults
+        # which any defaults set in the YAML file.
+        base_test_data = dict(BASE_TEST)
+        base_test_data.update(test_yaml.get('defaults', {}))
+
         prior_test = None
         for test_datum in test_data:
-            test = dict(BASE_TEST)
+            test = dict(base_test_data)
             test.update(test_datum)
             test_name = '%s_%s' % (test_base_name,
                                    test['name'].lower().replace(' ', '_'))

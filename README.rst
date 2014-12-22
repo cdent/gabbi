@@ -45,10 +45,12 @@ you can use ``tox``:
 
     tox -epep8,py27,py33
 
-Or if you prefer a bit more visibility you can run things a bit more
-manually:
+Or if you have the dependencies installed (or a warmed up
+virtualenv) you can run the tests by hand and exit on the first
+failure. Note that you do *not* want ``discover`` here as that will
+lead to false passes:
 
-    python -m subunit.run discover gabbi |subunit2pyunit
+    python -m subunit.run -f gabbi.test_test | subunit2pyunit
 
 To Do
 -----
