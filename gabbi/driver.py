@@ -34,6 +34,7 @@ from unittest import suite
 import uuid
 
 import httplib2
+import jsonpath_rw
 from six.moves.urllib import parse as urlparse
 import testtools
 import wsgi_intercept
@@ -181,10 +182,12 @@ class HTTPTestCase(testtools.TestCase):
         # Decode body as JSON and compare.
         # NOTE(chdent): This just here for now to see if it is workable.
         if expected_json:
-            response_data = json.loads(decoded_output)
             for expect in expected_json:
-                self.assertIn(expect, response_data)
-                self.assertEqual(expected_json[expect], response_data[expect])
+                response_data = json.loads(decoded_output)
+                path_expr = jsonpath_rw.parse(expect)
+                matches = [match.value for match
+                           in path_expr.find(response_data)]
+                self.assertEqual(expected_json[expect], matches[0])
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""

@@ -3,4 +3,5 @@ six>=1.7.0
 PyYAML
 testtools>=0.9.32
 httplib2
+jsonpath-rw
 wsgi-intercept

@@ -15,8 +15,7 @@ tests:
   expected:
       - '"alpha": ["1"]'
   expected_json:
-      alpha:
-          - "1"
+      alpha[0]: "1"
 
 - name: bogus method
   url: /
@@ -31,9 +30,6 @@ tests:
   url: /somewhere?foo=1&bar=2&bar=3
   expected:
       - "\"bar\": [\"2\", \"3\"]"
-
-- name: json query returned
-  url: /somewhere?foo=1&bar=2&bar=3
   expected_json:
       bar:
           - "2"
