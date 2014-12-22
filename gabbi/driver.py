@@ -95,97 +95,9 @@ class HTTPTestCase(testtools.TestCase):
             self.prior.run()
         self._run_test()
 
-    def _parse_url(self, url, ssl=False):
-        """Create a url from test data.
-
-        If provided with a full URL, just return that. If SSL is requested
-        set the scheme appropriately.
-
-        Scheme and netloc are saved for later use in comparisons.
-        """
-        parsed_url = urlparse.urlsplit(url)
-        url_scheme = parsed_url[0]
-        scheme = 'http'
-        netloc = self.host
-
-        if not url_scheme:
-            if self.port:
-                netloc = '%s:%s' % (self.host, self.port)
-            if ssl:
-                scheme = 'https'
-            full_url = urlparse.urlunsplit((scheme, netloc, parsed_url[2],
-                                            parsed_url[3], ''))
-            self.scheme = scheme
-            self.netloc = netloc
-        else:
-            full_url = url
-            self.scheme = url_scheme
-            self.netloc = parsed_url[1]
-
-        return full_url
-
-    @staticmethod
-    def _extract_json_path_value(data, path):
-        path_expr = jsonpath_rw.parse(path)
-        matches = [match.value for match in path_expr.find(data)]
-        return matches[0]
-
-    def _replacer(self, match):
-        path = match.group(1)
-        return str(self._extract_json_path_value(self.prior.json_data, path))
-
-    def _replace_response_values(self, template):
-        return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
-
-    def _run_test(self):
-        """Make an HTTP request."""
-        test = self.test_data
-        http = self.http
-        base_url = test['url']
-
-        # Reset follow_redirects with every go.
-        http.follow_redirects = False
-        if test['redirects']:
-            http.follow_redirects = True
-
-        if '$LOCATION' in base_url:
-            # Let AttributeError raise
-            base_url = base_url.replace('$LOCATION', self.prior.location)
-
-        if '$RESPONSE' in base_url:
-            base_url = self._replace_response_values(base_url)
-
-        full_url = self._parse_url(base_url, test['ssl'])
-        method = test['method'].upper()
-        headers = test['request_headers']
-        if method == 'GET' or method == 'DELETE':
-            response, content = http.request(
-                full_url,
-                method=method,
-                headers=headers
-            )
-        else:
-            body = test['data'].encode('UTF-8')
-            body = self._replace_response_values(body)
-            response, content = http.request(
-                full_url,
-                method=method,
-                headers=headers,
-                body=body
-            )
-
-        # Set location attribute for follow on requests
-        if 'location' in response:
-            self.location = response['location']
-
-        self._assert_response(response, content, test['status'],
-                              headers=test['response_headers'],
-                              expected=test['response_strings'],
-                              json_paths=test['response_json_paths'])
-
     def _assert_response(self, response, content, status, headers=None,
                          expected=None, json_paths=None):
-        """Compare the results with expected data."""
+        """Compare the response with expected data."""
 
         # Never accept a 500
         if response['status'] == '500':
@@ -229,13 +141,110 @@ class HTTPTestCase(testtools.TestCase):
         else:
             return content
 
-    def _not_binary(self, content_type):
+    @staticmethod
+    def _extract_json_path_value(data, path):
+        """Extract the value at JSON Path path from the data.
+
+        The input data is a Python datastructre, not a JSON string.
+        """
+        path_expr = jsonpath_rw.parse(path)
+        matches = [match.value for match in path_expr.find(data)]
+        return matches[0]
+
+    @staticmethod
+    def _not_binary(content_type):
         """Decide if something is content we'd like to treat as a string."""
         return (content_type.startswith('text/')
                 or content_type.endswith('+xml')
                 or content_type.endswith('+json')
                 or content_type == 'application/javascript'
                 or content_type == 'application/json')
+
+    def _parse_url(self, url, ssl=False):
+        """Create a url from test data.
+
+        If provided with a full URL, just return that. If SSL is requested
+        set the scheme appropriately.
+
+        Scheme and netloc are saved for later use in comparisons.
+        """
+        parsed_url = urlparse.urlsplit(url)
+        url_scheme = parsed_url[0]
+        scheme = 'http'
+        netloc = self.host
+
+        if not url_scheme:
+            if self.port:
+                netloc = '%s:%s' % (self.host, self.port)
+            if ssl:
+                scheme = 'https'
+            full_url = urlparse.urlunsplit((scheme, netloc, parsed_url[2],
+                                            parsed_url[3], ''))
+            self.scheme = scheme
+            self.netloc = netloc
+        else:
+            full_url = url
+            self.scheme = url_scheme
+            self.netloc = parsed_url[1]
+
+        return full_url
+
+    def _replacer(self, match):
+        """Replace a regex match with the value of a JSON Path."""
+        path = match.group(1)
+        return str(self._extract_json_path_value(self.prior.json_data, path))
+
+    def _replace_response_values(self, template):
+        """Replace a JSON Path in a template string with its value."""
+        return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
+
+    def _run_test(self):
+        """Make an HTTP request.
+
+        If the request is neither GET nor DELETE, then include a body.
+        """
+        test = self.test_data
+        http = self.http
+        base_url = test['url']
+
+        # Reset follow_redirects with every go.
+        http.follow_redirects = False
+        if test['redirects']:
+            http.follow_redirects = True
+
+        if '$LOCATION' in base_url:
+            # Let AttributeError raise
+            base_url = base_url.replace('$LOCATION', self.prior.location)
+
+        if '$RESPONSE' in base_url:
+            base_url = self._replace_response_values(base_url)
+
+        full_url = self._parse_url(base_url, test['ssl'])
+        method = test['method'].upper()
+        headers = test['request_headers']
+        if method == 'GET' or method == 'DELETE':
+            response, content = http.request(
+                full_url,
+                method=method,
+                headers=headers
+            )
+        else:
+            body = self._replace_response_values(test['data'])
+            response, content = http.request(
+                full_url,
+                method=method,
+                headers=headers,
+                body=body.encode('UTF-8')
+            )
+
+        # Set location attribute for follow on requests
+        if 'location' in response:
+            self.location = response['location']
+
+        self._assert_response(response, content, test['status'],
+                              headers=test['response_headers'],
+                              expected=test['response_strings'],
+                              json_paths=test['response_json_paths'])
 
     def _test_headers(self, headers, response):
         """Compare expected headers with actual headers."""

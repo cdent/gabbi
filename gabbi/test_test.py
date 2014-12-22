@@ -77,7 +77,7 @@ class SimpleWsgi(object):
         if request_method.startswith('P'):
             body = environ['wsgi.input'].read()
             if body:
-                body_data = json.loads(body)
+                body_data = json.loads(body.decode('utf-8'))
                 query_data.update(body_data)
             headers.append(('Location', request_url))
 
