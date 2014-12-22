@@ -39,7 +39,6 @@ class SimpleWsgi(object):
     def __call__(self, environ, start_response):
         request_method = environ['REQUEST_METHOD'].upper()
         query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
-        query_output = json.dumps(query_data)
 
         request_url = environ.get('REQUEST_URI',
                                   environ.get('RAW_URI', 'unknown'))
@@ -76,10 +75,15 @@ class SimpleWsgi(object):
             return []
 
         if request_method.startswith('P'):
+            body = environ['wsgi.input'].read()
+            if body:
+                body_data = json.loads(body)
+                query_data.update(body_data)
             headers.append(('Location', request_url))
 
         start_response('200 OK', headers)
 
+        query_output = json.dumps(query_data)
         return [query_output.encode('utf-8')]
 
 

@@ -30,6 +30,7 @@ An entire directory of YAML files is a TestSuite of TestSuites.
 import glob
 import json
 import os
+import re
 from unittest import suite
 import uuid
 
@@ -123,6 +124,19 @@ class HTTPTestCase(testtools.TestCase):
 
         return full_url
 
+    @staticmethod
+    def _extract_json_path_value(data, path):
+        path_expr = jsonpath_rw.parse(path)
+        matches = [match.value for match in path_expr.find(data)]
+        return matches[0]
+
+    def _replacer(self, match):
+        path = match.group(1)
+        return str(self._extract_json_path_value(self.prior.json_data, path))
+
+    def _replace_response_values(self, template):
+        return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
+
     def _run_test(self):
         """Make an HTTP request."""
         test = self.test_data
@@ -138,6 +152,9 @@ class HTTPTestCase(testtools.TestCase):
             # Let AttributeError raise
             base_url = base_url.replace('$LOCATION', self.prior.location)
 
+        if '$RESPONSE' in base_url:
+            base_url = self._replace_response_values(base_url)
+
         full_url = self._parse_url(base_url, test['ssl'])
         method = test['method'].upper()
         headers = test['request_headers']
@@ -149,6 +166,7 @@ class HTTPTestCase(testtools.TestCase):
             )
         else:
             body = test['data'].encode('UTF-8')
+            body = self._replace_response_values(body)
             response, content = http.request(
                 full_url,
                 method=method,
@@ -190,11 +208,10 @@ class HTTPTestCase(testtools.TestCase):
         # NOTE(chdent): This just here for now to see if it is workable.
         if json_paths:
             response_data = json.loads(decoded_output)
+            self.json_data = response_data
             for path in json_paths:
-                path_expr = jsonpath_rw.parse(path)
-                matches = [match.value for match
-                           in path_expr.find(response_data)]
-                self.assertEqual(json_paths[path], matches[0])
+                match = self._extract_json_path_value(response_data, path)
+                self.assertEqual(json_paths[path], match)
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""

@@ -1,0 +1,29 @@
+# Make reference to prior request response data via json path.
+#
+
+tests:
+- name: post some json
+  url: /posterchild
+  data: '{"a": 1, "b": 2, "link": "/v2"}'
+  method: POST
+  response_json_paths:
+      a: 1
+      b: 2
+      link: "/v2"
+  response_headers:
+      location: $SCHEME://$NETLOC/posterchild
+
+- name: post some more json
+  url: $RESPONSE['link']
+  method: POST
+  data: |
+     {"a": $RESPONSE['a'],
+      "c": "$RESPONSE['link']"}
+
+  response_json_paths:
+     a: 1
+     c: /v2
+  response_headers:
+     x-gabbi-url: $SCHEME://$NETLOC/v2
+     
+     
