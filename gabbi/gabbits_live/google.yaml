@@ -1,0 +1,13 @@
+defaults:
+    ssl: True
+
+tests:
+- name: google
+  url: /
+  status: 302 || 301
+
+- name: follow redirects
+  desc: Confirm redirects are followed when we ask
+  url: /
+  redirects: True
+  status: 200
