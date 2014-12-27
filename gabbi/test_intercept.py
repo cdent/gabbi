@@ -23,14 +23,25 @@ For the sake of exploratory development.
 
 import json
 import os
+import sys
 
 from six.moves.urllib import parse as urlparse
 
 from gabbi import driver
+from gabbi import fixture
 
 
 TESTS_DIR = 'gabbits_intercept'
 METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
+
+
+class TestFixtureOne(fixture.GabbiFixture):
+    """Drive the fixture testing weakly."""
+
+
+class TestFixtureTwo(fixture.GabbiFixture):
+    """Drive the fixture testing weakly."""
+    pass
 
 
 class SimpleWsgi(object):
@@ -95,4 +106,5 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
-                              intercept=SimpleWsgi)
+                              intercept=SimpleWsgi,
+                              fixture_module=sys.modules[__name__])

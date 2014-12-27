@@ -1,0 +1,15 @@
+
+fixtures:
+    - TestFixtureOne
+    - TestFixtureTwo
+
+tests:
+    - name: just to see
+      url: /
+    - name: just to see one
+      url: /
+    - name: just to see two
+      url: /
+    - name: just to see three
+      url: /
+

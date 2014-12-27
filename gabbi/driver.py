@@ -43,6 +43,8 @@ import wsgi_intercept
 from wsgi_intercept import httplib2_intercept
 import yaml
 
+from gabbi import fixture
+
 
 # Empty test from which all others inherit
 BASE_TEST = {
@@ -66,6 +68,20 @@ class ServerError(Exception):
     pass
 
 
+class GabbiSuite(suite.TestSuite):
+    """A TestSuite with a manual fixture stop at its end."""
+
+    def run(self, result, debug=False):
+        result = super(GabbiSuite, self).run(result, debug)
+        try:
+            fixtures = self._tests[0].fixtures
+            for fixture_class in reversed(fixtures):
+                fixture.stop_fixture(fixture_class)
+        except AttributeError:
+            pass
+        return result
+
+
 class HTTPTestCase(testtools.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
@@ -79,6 +95,7 @@ class HTTPTestCase(testtools.TestCase):
     def setUp(self):
         if not self.has_run:
             super(HTTPTestCase, self).setUp()
+            self._check_fixture()
 
     def tearDown(self):
         if not self.has_run:
@@ -125,6 +142,11 @@ class HTTPTestCase(testtools.TestCase):
             for path in json_paths:
                 match = self._extract_json_path_value(response_data, path)
                 self.assertEqual(json_paths[path], match)
+
+    def _check_fixture(self):
+        """If a fixture is defined, establish it."""
+        for fixture_class in self.fixtures:
+            fixture.start_fixture(fixture_class)
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""
@@ -303,7 +325,7 @@ class TestBuilder(type):
 
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
-                test_file_name=None):
+                test_file_name=None, fixture_module=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -330,15 +352,21 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     key_test = set(BASE_TEST.keys())
 
     for test_file in glob.iglob(path):
-        file_suite = suite.TestSuite()
+        file_suite = GabbiSuite()
         test_yaml = load_yaml(test_file)
         test_data = test_yaml['tests']
+        fixtures = test_yaml.get('fixtures', None)
         test_base_name = os.path.splitext(os.path.basename(test_file))[0]
 
         # Set defaults from BASE_TESTS the update those defaults
         # which any defaults set in the YAML file.
         base_test_data = dict(BASE_TEST)
         base_test_data.update(test_yaml.get('defaults', {}))
+
+        fixture_classes = []
+        if fixtures and fixture_module:
+            for fixture_class in fixtures:
+                fixture_classes.append(getattr(fixture_module, fixture_class))
 
         prior_test = None
         for test_datum in test_data:
@@ -349,11 +377,13 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                                       test['name'].lower().replace(' ', '_'))
             if set(test.keys()) != key_test:
                 raise ValueError('Invalid Keys in test %s' % test_name)
+
             # Use metaclasses to build a class of the necessary type
             # with relevant arguments.
             klass = TestBuilder(test_name, (HTTPTestCase,),
                                 {'test_data': test,
                                  'test_directory': test_directory,
+                                 'fixtures': fixture_classes,
                                  'http': http,
                                  'host': host,
                                  'port': port,
