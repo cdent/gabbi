@@ -28,6 +28,7 @@ An entire directory of YAML files is a TestSuite of TestSuites.
 """
 
 import glob
+import inspect
 import json
 import os
 import re
@@ -280,13 +281,19 @@ class TestBuilder(type):
         return type.__new__(mcs, name, bases, attributes)
 
 
-def build_tests(path, loader, host=None, port=8001, intercept=None):
+def build_tests(path, loader, host=None, port=8001, intercept=None,
+                test_file_name=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
     """
     top_suite = suite.TestSuite()
     http = httplib2.Http()
+
+    if test_file_name is None:
+        test_file_name = inspect.stack()[1]
+        test_file_name = os.path.splitext(os.path.basename(
+            test_file_name[1]))[0]
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
@@ -315,8 +322,9 @@ def build_tests(path, loader, host=None, port=8001, intercept=None):
         for test_datum in test_data:
             test = dict(base_test_data)
             test.update(test_datum)
-            test_name = '%s_%s' % (test_base_name,
-                                   test['name'].lower().replace(' ', '_'))
+            test_name = '%s_%s_%s' % (test_file_name,
+                                      test_base_name,
+                                      test['name'].lower().replace(' ', '_'))
             if set(test.keys()) != key_test:
                 raise ValueError('Invalid Keys in test %s' % test_name)
             # Use metaclasses to build a class of the necessary type

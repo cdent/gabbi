@@ -29,7 +29,7 @@ from six.moves.urllib import parse as urlparse
 from gabbi import driver
 
 
-TESTS_DIR = 'gabbits'
+TESTS_DIR = 'gabbits_intercept'
 METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 
 

@@ -21,10 +21,7 @@ For the sake of exploratory development.
 """
 
 
-import json
 import os
-
-from six.moves.urllib import parse as urlparse
 
 from gabbi import driver
 
