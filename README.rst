@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/cdent/gabbi.svg?branch=master
+    :target: https://travis-ci.org/cdent/gabbi
+
 gabbi
 =====
 
