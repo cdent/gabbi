@@ -7,9 +7,8 @@ gabbi
 Gabbi is a tool for running HTTP tests where requests and responses
 are represented in a declarative form.
 
-It is currently under development and does not yet work (it will
-create TestSuites from YAML files, but not yet execute any http
-requests).
+It is under active development. See the YAML files for examples of
+working tests.
 
 Purpose
 -------
@@ -19,10 +18,9 @@ represent HTTP requests and expected responses and the obscured realm of
 Python-based, object-oriented unit tests in the style of the unittest
 module and its derivatives.
 
-Each YAML file represents an order list of HTTP requests along with
+Each YAML file represents an ordered list of HTTP requests along with
 the expected responses. This allows a single file to represent a
-process in the API, not just a single request in isolation. For
-example:
+process in the API being tested. For example:
 
 * Create a resource.
 * Retrieve a resource.
@@ -35,30 +33,28 @@ the YAML file will be run (in order). In any single process any test
 will only be run once. Concurrency is handled such that one file
 runs in one process.
 
-The features mean that it is possible to create tests that are
+These features mean that it is possible to create tests that are
 useful for both humans (as tools for improving and developing APIs)
 and automated CI systems.
 
 Testing
 -------
 
-To run the built in tests (the YAML files are in the directory
-``gabbi/gabbits`` and loaded by the file ``gabbi/test_test.py``),
+To run the built in tests (the YAML files are in the directories
+``gabbi/gabbits_*`` and loaded by the file ``gabbi/test_*.py``),
 you can use ``tox``:
 
     tox -epep8,py27,py33
 
 Or if you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
-failure. Note that you do *not* want ``discover`` here as that will
-lead to false passes:
+failure.
 
-    python -m subunit.run -f gabbi.test_test | subunit2pyunit
+    python -m subunit.run discover -f gabbi | subunit2pyunit
 
 To Do
 -----
 
-* [x] Do the actual HTTP requesting and response evaluation.
-* [ ] Enable optional use of wsgi-intercept so no web server is required.
+* [ ] Loading structure data or files for POST.
 * [ ] Consider fixture management (data store) per YAML file.
 * [ ] Dealing with driving authN and authZ.

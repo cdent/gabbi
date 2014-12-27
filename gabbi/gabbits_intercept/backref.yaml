@@ -4,6 +4,8 @@
 tests:
 - name: post some json
   url: /posterchild
+  request_headers:
+      content-type: application/json
   data: '{"a": 1, "b": 2, "link": "/v2"}'
   method: POST
   response_json_paths:
@@ -15,6 +17,8 @@ tests:
 
 - name: post some more json
   url: $RESPONSE['link']
+  request_headers:
+      content-type: application/json
   method: POST
   data: |
      {"a": $RESPONSE['a'],
@@ -25,5 +29,3 @@ tests:
      c: /v2
   response_headers:
      x-gabbi-url: $SCHEME://$NETLOC/v2
-     
-     

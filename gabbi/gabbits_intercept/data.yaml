@@ -1,0 +1,43 @@
+# Test loading POST data via data structures and file
+#
+
+tests:
+    - name: load data dictionary
+      url: / 
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          foo: 1
+          bar: 2
+      response_json_paths:
+          foo: 1
+          bar: 2
+
+    - name: load data list
+      url: / 
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          - 1
+          - 2
+      response_json_paths:
+          $[0]: 1
+          $[1]: 2
+
+    - name: load json file
+      url: /
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: <@data.json
+      response_json_paths:
+          foo.bar: 1
+
+    - name: load image file
+      url: /
+      method: POST
+      request_headers:
+          content-type: image/png
+      data: <@kitten.png

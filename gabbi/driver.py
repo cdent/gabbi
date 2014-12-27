@@ -152,6 +152,12 @@ class HTTPTestCase(testtools.TestCase):
         matches = [match.value for match in path_expr.find(data)]
         return matches[0]
 
+    def _load_data_file(self, filename):
+        """Read a file from the current test directory."""
+        path = os.path.join(self.test_directory, filename)
+        with open(path, mode='rb') as data_file:
+            return data_file.read()
+
     @staticmethod
     def _not_binary(content_type):
         """Decide if something is content we'd like to treat as a string."""
@@ -223,20 +229,24 @@ class HTTPTestCase(testtools.TestCase):
         full_url = self._parse_url(base_url, test['ssl'])
         method = test['method'].upper()
         headers = test['request_headers']
-        if method == 'GET' or method == 'DELETE':
-            response, content = http.request(
-                full_url,
-                method=method,
-                headers=headers
-            )
-        else:
-            body = self._replace_response_values(test['data'])
-            response, content = http.request(
-                full_url,
-                method=method,
-                headers=headers,
-                body=body.encode('UTF-8')
-            )
+
+        body = test['data']
+        if body:
+            body, is_str = self._test_data_to_string(body)
+            if self._not_binary(headers['content-type']):
+                if is_str:
+                    try:
+                        body = str(body, 'UTF-8')
+                    except TypeError:
+                        body = body.encode('UTF-8')
+                body = self._replace_response_values(body)
+
+        response, content = http.request(
+            full_url,
+            method=method,
+            headers=headers,
+            body=body
+        )
 
         # Set location attribute for follow on requests
         if 'location' in response:
@@ -246,6 +256,17 @@ class HTTPTestCase(testtools.TestCase):
                               headers=test['response_headers'],
                               expected=test['response_strings'],
                               json_paths=test['response_json_paths'])
+
+    def _test_data_to_string(self, data):
+        """Turn the request data into a string."""
+        if isinstance(data, str):
+            if data.startswith('<@'):
+                info = self._load_data_file(data.replace('<@', '', 1))
+                return info, True
+            else:
+                return data, False
+        else:
+            return json.dumps(data), False
 
     def _test_headers(self, headers, response):
         """Compare expected headers with actual headers."""
@@ -303,6 +324,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     if intercept:
         host = install_intercept(intercept, port)
 
+    test_directory = path
     path = '%s/*.yaml' % path
 
     key_test = set(BASE_TEST.keys())
@@ -331,6 +353,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
             # with relevant arguments.
             klass = TestBuilder(test_name, (HTTPTestCase,),
                                 {'test_data': test,
+                                 'test_directory': test_directory,
                                  'http': http,
                                  'host': host,
                                  'port': port,
