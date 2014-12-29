@@ -37,6 +37,7 @@ METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 
 class TestFixtureOne(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
+    pass
 
 
 class TestFixtureTwo(fixture.GabbiFixture):

@@ -72,13 +72,26 @@ class GabbiSuite(suite.TestSuite):
     """A TestSuite with a manual fixture stop at its end."""
 
     def run(self, result, debug=False):
+        """Override TestSuite run to start and stop suite-level fixtures."""
+        # Start fixtures
+        try:
+            fixtures = self._tests[0].fixtures
+            for fixture_class in fixtures:
+                fixture.start_fixture(fixture_class)
+        except AttributeError:
+            pass
+
+        # Run the actual tests
         result = super(GabbiSuite, self).run(result, debug)
+
+        # Stop fixtures
         try:
             fixtures = self._tests[0].fixtures
             for fixture_class in reversed(fixtures):
                 fixture.stop_fixture(fixture_class)
         except AttributeError:
             pass
+
         return result
 
 
@@ -95,7 +108,6 @@ class HTTPTestCase(testtools.TestCase):
     def setUp(self):
         if not self.has_run:
             super(HTTPTestCase, self).setUp()
-            self._check_fixture()
 
     def tearDown(self):
         if not self.has_run:
@@ -142,11 +154,6 @@ class HTTPTestCase(testtools.TestCase):
             for path in json_paths:
                 match = self._extract_json_path_value(response_data, path)
                 self.assertEqual(json_paths[path], match)
-
-    def _check_fixture(self):
-        """If a fixture is defined, establish it."""
-        for fixture_class in self.fixtures:
-            fixture.start_fixture(fixture_class)
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""
