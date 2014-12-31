@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Red Hat. All Rights Reserved.
+# Copyright 2014, 2015 Red Hat. All Rights Reserved.
 #
 # Author: Chris Dent <chdent@redhat.com>
 #

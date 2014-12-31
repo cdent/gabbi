@@ -1,5 +1,5 @@
 #
-# Copyright 2014 Red Hat. All Rights Reserved.
+# Copyright 2014, 2015 Red Hat. All Rights Reserved.
 #
 # Author: Chris Dent <chdent@redhat.com>
 #
@@ -15,10 +15,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""A sample test module to exercise the code.
-
-For the sake of exploratory development.
-"""
+"""A test module to exercise the live requests functionality"""
 
 
 import os
