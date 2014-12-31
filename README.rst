@@ -1,7 +1,7 @@
 .. image:: https://travis-ci.org/cdent/gabbi.svg?branch=master
     :target: https://travis-ci.org/cdent/gabbi
 .. image:: https://readthedocs.org/projects/gabbi/badge/?version=latest
-    :target: https://readthedocs.org/projects/gabbi/?badge=latest
+    :target: http://gabbi.readthedocs.org/en/latest/
     :alt: Documentation Status
 
 gabbi
