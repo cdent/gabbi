@@ -1,5 +1,5 @@
 # simple Makefile for some common tasks
-.PHONY: clean test dist release pypi tagv
+.PHONY: clean test dist release pypi tagv docs
 
 clean:
 	find . -name "*.pyc" |xargs rm || true
@@ -22,6 +22,9 @@ cleanagain:
 	rm -r .tox || true
 	rm -r .eggs || true
 	rm -r gabbi.egg-info || true
+
+docs:
+	cd docs ; $(MAKE) html
 
 test:
 	tox

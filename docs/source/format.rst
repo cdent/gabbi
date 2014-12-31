@@ -23,3 +23,7 @@ required. Other top level keys are:
 
 Each test can use the following structure. Only ``name`` and ``url``
 are required.
+
+* To be written. In the meantime see `some of the gabbi tests`_.
+
+.. _some of the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
