@@ -6,6 +6,7 @@ clean:
 	rm -r dist || true
 	rm -r build || true
 	rm -r .tox || true
+	rm -r .eggs || true
 	rm -r gabbi.egg-info || true
 
 tagv:
@@ -19,6 +20,7 @@ cleanagain:
 	rm -r dist || true
 	rm -r build || true
 	rm -r .tox || true
+	rm -r .eggs || true
 	rm -r gabbi.egg-info || true
 
 test:
