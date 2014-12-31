@@ -1,5 +1,8 @@
 .. image:: https://travis-ci.org/cdent/gabbi.svg?branch=master
     :target: https://travis-ci.org/cdent/gabbi
+.. image:: https://readthedocs.org/projects/gabbi/badge/?version=latest
+    :target: https://readthedocs.org/projects/gabbi/?badge=latest
+    :alt: Documentation Status
 
 gabbi
 =====
@@ -55,6 +58,4 @@ failure.
 To Do
 -----
 
-* [ ] Loading structure data or files for POST.
-* [ ] Consider fixture management (data store) per YAML file.
 * [ ] Dealing with driving authN and authZ.
