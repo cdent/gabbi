@@ -32,7 +32,7 @@ test:
 dist: test
 	python setup.py sdist
 
-release: clean test cleanagain tagv pypi peermore
+release: clean test cleanagain tagv pypi
 
 pypi:
 	python setup.py sdist upload
