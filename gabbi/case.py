@@ -111,7 +111,7 @@ class HTTPTestCase(testtools.TestCase):
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
-        path = os.path.join(self.test_directory, filename)
+        path = os.path.join(self.test_directory, os.path.basename(filename))
         with open(path, mode='rb') as data_file:
             return data_file.read()
 
