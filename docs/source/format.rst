@@ -53,7 +53,7 @@ these allow substitutions (explained below).
   constructed request.
 * ``data``: A representation to pass as the body of a request. If you
   use this you should set ``content-type`` in ``request_headers`` to
-  something meaningful.
+  something meaningful. See `Data`_ below for more details.
 * ``response_headers``: A dictionary of key-value pairs representing
   expected response headers.
 * ``response_strings``: A sequence of string fragments expected to be
@@ -77,5 +77,21 @@ explicit statements about the URLs being used.
 As all of these features needed to be tested in the development of
 gabbi itself, `the gabbi tests`_ are a good source of examples on how
 to use the functionality.
+
+Data
+----
+
+The ``data`` key has some special handing to allow for a bit more
+flexibility when doing a ``POST`` or ``PUT``. If the value is not a
+string (that is, it is a sequence or structure) it is treated as a
+datastructure which is turned into a JSON string. If the value is a
+string that begins with ``<@`` then the rest of the string is treated
+as a file to be loaded from the same directory as the YAML file. If
+the the value is an undecorated string, that's the value.
+
+Care should be taken to ensure that a reasonable content-type is set
+for the data as this will control if any encoding is done of the
+string value. If it is text, json, xml, javascript it will encoded to
+UTF-8.
 
 .. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
