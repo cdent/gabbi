@@ -22,8 +22,60 @@ required. Other top level keys are:
   defaults (explained below).
 
 Each test can use the following structure. Only ``name`` and ``url``
-are required.
+are required. For examples see `the gabbi tests`_. Most of
+these allow substitutions (explained below).
 
-* To be written. In the meantime see `some of the gabbi tests`_.
+* ``name``: The name of the test. Should be unique in this file. When
+  tests are dynamically generated the ``TestCase`` name will include
+  this name, lowercased with spaces transformed to ``_``. In at least
+  some test runners this will allow you to select and filter on test
+  name. **Required**
+* ``desc``: An arbitrary string describing this test. This is perhaps
+  redundant as YAML allows comments. However it's here in case other
+  tooling might use it.
+* ``url``: The URL to request. This can either be a full path or a
+  fully qualified URL (with host and scheme). If not qualified the
+  test builder will be responsible for determining host and scheme.
+  **Required**
+* ``method``: The request method to use. Defaults to ``GET``.
+* ``status``: The expected response status code. The default is
+  ``200``. If necessary you may indicate multiple response codes
+  separated by ``||`` (e.g. ``302 || 301``). Avoid this if possible as
+  it indicates there is ambiguity in your tests or your API. Ambiguity
+  is bad.
+* ``ssl``: Make this request use SSL? Defaults to ``False``. This only
+  comes into play if the ``url`` does not provide a scheme (see
+  :doc:`host` for more info).
+* ``redirects``: If ``True`` automatically follow redirects. Defaults
+  to ``False``.
+* ``request_headers``: A dictionary of key-value pairs representing
+  request header names and values. These will be added to the
+  constructed request.
+* ``data``: A representation to pass as the body of a request. If you
+  use this you should set ``content-type`` in ``request_headers`` to
+  something meaningful.
+* ``response_headers``: A dictionary of key-value pairs representing
+  expected response headers.
+* ``response_strings``: A sequence of string fragments expected to be
+  in the response body.
+* ``response_json_paths``: A dictionary of JSONPath rules paired with
+  expected matches.
 
-.. _some of the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
+There are a small number of magical variables that can be used to make
+reference to the state of a current test or the one just prior. These
+are replaced with real values during test processing.
+
+* ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
+* ``$NETLOC``: The host and potentially port of the request.
+* ``$LOCATION``: The location header returned in the prior response.
+* ``$RESPONSE['<json path>']``: A JSONPath query into the prior
+  response.
+
+With these it ought to be possible to traverse an API without any
+explicit statements about the URLs being used.
+
+As all of these features needed to be tested in the development of
+gabbi itself, `the gabbi tests`_ are a good source of examples on how
+to use the functionality.
+
+.. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept

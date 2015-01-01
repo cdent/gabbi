@@ -163,10 +163,7 @@ class HTTPTestCase(testtools.TestCase):
         return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
 
     def _run_test(self):
-        """Make an HTTP request.
-
-        If the request is neither GET nor DELETE, then include a body.
-        """
+        """Make an HTTP request and compare the response with expectations."""
         test = self.test_data
         http = self.http
         base_url = test['url']
