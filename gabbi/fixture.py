@@ -14,19 +14,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-"""Manage fixtures for gabbi at the test file level."""
+"""Manage fixtures for gabbi at the test suite level."""
 
+import sys
+from contextlib import contextmanager
 
-def start_fixture(fixture_class):
-    """Create the fixture class and start it."""
-    fixture = fixture_class()
-    fixture.start()
-
-
-def stop_fixture(fixture_class):
-    """Re-Create the fixture class and stop it."""
-    fixture = fixture_class()
-    fixture.stop()
+import six
 
 
 class GabbiFixtureError(Exception):
@@ -35,48 +28,54 @@ class GabbiFixtureError(Exception):
 
 
 class GabbiFixture(object):
-    """A singleton of a fixture.
+    """A context manager that operates as a fixture.
 
     Subclasses must implement start_fixture and stop_fixture, each of which
     contain the logic for stopping and starting whatever the fixture is.
     What a fixture is is left as an exercise for the implementor.
 
-    A singleton is used so as to avoid in process duplication of the same
-    fixture. For environments where concurrent testing will be used, the
-    fixture should guard against collisions by uniquifying filenames,
-    database names and other external resources.
-
-    If calling code attempts to start an already started fixture, an Exception
-    will be raised: GabbiFixtureError.
+    These context managers will be nested so any actually work needs to
+    happen in `start_fixture` and `stop_fixture` and not in ``__init__``.
+    Otherwise exception handling will not work properly.
     """
 
-    _instance = None
-    _started = False
+    def __enter__(self):
+        self.start_fixture()
 
-    def __new__(cls, *args, **kwargs):
-        """Create the new instance or return an existing one."""
-        if not cls._instance:
-            cls._instance = super(GabbiFixture, cls).__new__(cls)
-        return cls._instance
-
-    def start(self):
-        """Request that the fixture be started."""
-        if not self._started:
-            self.start_fixture()
-            self._started = True
-        else:
-            raise GabbiFixtureError('fixture %s already started' % self)
+    def __exit__(self, type, value, traceback):
+        self.stop_fixture()
 
     def start_fixture(self):
         """Implement the actual workings of starting the fixture here."""
         pass
 
-    def stop(self):
-        """Request that the fixture be stopped."""
-        if self._started:
-            self.stop_fixture()
-        self._started = False
-
     def stop_fixture(self):
         """Implement the actual workings of stopping the fixture here."""
         pass
+
+
+@contextmanager
+def nest(fixtures):
+    """Nest a series of fixtures."""
+    vars = []
+    exits = []
+    exc = (None, None, None)
+    try:
+        for fixture in fixtures:
+            enter = fixture.__enter__
+            exit = fixture.__exit__
+            vars.append(enter())
+            exits.append(exit)
+        yield vars
+    except:
+        exc = sys.exc_info()
+    finally:
+        while exits:
+            exit = exits.pop()
+            try:
+                if exit(*exc):
+                    exc = (None, None, None)
+            except:
+                exc = sys.exc_info()
+        if exc != (None, None, None):
+            six.reraise(exc[0], exc[1], exc[2])

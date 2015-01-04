@@ -20,27 +20,26 @@ from . import fixture
 
 
 class GabbiSuite(suite.TestSuite):
-    """A TestSuite with a manual fixture start and stop."""
+    """A TestSuite with fixtures.
+
+    The suite wraps the tests with a set of nested context managers that
+    operate as fixtures.
+    """
 
     def run(self, result, debug=False):
-        """Override TestSuite run to start and stop suite-level fixtures."""
-        # Start fixtures
+        """Override TestSuite run to start suite-level fixtures.
+
+        To avoid exception confusion, use a null Fixture when there
+        are no fixtures.
+        """
+
+        # If there are fixtures, nest in their context.
+        fixtures = [fixture.GabbiFixture]
         try:
             fixtures = self._tests[0].fixtures
-            for fixture_class in fixtures:
-                fixture.start_fixture(fixture_class)
         except AttributeError:
             pass
-
-        # Run the actual tests
-        result = super(GabbiSuite, self).run(result, debug)
-
-        # Stop fixtures
-        try:
-            fixtures = self._tests[0].fixtures
-            for fixture_class in reversed(fixtures):
-                fixture.stop_fixture(fixture_class)
-        except AttributeError:
-            pass
+        with fixture.nest([fix() for fix in fixtures]):
+            result = super(GabbiSuite, self).run(result, debug)
 
         return result
