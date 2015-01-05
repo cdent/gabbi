@@ -56,7 +56,14 @@ class GabbiFixture(object):
 
 @contextmanager
 def nest(fixtures):
-    """Nest a series of fixtures."""
+    """Nest a series of fixtures.
+
+    This is duplicated from ``nested`` in the stdlib, which has been
+    deprecated because of issues with how exceptions are difficult to
+    handle during ``__init__``. Gabbi needs to nest an unknown number
+    of fixtures dynamically, so the ``with`` syntax that replaces
+    ``nested`` will not work.
+    """
     vars = []
     exits = []
     exc = (None, None, None)
