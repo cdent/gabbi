@@ -236,7 +236,7 @@ class HTTPTestCase(testtools.TestCase):
                 header_value = header_value.strip('/').rstrip('/')
                 self.assertRegexpMatches(
                     response_value, header_value,
-                    'Expect header %s to match %s, got %s' %
+                    'Expect header %s to match /%s/, got %s' %
                     (header, header_value, response_value))
             else:
                 self.assertEqual(header_value, response[header],
