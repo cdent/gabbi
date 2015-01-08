@@ -55,7 +55,8 @@ these allow substitutions (explained below).
   use this you should set ``content-type`` in ``request_headers`` to
   something meaningful. See `Data`_ below for more details.
 * ``response_headers``: A dictionary of key-value pairs representing
-  expected response headers.
+  expected response headers. If the value of a header is wrapped in
+  ``/``, it will be treated as a raw regular expression string.
 * ``response_strings``: A sequence of string fragments expected to be
   in the response body.
 * ``response_json_paths``: A dictionary of JSONPath rules paired with

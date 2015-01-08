@@ -1,0 +1,8 @@
+# Confirm regex handling in response headers
+tests:
+- name: regex test
+  url: /cow?alpha=1
+  method: PUT
+  response_headers:
+      x-gabbi-url: /cow\?al.*=1/
+      location: $SCHEME://$NETLOC/cow?alpha=1

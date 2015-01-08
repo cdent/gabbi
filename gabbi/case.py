@@ -223,13 +223,25 @@ class HTTPTestCase(testtools.TestCase):
             return json.dumps(data), False
 
     def _test_headers(self, headers, response):
-        """Compare expected headers with actual headers."""
+        """Compare expected headers with actual headers.
+
+        If a header value is wrapped in ``/`` it is treated as a raw
+        regular expression.
+        """
         for header in headers:
             header_value = headers[header].replace('$SCHEME', self.scheme)
             header_value = header_value.replace('$NETLOC', self.netloc)
-            self.assertEqual(header_value, response[header],
-                             'Expect header %s with value %s, got %s' %
-                             (header, header_value, response[header]))
+            response_value = response[header]
+            if header_value.startswith('/') and header_value.endswith('/'):
+                header_value = header_value.strip('/').rstrip('/')
+                self.assertRegexpMatches(
+                    response_value, header_value,
+                    'Expect header %s to match %s, got %s' %
+                    (header, header_value, response_value))
+            else:
+                self.assertEqual(header_value, response[header],
+                                 'Expect header %s with value %s, got %s' %
+                                 (header, header_value, response[header]))
 
     def _test_status(self, expected_status, observed_status):
         """Confirm we got the expected status.
