@@ -81,7 +81,9 @@ class HTTPTestCase(testtools.TestCase):
             self.json_data = response_data
             for path in json_paths:
                 match = self._extract_json_path_value(response_data, path)
-                self.assertEqual(json_paths[path], match)
+                self.assertEqual(json_paths[path], match,
+                                 'Unable to match %s as %s'
+                                 % (path, json_paths[path]))
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""
@@ -107,7 +109,12 @@ class HTTPTestCase(testtools.TestCase):
         """
         path_expr = jsonpath_rw.parse(path)
         matches = [match.value for match in path_expr.find(data)]
-        return matches[0]
+        try:
+            return matches[0]
+        except IndexError:
+            raise ValueError(
+                    "JSONPath '%s' failed to match on data: '%s'"
+                    % (path, data))
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
