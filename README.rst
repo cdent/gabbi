@@ -48,12 +48,12 @@ Testing
 
 To run the built in tests (the YAML files are in the directories
 ``gabbi/gabbits_*`` and loaded by the file ``gabbi/test_*.py``),
-you can use ``tox``:
+you can use ``tox``::
 
     tox -epep8,py27,py33
 
 Or if you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
-failure.
+failure::
 
     python -m subunit.run discover -f gabbi | subunit2pyunit
