@@ -11,7 +11,10 @@ Gabbi is a tool for running HTTP tests where requests and responses
 are represented in a declarative form.
 
 It is under active development. See the YAML files for examples of
-working tests.
+working tests and the docs_ for more details on features and
+formats.
+
+.. _docs: http://gabbi.readthedocs.org/
 
 Purpose
 -------
@@ -54,8 +57,3 @@ virtualenv) you can run the tests by hand and exit on the first
 failure.
 
     python -m subunit.run discover -f gabbi | subunit2pyunit
-
-To Do
------
-
-* [ ] Dealing with driving authN and authZ.
