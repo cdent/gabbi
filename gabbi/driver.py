@@ -121,7 +121,7 @@ def load_yaml(yaml_file):
         return yaml.safe_load(source.read())
 
 
-def test_suite_from_yaml(loader, test_name, test_yaml, test_directory,
+def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module):
     """Generate a TestSuite from YAML data."""
 
@@ -145,7 +145,7 @@ def test_suite_from_yaml(loader, test_name, test_yaml, test_directory,
         test = dict(base_test_data)
         test.update(test_datum)
 
-        test_name = '%s_%s' % (test_name,
+        test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
         if set(test.keys()) != set(BASE_TEST.keys()):
