@@ -71,77 +71,34 @@ class TestBuilder(type):
 
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
-                test_file_name=None, fixture_module=None):
+                test_loader_name=None, fixture_module=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
     """
     top_suite = suite.TestSuite()
-    http = httplib2.Http()
 
-    if test_file_name is None:
-        test_file_name = inspect.stack()[1]
-        test_file_name = os.path.splitext(os.path.basename(
-            test_file_name[1]))[0]
-
-    # Return an empty suite if we have no host to access, either via
-    # a real host or an intercept
-    if not host and not intercept:
-        return top_suite
+    if test_loader_name is None:
+        test_loader_name = inspect.stack()[1]
+        test_loader_name = os.path.splitext(os.path.basename(
+            test_loader_name[1]))[0]
 
     if intercept:
         host = install_intercept(intercept, port)
 
-    test_directory = path
-    path = '%s/*.yaml' % path
+    yaml_file_glob = '%s/*.yaml' % path
 
-    key_test = set(BASE_TEST.keys())
-
-    for test_file in glob.iglob(path):
-        file_suite = GabbiSuite()
-        test_yaml = load_yaml(test_file)
-        test_data = test_yaml['tests']
-        fixtures = test_yaml.get('fixtures', None)
-        test_base_name = os.path.splitext(os.path.basename(test_file))[0]
-
-        # Set defaults from BASE_TESTS the update those defaults
-        # which any defaults set in the YAML file.
-        base_test_data = dict(BASE_TEST)
-        base_test_data.update(test_yaml.get('defaults', {}))
-
-        fixture_classes = []
-        if fixtures and fixture_module:
-            for fixture_class in fixtures:
-                fixture_classes.append(getattr(fixture_module, fixture_class))
-
-        prior_test = None
-        for test_datum in test_data:
-            test = dict(base_test_data)
-            test.update(test_datum)
-            test_name = '%s_%s_%s' % (test_file_name,
-                                      test_base_name,
-                                      test['name'].lower().replace(' ', '_'))
-            if set(test.keys()) != key_test:
-                raise ValueError('Invalid Keys in test %s' % test_name)
-
-            # Use metaclasses to build a class of the necessary type
-            # with relevant arguments.
-            klass = TestBuilder(test_name, (HTTPTestCase,),
-                                {'test_data': test,
-                                 'test_directory': test_directory,
-                                 'fixtures': fixture_classes,
-                                 'http': http,
-                                 'host': host,
-                                 'port': port,
-                                 'prior': prior_test})
-
-            tests = loader.loadTestsFromTestCase(klass)
-            this_test = tests._tests[0]
-            file_suite.addTest(this_test)
-            prior_test = this_test
-
-        top_suite.addTest(file_suite)
-
+    # Return an empty suite if we have no host to access, either via
+    # a real host or an intercept
+    if host or intercept:
+        for test_file in glob.iglob(yaml_file_glob):
+            test_yaml = load_yaml(test_file)
+            test_name = '%s_%s' % (test_loader_name,
+                                   os.path.splitext(
+                                       os.path.basename(test_file))[0])
+            file_suite = test_suite_from_yaml(loader, test_name, test_yaml,
+                                              path, host, port, fixture_module)
+            top_suite.addTest(file_suite)
     return top_suite
 
 
@@ -162,3 +119,53 @@ def load_yaml(yaml_file):
     """Read and parse any YAML file. Let exceptions flow where they may."""
     with open(yaml_file) as source:
         return yaml.safe_load(source.read())
+
+
+def test_suite_from_yaml(loader, test_name, test_yaml, test_directory,
+                         host, port, fixture_module):
+    """Generate a TestSuite from YAML data."""
+
+    file_suite = GabbiSuite()
+    test_data = test_yaml['tests']
+    fixtures = test_yaml.get('fixtures', None)
+
+    # Set defaults from BASE_TESTS then update those defaults
+    # with any defaults set in the YAML file.
+    base_test_data = dict(BASE_TEST)
+    base_test_data.update(test_yaml.get('defaults', {}))
+
+    # Establish any fixture classes.
+    fixture_classes = []
+    if fixtures and fixture_module:
+        for fixture_class in fixtures:
+            fixture_classes.append(getattr(fixture_module, fixture_class))
+
+    prior_test = None
+    for test_datum in test_data:
+        test = dict(base_test_data)
+        test.update(test_datum)
+
+        test_name = '%s_%s' % (test_name,
+                               test['name'].lower().replace(' ', '_'))
+
+        if set(test.keys()) != set(BASE_TEST.keys()):
+            raise AssertionError('Invalid test keys used in test: %s'
+                                 % test_name)
+
+        # Use metaclasses to build a class of the necessary type
+        # with relevant arguments.
+        klass = TestBuilder(test_name, (HTTPTestCase,),
+                            {'test_data': test,
+                             'test_directory': test_directory,
+                             'fixtures': fixture_classes,
+                             'http': httplib2.Http(),
+                             'host': host,
+                             'port': port,
+                             'prior': prior_test})
+
+        tests = loader.loadTestsFromTestCase(klass)
+        this_test = tests._tests[0]
+        file_suite.addTest(this_test)
+        prior_test = this_test
+
+    return file_suite
