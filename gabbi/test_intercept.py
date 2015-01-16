@@ -21,18 +21,16 @@ For the sake of exploratory development.
 """
 
 
-import json
 import os
 import sys
 
-from six.moves.urllib import parse as urlparse
 
 from gabbi import driver
 from gabbi import fixture
+from gabbi import simple_wsgi
 
 
 TESTS_DIR = 'gabbits_intercept'
-METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 
 
 class TestFixtureOne(fixture.GabbiFixture):
@@ -45,67 +43,9 @@ class TestFixtureTwo(fixture.GabbiFixture):
     pass
 
 
-class SimpleWsgi(object):
-    """A simple wsgi application to use in tests."""
-
-    def __call__(self, environ, start_response):
-        request_method = environ['REQUEST_METHOD'].upper()
-        query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
-
-        request_url = environ.get('REQUEST_URI',
-                                  environ.get('RAW_URI', 'unknown'))
-
-        path, query, fragment = urlparse.urlsplit(request_url)[2:]
-        server_name = environ.get('SERVER_NAME')
-        server_port = environ.get('SERVER_PORT')
-        server_scheme = environ.get('wsgi.url_scheme')
-        if server_port not in ['80', '443']:
-            netloc = '%s:%s' % (server_name, server_port)
-        else:
-            netloc = server_name
-
-        request_url = urlparse.urlunsplit((server_scheme, netloc, path,
-                                           query, fragment))
-
-        accept_header = environ.get('HTTP_ACCEPT')
-
-        if accept_header:
-            content_type = accept_header
-        else:
-            content_type = 'application/json'
-
-        headers = [
-            ('X-Gabbi-method', request_method),
-            ('Content-Type', content_type),
-            ('X-Gabbi-url', request_url),
-        ]
-
-        if request_method not in METHODS:
-            headers.append(
-                ('Allow', ', '.join(METHODS)))
-            start_response('405 Method Not Allowed', headers)
-            return []
-
-        if request_method.startswith('P'):
-            body = environ['wsgi.input'].read()
-            if body:
-                if environ.get('CONTENT_TYPE', '') == 'application/json':
-                    body_data = json.loads(body.decode('utf-8'))
-                    if query_data:
-                        query_data.update(body_data)
-                    else:
-                        query_data = body_data
-            headers.append(('Location', request_url))
-
-        start_response('200 OK', headers)
-
-        query_output = json.dumps(query_data)
-        return [query_output.encode('utf-8')]
-
-
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
-                              intercept=SimpleWsgi,
+                              intercept=simple_wsgi.SimpleWsgi,
                               fixture_module=sys.modules[__name__])
