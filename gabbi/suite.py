@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from unittest import case
 from unittest import suite
 
 from . import fixture
@@ -24,6 +25,9 @@ class GabbiSuite(suite.TestSuite):
 
     The suite wraps the tests with a set of nested context managers that
     operate as fixtures.
+
+    If a fixture raises unittest.case.SkipTest during setup, all the
+    tests in this suite will be skipped.
     """
 
     def run(self, result, debug=False):
@@ -39,7 +43,10 @@ class GabbiSuite(suite.TestSuite):
             fixtures = self._tests[0].fixtures
         except AttributeError:
             pass
-        with fixture.nest([fix() for fix in fixtures]):
-            result = super(GabbiSuite, self).run(result, debug)
+        try:
+            with fixture.nest([fix() for fix in fixtures]):
+                result = super(GabbiSuite, self).run(result, debug)
+        except case.SkipTest as exc:
+            [result.addSkip(test, str(exc)) for test in self._tests]
 
         return result

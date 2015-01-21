@@ -15,3 +15,9 @@ any direct awareness of the fixtures. The fixtures exist, instead, on the
 inside of the API being tested. Their most common function is
 expected to be the creation of sample data, by whatever means make
 sense for the system being tested.
+
+If a fixture raises ``unittest.case.SkipTest`` during
+``start_fixture`` all the tests in the current file will be skipped.
+This makes it possible to skip the tests if some optional
+configuration (such as a particular type of database) is not
+available.
