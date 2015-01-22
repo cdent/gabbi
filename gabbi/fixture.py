@@ -20,6 +20,8 @@ import sys
 from contextlib import contextmanager
 
 import six
+import wsgi_intercept
+from wsgi_intercept import httplib2_intercept
 
 
 class GabbiFixtureError(Exception):
@@ -52,6 +54,24 @@ class GabbiFixture(object):
     def stop_fixture(self):
         """Implement the actual workings of stopping the fixture here."""
         pass
+
+
+class InterceptFixture(GabbiFixture):
+    """Start up the wsgi intercept. This should not be called directly."""
+
+    httplib2_intercept.install()
+
+    def __init__(self, host, port, app):
+        self.host = host
+        self.port = port
+        self.app = app
+
+    def start_fixture(self):
+        wsgi_intercept.add_wsgi_intercept(self.host, self.port,
+                                          lambda: self.app())
+
+    def stop_fixture(self):
+        wsgi_intercept.remove_wsgi_intercept(self.host, self.port)
 
 
 @contextmanager

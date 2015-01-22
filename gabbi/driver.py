@@ -34,8 +34,6 @@ from unittest import suite
 import uuid
 
 import httplib2
-import wsgi_intercept
-from wsgi_intercept import httplib2_intercept
 import yaml
 
 from .suite import GabbiSuite
@@ -83,36 +81,23 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         test_loader_name = os.path.splitext(os.path.basename(
             test_loader_name[1]))[0]
 
-    if intercept:
-        host = install_intercept(intercept, port)
-
     yaml_file_glob = '%s/*.yaml' % path
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
     if host or intercept:
         for test_file in glob.iglob(yaml_file_glob):
+            if intercept:
+                host = str(uuid.uuid4())
             test_yaml = load_yaml(test_file)
             test_name = '%s_%s' % (test_loader_name,
                                    os.path.splitext(
                                        os.path.basename(test_file))[0])
             file_suite = test_suite_from_yaml(loader, test_name, test_yaml,
-                                              path, host, port, fixture_module)
+                                              path, host, port, fixture_module,
+                                              intercept)
             top_suite.addTest(file_suite)
     return top_suite
-
-
-def factory(wsgi_app):
-    """Satisfy a bad API."""
-    return wsgi_app
-
-
-def install_intercept(wsgi_callable, port):
-    """Install a wsgi-intercept on a random hostname."""
-    hostname = str(uuid.uuid4())
-    httplib2_intercept.install()
-    wsgi_intercept.add_wsgi_intercept(hostname, port, factory(wsgi_callable))
-    return hostname
 
 
 def load_yaml(yaml_file):
@@ -122,7 +107,7 @@ def load_yaml(yaml_file):
 
 
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
-                         host, port, fixture_module):
+                         host, port, fixture_module, intercept):
     """Generate a TestSuite from YAML data."""
 
     file_suite = GabbiSuite()
@@ -160,6 +145,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                              'fixtures': fixture_classes,
                              'http': httplib2.Http(),
                              'host': host,
+                             'intercept': intercept,
                              'port': port,
                              'prior': prior_test})
 

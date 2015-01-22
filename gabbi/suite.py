@@ -39,13 +39,31 @@ class GabbiSuite(suite.TestSuite):
 
         # If there are fixtures, nest in their context.
         fixtures = [fixture.GabbiFixture]
+        intercept = None
+
         try:
-            fixtures = self._tests[0].fixtures
+            first_test = self._tests[0]
+            fixtures = first_test.fixtures
+            host = first_test.host
+            port = first_test.port
+            intercept = first_test.intercept
+
+            # Unbind a passed in WSGI application. During the
+            # metaclass building process intercept becomes bound.
+            try:
+                intercept = intercept.__func__
+            except AttributeError:
+                pass
         except AttributeError:
             pass
+
         try:
             with fixture.nest([fix() for fix in fixtures]):
-                result = super(GabbiSuite, self).run(result, debug)
+                if intercept:
+                    with fixture.InterceptFixture(host, port, intercept):
+                        result = super(GabbiSuite, self).run(result, debug)
+                else:
+                    result = super(GabbiSuite, self).run(result, debug)
         except case.SkipTest as exc:
             [result.addSkip(test, str(exc)) for test in self._tests]
 
