@@ -19,11 +19,11 @@ import os
 import re
 
 import jsonpath_rw
-import testtools
+import unittest
 from six.moves.urllib import parse as urlparse
 
 
-class HTTPTestCase(testtools.TestCase):
+class HTTPTestCase(unittest.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
