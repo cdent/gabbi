@@ -130,6 +130,9 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test = dict(base_test_data)
         test.update(test_datum)
 
+        if not test['name']:
+            raise AssertionError('Test name missing in a test in %s.'
+                                 % test_base_name)
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
