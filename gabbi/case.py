@@ -13,14 +13,20 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+"""A single HTTP request reprensented as a ``unittest.TestCase``
+
+The test case encapsulates the request headers and body and expected
+response headers and body. When the test is run an HTTP request is
+made using httplib2. Assertions are made against the reponse.
+"""
 
 import json
 import os
 import re
 
 import jsonpath_rw
-import unittest
 from six.moves.urllib import parse as urlparse
+import unittest
 
 
 class HTTPTestCase(unittest.TestCase):
@@ -74,8 +80,7 @@ class HTTPTestCase(unittest.TestCase):
             for expect in expected:
                 self.assertIn(expect, decoded_output)
 
-        # Decode body as JSON and compare.
-        # NOTE(chdent): This just here for now to see if it is workable.
+        # Decode body as JSON and test against json_paths
         if json_paths:
             response_data = json.loads(decoded_output)
             self.json_data = response_data
@@ -113,8 +118,7 @@ class HTTPTestCase(unittest.TestCase):
             return matches[0]
         except IndexError:
             raise ValueError(
-                    "JSONPath '%s' failed to match on data: '%s'"
-                    % (path, data))
+                "JSONPath '%s' failed to match on data: '%s'" % (path, data))
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""

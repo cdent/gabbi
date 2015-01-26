@@ -36,8 +36,8 @@ import uuid
 import httplib2
 import yaml
 
-from .suite import GabbiSuite
-from .case import HTTPTestCase
+from gabbi import case
+from gabbi import suite as gabbi_suite
 
 
 # Empty test from which all others inherit
@@ -110,7 +110,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept):
     """Generate a TestSuite from YAML data."""
 
-    file_suite = GabbiSuite()
+    file_suite = gabbi_suite.GabbiSuite()
     test_data = test_yaml['tests']
     fixtures = test_yaml.get('fixtures', None)
 
@@ -142,7 +142,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
         # Use metaclasses to build a class of the necessary type
         # with relevant arguments.
-        klass = TestBuilder(test_name, (HTTPTestCase,),
+        klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
                              'test_directory': test_directory,
                              'fixtures': fixture_classes,

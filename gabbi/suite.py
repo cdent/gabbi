@@ -13,11 +13,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+"""A TestSuite for containing gabbi tests.
+
+This suite has two features: the contained tests are ordered and there
+are suite-level fixtures that operate as context managers.
+"""
 
 from unittest import case
 from unittest import suite
 
-from . import fixture
+from gabbi import fixture
 
 
 class GabbiSuite(suite.TestSuite):
@@ -65,6 +70,7 @@ class GabbiSuite(suite.TestSuite):
                 else:
                     result = super(GabbiSuite, self).run(result, debug)
         except case.SkipTest as exc:
-            [result.addSkip(test, str(exc)) for test in self._tests]
+            for test in self._tests:
+                result.addSkip(test, str(exc))
 
         return result

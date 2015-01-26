@@ -16,8 +16,8 @@
 
 """Manage fixtures for gabbi at the test suite level."""
 
+import contextlib
 import sys
-from contextlib import contextmanager
 
 import six
 import wsgi_intercept
@@ -44,7 +44,7 @@ class GabbiFixture(object):
     def __enter__(self):
         self.start_fixture()
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         self.stop_fixture()
 
     def start_fixture(self):
@@ -74,7 +74,7 @@ class InterceptFixture(GabbiFixture):
         wsgi_intercept.remove_wsgi_intercept(self.host, self.port)
 
 
-@contextmanager
+@contextlib.contextmanager
 def nest(fixtures):
     """Nest a series of fixtures.
 
@@ -84,25 +84,25 @@ def nest(fixtures):
     of fixtures dynamically, so the ``with`` syntax that replaces
     ``nested`` will not work.
     """
-    vars = []
+    contexts = []
     exits = []
     exc = (None, None, None)
     try:
         for fixture in fixtures:
-            enter = fixture.__enter__
-            exit = fixture.__exit__
-            vars.append(enter())
-            exits.append(exit)
-        yield vars
-    except:
+            enter_func = fixture.__enter__
+            exit_func = fixture.__exit__
+            contexts.append(enter_func())
+            exits.append(exit_func)
+        yield contexts
+    except Exception:
         exc = sys.exc_info()
     finally:
         while exits:
-            exit = exits.pop()
+            exit_func = exits.pop()
             try:
-                if exit(*exc):
+                if exit_func(*exc):
                     exc = (None, None, None)
-            except:
+            except Exception:
                 exc = sys.exc_info()
         if exc != (None, None, None):
             six.reraise(exc[0], exc[1], exc[2])
