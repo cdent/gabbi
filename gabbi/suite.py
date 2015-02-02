@@ -47,7 +47,7 @@ class GabbiSuite(suite.TestSuite):
         intercept = None
 
         try:
-            first_test = self._tests[0]
+            first_test = self._find_first_full_test()
             fixtures = first_test.fixtures
             host = first_test.host
             port = first_test.port
@@ -74,3 +74,14 @@ class GabbiSuite(suite.TestSuite):
                 result.addSkip(test, str(exc))
 
         return result
+
+    def _find_first_full_test(self):
+        """Traverse a sparse test suite to find the first HTTPTestCase.
+
+        When only some tests are requested empty TestSuites replace the
+        unrequested tests.
+        """
+        for test in self._tests:
+            if hasattr(test, 'fixtures'):
+                return test
+        raise AttributeError('no fixtures found')
