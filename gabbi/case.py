@@ -242,7 +242,14 @@ class HTTPTestCase(unittest.TestCase):
         for header in headers:
             header_value = headers[header].replace('$SCHEME', self.scheme)
             header_value = header_value.replace('$NETLOC', self.netloc)
-            response_value = response[header]
+
+            try:
+                response_value = response[header]
+            except KeyError as exc:
+                # Reform KeyError to something more debuggable.
+                raise KeyError("'%s' header not available in response keys: %s"
+                                     % (header, response.keys()))
+
             if header_value.startswith('/') and header_value.endswith('/'):
                 header_value = header_value.strip('/').rstrip('/')
                 self.assertRegexpMatches(
