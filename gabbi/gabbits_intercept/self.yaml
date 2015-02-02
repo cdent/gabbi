@@ -46,6 +46,30 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/named/thing
 
+- name: checklimit
+  url: /
+
+- name: post a body
+  url: /somewhere
+  method: POST
+  data:
+      cow: barn
+  request_headers:
+      content-type: application/json
+  response_json_paths:
+      $.cow: barn
+
+- name: post a body with query
+  url: /somewhere?chicken=coop
+  method: POST
+  data:
+      cow: barn
+  request_headers:
+      content-type: application/json
+  response_json_paths:
+      $.cow: barn
+      $.chicken[0]: coop
+
 - name: get ssl page
   url: /
   ssl: True
