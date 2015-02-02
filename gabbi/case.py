@@ -245,10 +245,10 @@ class HTTPTestCase(unittest.TestCase):
 
             try:
                 response_value = response[header]
-            except KeyError as exc:
+            except KeyError:
                 # Reform KeyError to something more debuggable.
                 raise KeyError("'%s' header not available in response keys: %s"
-                                     % (header, response.keys()))
+                               % (header, response.keys()))
 
             if header_value.startswith('/') and header_value.endswith('/'):
                 header_value = header_value.strip('/').rstrip('/')
