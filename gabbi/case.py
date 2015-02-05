@@ -78,6 +78,7 @@ class HTTPTestCase(unittest.TestCase):
         # Compare strings in response body
         if expected:
             for expect in expected:
+                expect = self._replace_response_values(expect)
                 self.assertIn(expect, decoded_output)
 
         # Decode body as JSON and test against json_paths
@@ -86,9 +87,9 @@ class HTTPTestCase(unittest.TestCase):
             self.json_data = response_data
             for path in json_paths:
                 match = self._extract_json_path_value(response_data, path)
-                self.assertEqual(json_paths[path], match,
-                                 'Unable to match %s as %s'
-                                 % (path, json_paths[path]))
+                expected = self._replace_response_values(json_paths[path])
+                self.assertEqual(expected, match, 'Unable to match %s as %s'
+                                 % (path, expected))
 
     def _decode_content(self, response, content):
         """Decode content to a proper string."""
@@ -171,7 +172,11 @@ class HTTPTestCase(unittest.TestCase):
 
     def _replace_response_values(self, template):
         """Replace a JSON Path in a template string with its value."""
-        return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
+        try:
+            return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
+        except TypeError:
+            # template is not a string
+            return template
 
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""

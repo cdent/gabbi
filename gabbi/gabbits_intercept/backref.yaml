@@ -20,12 +20,25 @@ tests:
   request_headers:
       content-type: application/json
   method: POST
-  data: |
-     {"a": $RESPONSE['a'],
-      "c": "$RESPONSE['link']"}
-
+  data:
+     a: $RESPONSE['a']
+     c: $RESPONSE['link']
   response_json_paths:
-     a: 1
+     a: $RESPONSE['a']
      c: /v2
+  response_headers:
+     x-gabbi-url: $SCHEME://$NETLOC/v2
+
+- name: post even more json
+  url: $RESPONSE['c']
+  request_headers:
+      content-type: application/json
+  method: POST
+  data: |
+      {"a": "$RESPONSE['a']",
+       "c": "$RESPONSE['c']"}
+  response_strings:
+      - '"a": "$RESPONSE[''a'']"'
+      - '"c": "/v2"'
   response_headers:
      x-gabbi-url: $SCHEME://$NETLOC/v2
