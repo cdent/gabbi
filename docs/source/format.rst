@@ -67,13 +67,19 @@ reference to the state of a current test or the one just prior. These
 are replaced with real values during test processing.
 
 * ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
+  Available in field ``response_headers``.
 * ``$NETLOC``: The host and potentially port of the request.
+  Available in field ``response_headers``.
 * ``$LOCATION``: The location header returned in the prior response.
+  Availble in field ``url``.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
-  response.
+  response. Available in fields ``url``, ``response_strings`` and
+  ``response_json_paths``
 
 With these it ought to be possible to traverse an API without any
-explicit statements about the URLs being used.
+explicit statements about the URLs being used. If you need a
+replacement on a field that is not currently supported please raise
+an issue or provide a patch.
 
 As all of these features needed to be tested in the development of
 gabbi itself, `the gabbi tests`_ are a good source of examples on how
