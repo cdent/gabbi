@@ -61,6 +61,9 @@ these allow substitutions (explained below).
   in the response body.
 * ``response_json_paths``: A dictionary of JSONPath rules paired with
   expected matches.
+* ``skip``: A string message which if set will cause the test to be
+  skipped with the provided message.
+* ``xfail``: If ``True`` expect this test to fail but run it anyway.
 
 There are a small number of magical variables that can be used to make
 reference to the state of a current test or the one just prior. These

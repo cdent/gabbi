@@ -54,12 +54,13 @@ BASE_TEST = {
     'response_strings': None,
     'response_json_paths': None,
     'data': '',
+    'xfail': False,
+    'skip': '',
 }
 
 
 class TestBuilder(type):
-    """Metaclass to munge a dynamically created test.
-    """
+    """Metaclass to munge a dynamically created test."""
 
     required_attributes = {'has_run': False}
 
@@ -141,7 +142,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                                  % test_name)
 
         # Use metaclasses to build a class of the necessary type
-        # with relevant arguments.
+        # and name with relevant arguments.
         klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
                              'test_directory': test_directory,

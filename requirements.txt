@@ -1,5 +1,6 @@
 pbr>=0.6,!=0.7,<1.0
 six>=1.7.0
+testtools
 PyYAML
 httplib2
 jsonpath-rw

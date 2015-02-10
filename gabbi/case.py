@@ -13,23 +13,40 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""A single HTTP request reprensented as a ``unittest.TestCase``
+"""A single HTTP request reprensented as a subclass of ``unittest.TestCase``
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
 made using httplib2. Assertions are made against the reponse.
 """
 
+import functools
 import json
 import os
 import re
+import sys
 
 import jsonpath_rw
 from six.moves.urllib import parse as urlparse
-import unittest
+from testtools import testcase
 
 
-class HTTPTestCase(unittest.TestCase):
+def potentialFailure(func):
+    """Decorate a test method that is expected to fail if 'xfail' is true."""
+    @functools.wraps(func)
+    def wrapper(self):
+        if self.test_data['xfail']:
+            try:
+                func(self)
+            except Exception:
+                raise testcase._ExpectedFailure(sys.exc_info())
+            raise testcase._UnexpectedSuccess
+        else:
+            func(self)
+    return wrapper
+
+
+class HTTPTestCase(testcase.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
@@ -48,6 +65,7 @@ class HTTPTestCase(unittest.TestCase):
             super(HTTPTestCase, self).tearDown()
         self.has_run = True
 
+    @potentialFailure
     def test_request(self):
         """Run this request if it has not yet run.
 
@@ -55,6 +73,10 @@ class HTTPTestCase(unittest.TestCase):
         """
         if self.has_run:
             return
+
+        if self.test_data['skip']:
+            self.skipTest(self.test_data['skip'])
+
         if self.prior and not self.prior.has_run:
             self.prior.run()
         self._run_test()
