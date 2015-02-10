@@ -6,8 +6,10 @@
 # This covers a situation where the change of intercepts to fixtures
 # broke limiting tests and we never knew.
 
-GREP_MATCH='gabbi.driver.test_intercept_self_checklimit.test_request ... ok'
+GREP_TEST_MATCH='gabbi.driver.test_intercept_self_checklimit.test_request ... ok'
+GREP_COUNT_MATCH='Ran 1 '
 
 python setup.py testr --testr-args="checklimit" && \
     testr last --subunit | subunit2pyunit 2>&1 | \
-    grep "${GREP_MATCH}"
+    grep "${GREP_TEST_MATCH}" && \
+    testr last | grep "${GREP_COUNT_MATCH}"
