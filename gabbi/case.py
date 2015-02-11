@@ -13,7 +13,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""A single HTTP request reprensented as a subclass of ``unittest.TestCase``
+"""A single HTTP request represented as a subclass of ``unittest.TestCase``
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
