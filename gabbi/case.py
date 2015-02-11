@@ -85,6 +85,12 @@ class HTTPTestCase(testcase.TestCase):
                          expected=None, json_paths=None):
         """Compare the response with expected data."""
 
+        # Decode and store response before anything else
+        decoded_output = self._decode_content(response, content)
+        if (decoded_output
+                and 'application/json' in response.get('content-type', '')):
+            self.json_data = json.loads(decoded_output)
+
         # Never accept a 500
         if response['status'] == '500':
             raise ServerError(content)
@@ -105,10 +111,8 @@ class HTTPTestCase(testcase.TestCase):
 
         # Decode body as JSON and test against json_paths
         if json_paths:
-            response_data = json.loads(decoded_output)
-            self.json_data = response_data
             for path in json_paths:
-                match = self._extract_json_path_value(response_data, path)
+                match = self._extract_json_path_value(self.json_data, path)
                 expected = self._replace_response_values(json_paths[path])
                 self.assertEqual(expected, match, 'Unable to match %s as %s'
                                  % (path, expected))
