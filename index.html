@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Gabbi by cdent</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Gabbi</h1>
+        <p class="header">Declarative HTTP Testing for Python</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/cdent/gabbi/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/cdent/gabbi/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/cdent/gabbi">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/cdent">cdent</a></p>
+
+
+      </header>
+      <section>
+        <h2>
+<a id="gabbi" class="anchor" href="#gabbi" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gabbi</h2>
+
+<p>Gabbi is a tool for running HTTP tests where requests and responses
+are represented in a declarative form.</p>
+
+<p>It is under active development. See the <a href="https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept">YAML files</a>
+for examples of working tests and <a href="http://gabbi.readthedocs.org/">the docs</a>
+for more details on features and formats.</p>
+
+<h2>
+<a id="purpose" class="anchor" href="#purpose" aria-hidden="true"><span class="octicon octicon-link"></span></a>Purpose</h2>
+
+<p>Gabbi works to bridge the gap between human readable YAML files that
+represent HTTP requests and expected responses and the obscured realm of
+Python-based, object-oriented unit tests in the style of the unittest
+module and its derivatives.</p>
+
+<p>Each YAML file represents an ordered list of HTTP requests along with
+the expected responses. This allows a single file to represent a
+process in the API being tested. For example:</p>
+
+<ul>
+<li>Create a resource.</li>
+<li>Retrieve a resource.</li>
+<li>Delete a resource.</li>
+<li>Retrieve a resource again to confirm it is gone.</li>
+</ul>
+
+<p>At the same time it is still possible to ask gabbi to run just one
+request. If it is in a sequence of tests, those tests prior to it in
+the YAML file will be run (in order). In any single process any test
+will only be run once. Concurrency is handled such that one file
+runs in one process.</p>
+
+<p>These features mean that it is possible to create tests that are
+useful for both humans (as tools for improving and developing APIs)
+and automated CI systems.</p>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
+
+<p>Gabbi can be installed from <a href="https://pypi.python.org/pypi/gabbi">PyPI</a>
+using <a href="https://pypi.python.org/pypi/pip">pip</a>:</p>
+
+<pre><code>$ pip install -U gabbi
+</code></pre>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
