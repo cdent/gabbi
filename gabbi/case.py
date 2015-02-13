@@ -107,6 +107,7 @@ class HTTPTestCase(testcase.TestCase):
         if expected:
             for expect in expected:
                 expect = self._replace_response_values(expect)
+                expect = self._replace_header_values(expect)
                 self.assertIn(expect, decoded_output)
 
         # Decode body as JSON and test against json_paths
@@ -114,6 +115,7 @@ class HTTPTestCase(testcase.TestCase):
             for path in json_paths:
                 match = self._extract_json_path_value(self.json_data, path)
                 expected = self._replace_response_values(json_paths[path])
+                expected = self._replace_header_values(expected)
                 self.assertEqual(expected, match, 'Unable to match %s as %s'
                                  % (path, expected))
 
@@ -146,6 +148,16 @@ class HTTPTestCase(testcase.TestCase):
         except IndexError:
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
+
+    def _header_replacer(self, match):
+        """Replace a regex match with the value of a prior header."""
+        header_key = match.group(1)
+        return self.prior.response[header_key.lower()]
+
+    def _json_replacer(self, match):
+        """Replace a regex match with the value of a JSON Path."""
+        path = match.group(1)
+        return str(self._extract_json_path_value(self.prior.json_data, path))
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
@@ -191,36 +203,50 @@ class HTTPTestCase(testcase.TestCase):
 
         return full_url
 
-    def _replacer(self, match):
-        """Replace a regex match with the value of a JSON Path."""
-        path = match.group(1)
-        return str(self._extract_json_path_value(self.prior.json_data, path))
+    def _replace_header_values(self, template):
+        """Replace a header indicator in a template string."""
+        try:
+            return re.sub(r"\$HEADERS\['([^']+)'\]",
+                          self._header_replacer, template)
+        except TypeError:
+            # template is not a string
+            return template
 
     def _replace_response_values(self, template):
         """Replace a JSON Path in a template string with its value."""
         try:
-            return re.sub(r"\$RESPONSE\['([^']+)'\]", self._replacer, template)
+            return re.sub(r"\$RESPONSE\['([^']+)'\]",
+                          self._json_replacer, template)
         except TypeError:
             # template is not a string
             return template
+
+    def _replace_url(self, url):
+        """Replace magic strings in url."""
+
+        if '$LOCATION' in url:
+            # Let AttributeError raise
+            url = url.replace('$LOCATION', self.prior.location)
+
+        if '$RESPONSE' in url:
+            url = self._replace_response_values(url)
+
+        if '$HEADERS' in url:
+            url = self._replace_header_values(url)
+
+        return url
 
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""
         test = self.test_data
         http = self.http
-        base_url = test['url']
 
         # Reset follow_redirects with every go.
         http.follow_redirects = False
         if test['redirects']:
             http.follow_redirects = True
 
-        if '$LOCATION' in base_url:
-            # Let AttributeError raise
-            base_url = base_url.replace('$LOCATION', self.prior.location)
-
-        if '$RESPONSE' in base_url:
-            base_url = self._replace_response_values(base_url)
+        base_url = self._replace_url(test['url'])
 
         full_url = self._parse_url(base_url, test['ssl'])
         method = test['method'].upper()
@@ -236,6 +262,7 @@ class HTTPTestCase(testcase.TestCase):
                     except TypeError:
                         body = body.encode('UTF-8')
                 body = self._replace_response_values(body)
+                body = self._replace_header_values(body)
 
         response, content = http.request(
             full_url,
@@ -244,7 +271,8 @@ class HTTPTestCase(testcase.TestCase):
             body=body
         )
 
-        # Set location attribute for follow on requests
+        # Set headers and location attributes for follow on requests
+        self.response = response
         if 'location' in response:
             self.location = response['location']
 
@@ -273,6 +301,7 @@ class HTTPTestCase(testcase.TestCase):
         for header in headers:
             header_value = headers[header].replace('$SCHEME', self.scheme)
             header_value = header_value.replace('$NETLOC', self.netloc)
+            header_value = self._replace_header_values(header_value)
 
             try:
                 response_value = response[header]

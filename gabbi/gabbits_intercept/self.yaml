@@ -59,6 +59,11 @@ tests:
   response_json_paths:
       $.cow: barn
 
+- name: get location from headers
+  url: $HEADERS['locaTion']
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/somewhere
+
 - name: post a body with query
   url: /somewhere?chicken=coop
   method: POST

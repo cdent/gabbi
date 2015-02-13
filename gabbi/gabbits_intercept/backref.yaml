@@ -42,3 +42,4 @@ tests:
       - '"c": "/v2"'
   response_headers:
      x-gabbi-url: $SCHEME://$NETLOC/v2
+     content-type: $HEADERS['content-type']

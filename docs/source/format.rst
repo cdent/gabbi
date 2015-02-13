@@ -78,6 +78,9 @@ are replaced with real values during test processing.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
   response. Available in fields ``url``, ``response_strings`` and
   ``response_json_paths``
+* ``$HEADERS['<header>']``: Indicate the name of a header from the
+  prior response to inject in the value. Available in fields ``url``,
+  ``response_strings``, ``response_strings`` and ``response_headers``.
 
 With these it ought to be possible to traverse an API without any
 explicit statements about the URLs being used. If you need a
