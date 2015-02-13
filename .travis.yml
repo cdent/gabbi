@@ -9,3 +9,5 @@ env:
       - TOXENV=py33
       - TOXENV=py34
 
+notifications:
+      irc: "chat.freenode.net#gabbi"
