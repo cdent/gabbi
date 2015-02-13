@@ -36,17 +36,18 @@ class SimpleWsgi(object):
         request_url = environ.get('REQUEST_URI',
                                   environ.get('RAW_URI', 'unknown'))
         accept_header = environ.get('HTTP_ACCEPT')
+        content_type_header = environ.get('CONTENT_TYPE', '')
 
         request_url = self._fully_qualify(environ, request_url)
 
         if accept_header:
-            content_type = accept_header
+            response_content_type = accept_header
         else:
-            content_type = 'application/json'
+            response_content_type = 'application/json'
 
         headers = [
             ('X-Gabbi-method', request_method),
-            ('Content-Type', content_type),
+            ('Content-Type', response_content_type),
             ('X-Gabbi-url', request_url),
         ]
 
@@ -59,7 +60,10 @@ class SimpleWsgi(object):
         if request_method.startswith('P'):
             body = environ['wsgi.input'].read()
             if body:
-                if environ.get('CONTENT_TYPE', '') == 'application/json':
+                if not content_type_header:
+                    start_response('400 Bad request', headers)
+                    return []
+                if content_type_header == 'application/json':
                     body_data = json.loads(body.decode('utf-8'))
                     if query_data:
                         query_data.update(body_data)

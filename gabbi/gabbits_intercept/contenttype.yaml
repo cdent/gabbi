@@ -1,0 +1,58 @@
+#
+# Don't require content type on PUT, POST and PATCH requests
+# in the test case. Instead allow testing of how the WSGI app handles
+# it.
+#
+# https://github.com/cdent/gabbi/issues/16
+#
+# This had been done initially to try to enforce some accuracy
+# in the created tests, but real-world use has shown we need to
+# be able to create tests that demonstrate that a server is behaving
+# poorly (and not requiring a content-type).
+#
+
+tests:
+    - name: put no content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      method: PUT
+      status: 400
+
+    - name: post no content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      method: POST
+      status: 400
+
+    - name: patch no content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      method: PATCH
+      status: 400
+
+    - name: put content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      request_headers:
+          content-type: application/json
+      method: PUT
+
+    - name: post content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      request_headers:
+          content-type: application/json
+      method: POST
+
+    - name: patch content-type 
+      desc: P methods should 400 when no content-type
+      url: /
+      data: '"moo"'
+      request_headers:
+          content-type: application/json
+      method: PATCH

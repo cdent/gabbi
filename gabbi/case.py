@@ -229,7 +229,7 @@ class HTTPTestCase(testcase.TestCase):
         body = test['data']
         if body:
             body, is_str = self._test_data_to_string(body)
-            if self._not_binary(headers['content-type']):
+            if self._not_binary(headers.get('content-type', '')):
                 if is_str:
                     try:
                         body = str(body, 'UTF-8')
