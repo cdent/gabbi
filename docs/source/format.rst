@@ -76,8 +76,8 @@ are replaced with real values during test processing.
 * ``$LOCATION``: The location header returned in the prior response.
   Availble in field ``url``.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
-  response. Available in fields ``url``, ``response_strings`` and
-  ``response_json_paths``
+  response. Available in fields ``url``, ``response_strings``,
+  ``response_json_paths`` and ``response_headers``.
 * ``$HEADERS['<header>']``: Indicate the name of a header from the
   prior response to inject in the value. Available in fields ``url``,
   ``response_strings``, ``response_strings`` and ``response_headers``.

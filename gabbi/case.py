@@ -301,6 +301,7 @@ class HTTPTestCase(testcase.TestCase):
         for header in headers:
             header_value = headers[header].replace('$SCHEME', self.scheme)
             header_value = header_value.replace('$NETLOC', self.netloc)
+            header_value = self._replace_response_values(header_value)
             header_value = self._replace_header_values(header_value)
 
             try:
