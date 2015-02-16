@@ -87,8 +87,8 @@ class HTTPTestCase(testcase.TestCase):
 
         # Decode and store response before anything else
         decoded_output = self._decode_content(response, content)
-        if (decoded_output
-                and 'application/json' in response.get('content-type', '')):
+        if (decoded_output and
+                'application/json' in response.get('content-type', '')):
             self.json_data = json.loads(decoded_output)
 
         # Never accept a 500
@@ -168,11 +168,11 @@ class HTTPTestCase(testcase.TestCase):
     @staticmethod
     def _not_binary(content_type):
         """Decide if something is content we'd like to treat as a string."""
-        return (content_type.startswith('text/')
-                or content_type.endswith('+xml')
-                or content_type.endswith('+json')
-                or content_type == 'application/javascript'
-                or content_type == 'application/json')
+        return (content_type.startswith('text/') or
+                content_type.endswith('+xml') or
+                content_type.endswith('+json') or
+                content_type == 'application/javascript' or
+                content_type == 'application/json')
 
     def _parse_url(self, url, ssl=False):
         """Create a url from test data.
