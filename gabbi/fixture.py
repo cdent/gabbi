@@ -18,6 +18,7 @@
 
 import contextlib
 import sys
+from unittest import case
 
 import six
 import wsgi_intercept
@@ -72,6 +73,13 @@ class InterceptFixture(GabbiFixture):
 
     def stop_fixture(self):
         wsgi_intercept.remove_wsgi_intercept(self.host, self.port)
+
+
+class SkipAllFixture(GabbiFixture):
+    """A fixture that skips all the tests in the current suite."""
+
+    def start_fixture(self):
+        raise case.SkipTest('entire suite skipped')
 
 
 @contextlib.contextmanager

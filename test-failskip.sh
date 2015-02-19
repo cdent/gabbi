@@ -3,7 +3,7 @@
 # does.
 
 GREP_FAIL_MATCH='expected failures=1'
-GREP_SKIP_MATCH='skips=1'
+GREP_SKIP_MATCH='skips=2'
 
 python setup.py testr && \
     testr last --subunit | subunit2pyunit 2>&1 | \

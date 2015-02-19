@@ -29,7 +29,6 @@ from gabbi import driver
 from gabbi import fixture
 from gabbi import simple_wsgi
 
-
 TESTS_DIR = 'gabbits_intercept'
 
 
@@ -41,6 +40,11 @@ class TestFixtureOne(fixture.GabbiFixture):
 class TestFixtureTwo(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
     pass
+
+
+# Incorporate the SkipAllFixture into this namespace so it can be used
+# by tests (c.f. skipall.yaml).
+SkipAllFixture = fixture.SkipAllFixture
 
 
 def load_tests(loader, tests, pattern):
