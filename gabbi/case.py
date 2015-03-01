@@ -31,6 +31,16 @@ from six.moves.urllib import parse as urlparse
 from testtools import testcase
 
 
+REPLACERS = [
+    'SCHEME',
+    'NETLOC',
+    'ENVIRON',
+    'LOCATION',
+    'HEADERS',
+    'RESPONSE',
+]
+
+
 def potentialFailure(func):
     """Decorate a test method that is expected to fail if 'xfail' is true."""
     @functools.wraps(func)
@@ -101,21 +111,17 @@ class HTTPTestCase(testcase.TestCase):
         if headers:
             self._test_headers(headers, response)
 
-        decoded_output = self._decode_content(response, content)
-
         # Compare strings in response body
         if expected:
             for expect in expected:
-                expect = self._replace_response_values(expect)
-                expect = self._replace_header_values(expect)
+                expect = self.replace_template(expect)
                 self.assertIn(expect, decoded_output)
 
-        # Decode body as JSON and test against json_paths
+        # Test json_paths against json data
         if json_paths:
             for path in json_paths:
                 match = self._extract_json_path_value(self.json_data, path)
-                expected = self._replace_response_values(json_paths[path])
-                expected = self._replace_header_values(expected)
+                expected = self.replace_template(json_paths[path])
                 self.assertEqual(expected, match, 'Unable to match %s as %s'
                                  % (path, expected))
 
@@ -148,6 +154,14 @@ class HTTPTestCase(testcase.TestCase):
         except IndexError:
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
+
+    def _environ_replacer(self, match):
+        """Replace a regex match with an environment value.
+
+        Let KeyError raise if variable not present.
+        """
+        environ_name = match.group(1)
+        return os.environ[environ_name]
 
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
@@ -203,38 +217,52 @@ class HTTPTestCase(testcase.TestCase):
 
         return full_url
 
-    def _replace_header_values(self, template):
-        """Replace a header indicator in a template string."""
-        try:
-            return re.sub(r"\$HEADERS\['([^']+)'\]",
-                          self._header_replacer, template)
-        except TypeError:
-            # template is not a string
-            return template
+    def _scheme_replace(self, message):
+        """Replace $SCHEME with the current protocol."""
+        return message.replace('$SCHEME', self.scheme)
 
-    def _replace_response_values(self, template):
-        """Replace a JSON Path in a template string with its value."""
-        try:
-            return re.sub(r"\$RESPONSE\['([^']+)'\]",
-                          self._json_replacer, template)
-        except TypeError:
-            # template is not a string
-            return template
+    def _netloc_replace(self, message):
+        """Replace $NETLOC with the current host and port."""
+        return message.replace('$NETLOC', self.netloc)
 
-    def _replace_url(self, url):
-        """Replace magic strings in url."""
+    def _environ_replace(self, message):
+        """Replace an indicator in a message with the environment value."""
+        return re.sub(r"\$ENVIRON\['([^']+)'\]",
+                      self._environ_replacer, message)
 
-        if '$LOCATION' in url:
-            # Let AttributeError raise
-            url = url.replace('$LOCATION', self.prior.location)
+    def _headers_replace(self, message):
+        """Replace a header indicator in a message with that headers value from
+        the prior request.
+        """
+        return re.sub(r"\$HEADERS\['([^']+)'\]",
+                      self._header_replacer, message)
 
-        if '$RESPONSE' in url:
-            url = self._replace_response_values(url)
+    def _response_replace(self, message):
+        """Replace a JSON Path from the prior request with a value."""
+        return re.sub(r"\$RESPONSE\['([^']+)'\]",
+                      self._json_replacer, message)
 
-        if '$HEADERS' in url:
-            url = self._replace_header_values(url)
+    def _location_replace(self, message):
+        """Replace $LOCATION in a message.
 
-        return url
+        With the location header from the prior request.
+        """
+        return message.replace('$LOCATION', self.prior.location)
+
+    def replace_template(self, message):
+        """Replace magic strings in message."""
+
+        for replacer in REPLACERS:
+            template = '$%s' % replacer
+            method = '_%s_replace' % replacer.lower()
+            try:
+                if template in message:
+                    message = getattr(self, method)(message)
+            except TypeError:
+                # Message is not a string
+                pass
+
+        return message
 
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""
@@ -246,7 +274,7 @@ class HTTPTestCase(testcase.TestCase):
         if test['redirects']:
             http.follow_redirects = True
 
-        base_url = self._replace_url(test['url'])
+        base_url = self.replace_template(test['url'])
 
         full_url = self._parse_url(base_url, test['ssl'])
         method = test['method'].upper()
@@ -261,8 +289,7 @@ class HTTPTestCase(testcase.TestCase):
                         body = str(body, 'UTF-8')
                     except TypeError:
                         body = body.encode('UTF-8')
-                body = self._replace_response_values(body)
-                body = self._replace_header_values(body)
+                body = self.replace_template(body)
 
         response, content = http.request(
             full_url,
@@ -299,10 +326,7 @@ class HTTPTestCase(testcase.TestCase):
         regular expression.
         """
         for header in headers:
-            header_value = headers[header].replace('$SCHEME', self.scheme)
-            header_value = header_value.replace('$NETLOC', self.netloc)
-            header_value = self._replace_response_values(header_value)
-            header_value = self._replace_header_values(header_value)
+            header_value = self.replace_template(headers[header])
 
             try:
                 response_value = response[header]
