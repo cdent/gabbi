@@ -368,6 +368,7 @@ def _decode_content(response, content):
     else:
         return content
 
+
 def _not_binary(content_type):
     """Decide if something is content we'd like to treat as a string."""
     return (content_type.startswith('text/') or
