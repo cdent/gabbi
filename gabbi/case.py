@@ -41,6 +41,25 @@ REPLACERS = [
 ]
 
 
+# Empty test from which all others inherit
+BASE_TEST = {
+    'name': '',
+    'desc': '',
+    'ssl': False,
+    'redirects': False,
+    'method': 'GET',
+    'url': '',
+    'status': '200',
+    'request_headers': {},
+    'response_headers': {},
+    'response_strings': [],
+    'response_json_paths': {},
+    'data': '',
+    'xfail': False,
+    'skip': '',
+}
+
+
 def potentialFailure(func):
     """Decorate a test method that is expected to fail if 'xfail' is true."""
     @functools.wraps(func)
@@ -91,55 +110,57 @@ class HTTPTestCase(testcase.TestCase):
             self.prior.run()
         self._run_test()
 
-    def _assert_response(self, response, content, status, headers=None,
-                         expected=None, json_paths=None):
-        """Compare the response with expected data."""
+    def replace_template(self, message):
+        """Replace magic strings in message."""
 
-        # Decode and store response before anything else
-        decoded_output = self._decode_content(response, content)
-        if (decoded_output and
-                'application/json' in response.get('content-type', '')):
-            self.json_data = json.loads(decoded_output)
+        for replacer in REPLACERS:
+            template = '$%s' % replacer
+            method = '_%s_replace' % replacer.lower()
+            try:
+                if template in message:
+                    message = getattr(self, method)(message)
+            except TypeError:
+                # Message is not a string
+                pass
+
+        return message
+
+    def _assert_response(self, response, test):
+        """Compare the response with expected data."""
 
         # Never accept a 500
         if response['status'] == '500':
-            raise ServerError(content)
+            raise ServerError(self.output)
 
-        # Always test status
-        self._test_status(status, response['status'])
-
-        if headers:
-            self._test_headers(headers, response)
+        self._test_status(test['status'], response['status'])
+        self._test_headers(test['response_headers'], response)
 
         # Compare strings in response body
-        if expected:
-            for expect in expected:
-                expect = self.replace_template(expect)
-                self.assertIn(expect, decoded_output)
+        for expected in test['response_strings']:
+            expected = self.replace_template(expected)
+            self.assertIn(expected, self.output)
 
         # Test json_paths against json data
-        if json_paths:
-            for path in json_paths:
-                match = self._extract_json_path_value(self.json_data, path)
-                expected = self.replace_template(json_paths[path])
-                self.assertEqual(expected, match, 'Unable to match %s as %s'
-                                 % (path, expected))
+        for path in test['response_json_paths']:
+            match = self._extract_json_path_value(self.json_data, path)
+            expected = self.replace_template(
+                test['response_json_paths'][path])
+            self.assertEqual(expected, match, 'Unable to match %s as %s'
+                             % (path, expected))
 
-    def _decode_content(self, response, content):
-        """Decode content to a proper string."""
-        content_type = response.get('content-type',
-                                    'application/binary').lower()
-        if ';' in content_type:
-            content_type, charset = (attr.strip() for attr in
-                                     content_type.split(';'))
-            charset = charset.split('=')[1].strip()
-        else:
-            charset = 'utf-8'
+    def _environ_replace(self, message):
+        """Replace an indicator in a message with the environment value."""
+        return re.sub(r"\$ENVIRON\['([^']+)'\]",
+                      self._environ_replacer, message)
 
-        if self._not_binary(content_type):
-            return content.decode(charset)
-        else:
-            return content
+    @staticmethod
+    def _environ_replacer(match):
+        """Replace a regex match with an environment value.
+
+        Let KeyError raise if variable not present.
+        """
+        environ_name = match.group(1)
+        return os.environ[environ_name]
 
     @staticmethod
     def _extract_json_path_value(data, path):
@@ -155,13 +176,12 @@ class HTTPTestCase(testcase.TestCase):
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
 
-    def _environ_replacer(self, match):
-        """Replace a regex match with an environment value.
-
-        Let KeyError raise if variable not present.
+    def _headers_replace(self, message):
+        """Replace a header indicator in a message with that headers value from
+        the prior request.
         """
-        environ_name = match.group(1)
-        return os.environ[environ_name]
+        return re.sub(r"\$HEADERS\['([^']+)'\]",
+                      self._header_replacer, message)
 
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
@@ -173,20 +193,22 @@ class HTTPTestCase(testcase.TestCase):
         path = match.group(1)
         return str(self._extract_json_path_value(self.prior.json_data, path))
 
+    def _location_replace(self, message):
+        """Replace $LOCATION in a message.
+
+        With the location header from the prior request.
+        """
+        return message.replace('$LOCATION', self.prior.location)
+
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
         path = os.path.join(self.test_directory, os.path.basename(filename))
         with open(path, mode='rb') as data_file:
             return data_file.read()
 
-    @staticmethod
-    def _not_binary(content_type):
-        """Decide if something is content we'd like to treat as a string."""
-        return (content_type.startswith('text/') or
-                content_type.endswith('+xml') or
-                content_type.endswith('+json') or
-                content_type == 'application/javascript' or
-                content_type == 'application/json')
+    def _netloc_replace(self, message):
+        """Replace $NETLOC with the current host and port."""
+        return message.replace('$NETLOC', self.netloc)
 
     def _parse_url(self, url, ssl=False):
         """Create a url from test data.
@@ -217,81 +239,34 @@ class HTTPTestCase(testcase.TestCase):
 
         return full_url
 
-    def _scheme_replace(self, message):
-        """Replace $SCHEME with the current protocol."""
-        return message.replace('$SCHEME', self.scheme)
-
-    def _netloc_replace(self, message):
-        """Replace $NETLOC with the current host and port."""
-        return message.replace('$NETLOC', self.netloc)
-
-    def _environ_replace(self, message):
-        """Replace an indicator in a message with the environment value."""
-        return re.sub(r"\$ENVIRON\['([^']+)'\]",
-                      self._environ_replacer, message)
-
-    def _headers_replace(self, message):
-        """Replace a header indicator in a message with that headers value from
-        the prior request.
-        """
-        return re.sub(r"\$HEADERS\['([^']+)'\]",
-                      self._header_replacer, message)
-
     def _response_replace(self, message):
         """Replace a JSON Path from the prior request with a value."""
         return re.sub(r"\$RESPONSE\['([^']+)'\]",
                       self._json_replacer, message)
 
-    def _location_replace(self, message):
-        """Replace $LOCATION in a message.
-
-        With the location header from the prior request.
-        """
-        return message.replace('$LOCATION', self.prior.location)
-
-    def replace_template(self, message):
-        """Replace magic strings in message."""
-
-        for replacer in REPLACERS:
-            template = '$%s' % replacer
-            method = '_%s_replace' % replacer.lower()
-            try:
-                if template in message:
-                    message = getattr(self, method)(message)
-            except TypeError:
-                # Message is not a string
-                pass
-
-        return message
-
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""
         test = self.test_data
-        http = self.http
-
-        # Reset follow_redirects with every go.
-        http.follow_redirects = False
-        if test['redirects']:
-            http.follow_redirects = True
 
         base_url = self.replace_template(test['url'])
-
         full_url = self._parse_url(base_url, test['ssl'])
+
         method = test['method'].upper()
         headers = test['request_headers']
 
-        body = test['data']
-        if body:
-            body, is_str = self._test_data_to_string(body)
-            if self._not_binary(headers.get('content-type', '')):
-                if is_str:
-                    try:
-                        body = str(body, 'UTF-8')
-                    except TypeError:
-                        body = body.encode('UTF-8')
-                body = self.replace_template(body)
+        if test['data']:
+            body = self._test_data_to_string(
+                test['data'], headers.get('content-type', ''))
+        else:
+            body = ''
 
-        response, content = http.request(
+        # Reset follow_redirects with every go.
+        self.http.follow_redirects = False
+        if test['redirects']:
+            self.http.follow_redirects = True
+
+        # Make the actual request.
+        response, content = self.http.request(
             full_url,
             method=method,
             headers=headers,
@@ -303,21 +278,38 @@ class HTTPTestCase(testcase.TestCase):
         if 'location' in response:
             self.location = response['location']
 
-        self._assert_response(response, content, test['status'],
-                              headers=test['response_headers'],
-                              expected=test['response_strings'],
-                              json_paths=test['response_json_paths'])
+        # Decode and store response before anything else
+        decoded_output = _decode_content(response, content)
+        if (decoded_output and
+                'application/json' in response.get('content-type', '')):
+            self.json_data = json.loads(decoded_output)
+        self.output = decoded_output
 
-    def _test_data_to_string(self, data):
-        """Turn the request data into a string."""
+        self._assert_response(response, test)
+
+    def _scheme_replace(self, message):
+        """Replace $SCHEME with the current protocol."""
+        return message.replace('$SCHEME', self.scheme)
+
+    def _test_data_to_string(self, data, content_type):
+        """Turn the request data into a string.
+
+        If the data is not binary, replace template strings.
+        """
         if isinstance(data, str):
             if data.startswith('<@'):
                 info = self._load_data_file(data.replace('<@', '', 1))
-                return info, True
-            else:
-                return data, False
+                if _not_binary(content_type):
+                    try:
+                        info = str(info, 'UTF-8')
+                    except TypeError:
+                        info = info.encode('UTF-8')
+                    data = info
+                else:
+                    return info
         else:
-            return json.dumps(data), False
+            data = json.dumps(data)
+        return self.replace_template(data)
 
     def _test_headers(self, headers, response):
         """Compare expected headers with actual headers.
@@ -358,6 +350,31 @@ class HTTPTestCase(testcase.TestCase):
         else:
             statii = [expected_status.strip()]
         self.assertIn(observed_status, statii)
+
+
+def _decode_content(response, content):
+    """Decode content to a proper string."""
+    content_type = response.get('content-type',
+                                'application/binary').lower()
+    if ';' in content_type:
+        content_type, charset = (attr.strip() for attr in
+                                 content_type.split(';'))
+        charset = charset.split('=')[1].strip()
+    else:
+        charset = 'utf-8'
+
+    if _not_binary(content_type):
+        return content.decode(charset)
+    else:
+        return content
+
+def _not_binary(content_type):
+    """Decide if something is content we'd like to treat as a string."""
+    return (content_type.startswith('text/') or
+            content_type.endswith('+xml') or
+            content_type.endswith('+json') or
+            content_type == 'application/javascript' or
+            content_type == 'application/json')
 
 
 class ServerError(Exception):
