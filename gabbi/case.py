@@ -253,8 +253,8 @@ class HTTPTestCase(testcase.TestCase):
 
         method = test['method'].upper()
         headers = test['request_headers']
-        for k in headers:
-            headers[k] = self.replace_template(headers[k])
+        for name in headers:
+            headers[name] = self.replace_template(headers[name])
 
         if test['data']:
             body = self._test_data_to_string(

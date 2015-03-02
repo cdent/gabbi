@@ -84,6 +84,7 @@ All of these variables may be used in all of the following fields:
 
 * ``url``
 * ``data``
+* ``request_headers``
 * ``response_strings``
 * ``response_json_paths`` (on the value side of the key value pair)
 * ``response_headers`` (on the value side of the key value pair)
