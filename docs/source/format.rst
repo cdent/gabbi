@@ -67,7 +67,7 @@ these allow substitutions (explained below).
 
 There are a number of magical variables that can be used to make
 reference to the state of a current test or the one just prior. These
-are replaced with real values during test processing. There are
+are replaced with real values during test processing. They are
 processed in the order given.
 
 * ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
