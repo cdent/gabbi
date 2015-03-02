@@ -1,5 +1,5 @@
-pbr>=0.6,!=0.7,<1.0
-six>=1.7.0
+pbr
+six
 testtools
 PyYAML
 httplib2
