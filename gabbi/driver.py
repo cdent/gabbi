@@ -40,25 +40,6 @@ from gabbi import case
 from gabbi import suite as gabbi_suite
 
 
-# Empty test from which all others inherit
-BASE_TEST = {
-    'name': '',
-    'desc': '',
-    'ssl': False,
-    'redirects': False,
-    'method': 'GET',
-    'url': '',
-    'status': '200',
-    'request_headers': {},
-    'response_headers': {},
-    'response_strings': None,
-    'response_json_paths': None,
-    'data': '',
-    'xfail': False,
-    'skip': '',
-}
-
-
 class TestBuilder(type):
     """Metaclass to munge a dynamically created test."""
 
@@ -117,7 +98,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
     # Set defaults from BASE_TESTS then update those defaults
     # with any defaults set in the YAML file.
-    base_test_data = dict(BASE_TEST)
+    base_test_data = dict(case.BASE_TEST)
     base_test_data.update(test_yaml.get('defaults', {}))
 
     # Establish any fixture classes.
@@ -137,7 +118,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
-        if set(test.keys()) != set(BASE_TEST.keys()):
+        if set(test.keys()) != set(case.BASE_TEST.keys()):
             raise AssertionError('Invalid test keys used in test: %s'
                                  % test_name)
 

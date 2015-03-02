@@ -65,24 +65,30 @@ these allow substitutions (explained below).
   skipped with the provided message.
 * ``xfail``: If ``True`` expect this test to fail but run it anyway.
 
-There are a small number of magical variables that can be used to make
+There are a number of magical variables that can be used to make
 reference to the state of a current test or the one just prior. These
-are replaced with real values during test processing.
+are replaced with real values during test processing. There are
+processed in the order given.
 
 * ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
-  Available in field ``response_headers``.
 * ``$NETLOC``: The host and potentially port of the request.
-  Available in field ``response_headers``.
+* ``$ENVIRON['<environment variable>']``: The name of an environment
+  variable. It value will replace the magical variable.
 * ``$LOCATION``: The location header returned in the prior response.
-  Availble in field ``url``.
-* ``$RESPONSE['<json path>']``: A JSONPath query into the prior
-  response. Available in fields ``url``, ``response_strings``,
-  ``response_json_paths`` and ``response_headers``.
 * ``$HEADERS['<header>']``: Indicate the name of a header from the
-  prior response to inject in the value. Available in fields ``url``,
-  ``response_strings``, ``response_strings`` and ``response_headers``.
+  prior response to inject in the value.
+* ``$RESPONSE['<json path>']``: A JSONPath query into the prior
+  response.
 
-With these it ought to be possible to traverse an API without any
+All of these variables may be used in all of the following fields:
+
+* ``url``
+* ``data``
+* ``response_strings``
+* ``response_json_paths`` (on the value side of the key value pair)
+* ``response_headers`` (on the value side of the key value pair)
+
+With these variables it ought to be possible to traverse an API without any
 explicit statements about the URLs being used. If you need a
 replacement on a field that is not currently supported please raise
 an issue or provide a patch.
@@ -102,9 +108,9 @@ string that begins with ``<@`` then the rest of the string is treated
 as a file to be loaded from the same directory as the YAML file. If
 the the value is an undecorated string, that's the value.
 
-Care should be taken to ensure that a reasonable content-type is set
-for the data as this will control if any encoding is done of the
-string value. If it is text, json, xml, javascript it will encoded to
-UTF-8.
+When reading from a file care should be taken to ensure that a
+reasonable content-type is set for the data as this will control if any
+encoding is done of the resulting string value. If it is text, json, xml
+or javascript it will be encoded to UTF-8.
 
 .. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
