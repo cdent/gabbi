@@ -30,6 +30,7 @@ import jsonpath_rw
 from six.moves.urllib import parse as urlparse
 from testtools import testcase
 
+from gabbi import utils
 
 REPLACERS = [
     'SCHEME',
@@ -125,8 +126,11 @@ class HTTPTestCase(testcase.TestCase):
 
         return message
 
-    def _assert_response(self, response, test):
+    def _assert_response(self):
         """Compare the response with expected data."""
+
+        test = self.test_data
+        response = self.response
 
         # Never accept a 500
         if response['status'] == '500':
@@ -244,6 +248,28 @@ class HTTPTestCase(testcase.TestCase):
         return re.sub(r"\$RESPONSE\['([^']+)'\]",
                       self._json_replacer, message)
 
+    def _run_request(self, url, method, headers, body):
+        """Run the http request and decode output."""
+
+        response, content = self.http.request(
+            url,
+            method=method,
+            headers=headers,
+            body=body
+        )
+
+        # Set headers and location attributes for follow on requests
+        self.response = response
+        if 'location' in response:
+            self.location = response['location']
+
+        # Decode and store response
+        decoded_output = utils.decode_content(response, content)
+        if (decoded_output and
+                'application/json' in response.get('content-type', '')):
+            self.json_data = json.loads(decoded_output)
+        self.output = decoded_output
+
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""
         test = self.test_data
@@ -267,27 +293,8 @@ class HTTPTestCase(testcase.TestCase):
         if test['redirects']:
             self.http.follow_redirects = True
 
-        # Make the actual request.
-        response, content = self.http.request(
-            full_url,
-            method=method,
-            headers=headers,
-            body=body
-        )
-
-        # Set headers and location attributes for follow on requests
-        self.response = response
-        if 'location' in response:
-            self.location = response['location']
-
-        # Decode and store response before anything else
-        decoded_output = _decode_content(response, content)
-        if (decoded_output and
-                'application/json' in response.get('content-type', '')):
-            self.json_data = json.loads(decoded_output)
-        self.output = decoded_output
-
-        self._assert_response(response, test)
+        self._run_request(full_url, method, headers, body)
+        self._assert_response()
 
     def _scheme_replace(self, message):
         """Replace $SCHEME with the current protocol."""
@@ -301,7 +308,7 @@ class HTTPTestCase(testcase.TestCase):
         if isinstance(data, str):
             if data.startswith('<@'):
                 info = self._load_data_file(data.replace('<@', '', 1))
-                if _not_binary(content_type):
+                if utils.not_binary(content_type):
                     try:
                         info = str(info, 'UTF-8')
                     except TypeError:
@@ -352,32 +359,6 @@ class HTTPTestCase(testcase.TestCase):
         else:
             statii = [expected_status.strip()]
         self.assertIn(observed_status, statii)
-
-
-def _decode_content(response, content):
-    """Decode content to a proper string."""
-    content_type = response.get('content-type',
-                                'application/binary').lower()
-    if ';' in content_type:
-        content_type, charset = (attr.strip() for attr in
-                                 content_type.split(';'))
-        charset = charset.split('=')[1].strip()
-    else:
-        charset = 'utf-8'
-
-    if _not_binary(content_type):
-        return content.decode(charset)
-    else:
-        return content
-
-
-def _not_binary(content_type):
-    """Decide if something is content we'd like to treat as a string."""
-    return (content_type.startswith('text/') or
-            content_type.endswith('+xml') or
-            content_type.endswith('+json') or
-            content_type == 'application/javascript' or
-            content_type == 'application/json')
 
 
 class ServerError(Exception):
