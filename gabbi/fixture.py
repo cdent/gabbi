@@ -68,8 +68,7 @@ class InterceptFixture(GabbiFixture):
         self.app = app
 
     def start_fixture(self):
-        wsgi_intercept.add_wsgi_intercept(self.host, self.port,
-                                          lambda: self.app())
+        wsgi_intercept.add_wsgi_intercept(self.host, self.port, self.app)
 
     def stop_fixture(self):
         wsgi_intercept.remove_wsgi_intercept(self.host, self.port)
