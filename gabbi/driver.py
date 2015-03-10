@@ -56,6 +56,10 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     Each YAML file represents an ordered sequence of HTTP requests.
     """
+
+    assert bool(host) ^ bool(intercept), \
+        'must specify exactly one of host or intercept'
+
     top_suite = suite.TestSuite()
 
     if test_loader_name is None:
@@ -67,18 +71,17 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
-    if host or intercept:
-        for test_file in glob.iglob(yaml_file_glob):
-            if intercept:
-                host = str(uuid.uuid4())
-            test_yaml = load_yaml(test_file)
-            test_name = '%s_%s' % (test_loader_name,
-                                   os.path.splitext(
-                                       os.path.basename(test_file))[0])
-            file_suite = test_suite_from_yaml(loader, test_name, test_yaml,
-                                              path, host, port, fixture_module,
-                                              intercept)
-            top_suite.addTest(file_suite)
+    for test_file in glob.iglob(yaml_file_glob):
+        if intercept:
+            host = str(uuid.uuid4())
+        test_yaml = load_yaml(test_file)
+        test_name = '%s_%s' % (test_loader_name,
+                               os.path.splitext(
+                                   os.path.basename(test_file))[0])
+        file_suite = test_suite_from_yaml(loader, test_name, test_yaml,
+                                          path, host, port, fixture_module,
+                                          intercept)
+        top_suite.addTest(file_suite)
     return top_suite
 
 
