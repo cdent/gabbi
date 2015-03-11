@@ -113,6 +113,10 @@ class HTTPTestCase(testcase.TestCase):
 
     def replace_template(self, message):
         """Replace magic strings in message."""
+        if isinstance(message, dict):
+            for k in message:
+                message[k] = self.replace_template(message[k])
+            return message
 
         for replacer in REPLACERS:
             template = '$%s' % replacer
