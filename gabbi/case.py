@@ -30,6 +30,7 @@ import jsonpath_rw
 from six.moves.urllib import parse as urlparse
 from testtools import testcase
 
+from gabbi import handlers
 from gabbi import utils
 
 REPLACERS = [
@@ -39,6 +40,12 @@ REPLACERS = [
     'LOCATION',
     'HEADERS',
     'RESPONSE',
+]
+
+
+RESPONSE_HANDLERS = [
+    handlers.handle_response_strings,
+    handlers.handle_json_paths,
 ]
 
 
@@ -143,18 +150,9 @@ class HTTPTestCase(testcase.TestCase):
         self._test_status(test['status'], response['status'])
         self._test_headers(test['response_headers'], response)
 
-        # Compare strings in response body
-        for expected in test['response_strings']:
-            expected = self.replace_template(expected)
-            self.assertIn(expected, self.output)
-
-        # Test json_paths against json data
-        for path in test['response_json_paths']:
-            match = self._extract_json_path_value(self.json_data, path)
-            expected = self.replace_template(
-                test['response_json_paths'][path])
-            self.assertEqual(expected, match, 'Unable to match %s as %s'
-                             % (path, expected))
+        # Process all the registered RESPONSE_HANDLERS
+        for handler in RESPONSE_HANDLERS:
+            handler(self)
 
     def _environ_replace(self, message):
         """Replace an indicator in a message with the environment value."""
@@ -171,7 +169,7 @@ class HTTPTestCase(testcase.TestCase):
         return os.environ[environ_name]
 
     @staticmethod
-    def _extract_json_path_value(data, path):
+    def extract_json_path_value(data, path):
         """Extract the value at JSON Path path from the data.
 
         The input data is a Python datastructre, not a JSON string.
@@ -199,7 +197,7 @@ class HTTPTestCase(testcase.TestCase):
     def _json_replacer(self, match):
         """Replace a regex match with the value of a JSON Path."""
         path = match.group(1)
-        return str(self._extract_json_path_value(self.prior.json_data, path))
+        return str(self.extract_json_path_value(self.prior.json_data, path))
 
     def _location_replace(self, message):
         """Replace $LOCATION in a message.
