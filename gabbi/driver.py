@@ -37,7 +37,14 @@ import httplib2
 import yaml
 
 from gabbi import case
+from gabbi import handlers
 from gabbi import suite as gabbi_suite
+
+RESPONSE_HANDLERS = [
+    handlers.StringResponseHandler,
+    handlers.JSONResponseHandler,
+    handlers.HeadersResponseHandler,
+]
 
 
 class TestBuilder(type):
@@ -68,6 +75,10 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
             test_loader_name[1]))[0]
 
     yaml_file_glob = '%s/*.yaml' % path
+
+    # Initialize the extensions to the response handling.
+    for handler in RESPONSE_HANDLERS:
+        handler(case.HTTPTestCase)
 
     # Return an empty suite if we have no host to access, either via
     # a real host or an intercept
@@ -101,7 +112,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
     # Set defaults from BASE_TESTS then update those defaults
     # with any defaults set in the YAML file.
-    base_test_data = dict(case.BASE_TEST)
+    base_test_data = dict(case.HTTPTestCase.base_test)
     base_test_data.update(test_yaml.get('defaults', {}))
 
     # Establish any fixture classes.
@@ -111,6 +122,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
             fixture_classes.append(getattr(fixture_module, fixture_class))
 
     prior_test = None
+    base_test_key_set = set(case.HTTPTestCase.base_test.keys())
     for test_datum in test_data:
         test = dict(base_test_data)
         test.update(test_datum)
@@ -121,9 +133,11 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
-        if set(test.keys()) != set(case.BASE_TEST.keys()):
-            raise AssertionError('Invalid test keys used in test: %s'
-                                 % test_name)
+        test_key_set = set(test.keys())
+        if test_key_set != base_test_key_set:
+            raise AssertionError(
+                'Invalid test keys used in test: %s. <Used: %s>, <Allowed: %s>'
+                % (test_name, test_key_set, base_test_key_set))
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.

@@ -20,6 +20,7 @@ response headers and body. When the test is run an HTTP request is
 made using httplib2. Assertions are made against the reponse.
 """
 
+import copy
 import functools
 import json
 import os
@@ -30,7 +31,6 @@ import jsonpath_rw
 from six.moves.urllib import parse as urlparse
 from testtools import testcase
 
-from gabbi import handlers
 from gabbi import utils
 
 REPLACERS = [
@@ -40,12 +40,6 @@ REPLACERS = [
     'LOCATION',
     'HEADERS',
     'RESPONSE',
-]
-
-
-RESPONSE_HANDLERS = [
-    handlers.handle_response_strings,
-    handlers.handle_json_paths,
 ]
 
 
@@ -59,9 +53,6 @@ BASE_TEST = {
     'url': '',
     'status': '200',
     'request_headers': {},
-    'response_headers': {},
-    'response_strings': [],
-    'response_json_paths': {},
     'data': '',
     'xfail': False,
     'skip': '',
@@ -92,6 +83,9 @@ class HTTPTestCase(testcase.TestCase):
     To keep the test harness happy we need to make sure the setUp and
     tearDown are only run once.
     """
+
+    response_handlers = []
+    base_test = copy.copy(BASE_TEST)
 
     def setUp(self):
         if not self.has_run:
@@ -148,10 +142,8 @@ class HTTPTestCase(testcase.TestCase):
             raise ServerError(self.output)
 
         self._test_status(test['status'], response['status'])
-        self._test_headers(test['response_headers'], response)
 
-        # Process all the registered RESPONSE_HANDLERS
-        for handler in RESPONSE_HANDLERS:
+        for handler in self.response_handlers:
             handler(self)
 
     def _environ_replace(self, message):
@@ -321,33 +313,6 @@ class HTTPTestCase(testcase.TestCase):
         else:
             data = json.dumps(data)
         return self.replace_template(data)
-
-    def _test_headers(self, headers, response):
-        """Compare expected headers with actual headers.
-
-        If a header value is wrapped in ``/`` it is treated as a raw
-        regular expression.
-        """
-        for header in headers:
-            header_value = self.replace_template(headers[header])
-
-            try:
-                response_value = response[header]
-            except KeyError:
-                # Reform KeyError to something more debuggable.
-                raise KeyError("'%s' header not available in response keys: %s"
-                               % (header, response.keys()))
-
-            if header_value.startswith('/') and header_value.endswith('/'):
-                header_value = header_value.strip('/').rstrip('/')
-                self.assertRegexpMatches(
-                    response_value, header_value,
-                    'Expect header %s to match /%s/, got %s' %
-                    (header, header_value, response_value))
-            else:
-                self.assertEqual(header_value, response[header],
-                                 'Expect header %s with value %s, got %s' %
-                                 (header, header_value, response[header]))
 
     def _test_status(self, expected_status, observed_status):
         """Confirm we got the expected status.
