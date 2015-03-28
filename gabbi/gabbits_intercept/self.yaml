@@ -92,3 +92,15 @@ tests:
   url: /$ENVIRON['GABBI_TEST_URL']
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/takingnames
+
+- name: test pluggable response
+  url: /foo?alpha=1
+  response_test:
+      - 'COW"alpha": ["1"]'
+
+- name: fail pluggable response
+  desc: this one will fail because COW is not removable
+  url: /foo?alpha=1
+  xfail: true
+  response_test:
+      - 'CO"alpha": ["1"]'

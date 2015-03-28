@@ -58,7 +58,8 @@ class TestBuilder(type):
 
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
-                test_loader_name=None, fixture_module=None):
+                test_loader_name=None, fixture_module=None,
+                response_handlers=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -67,6 +68,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     assert bool(host) ^ bool(intercept), \
         'must specify exactly one of host or intercept'
 
+    response_handlers = response_handlers or []
     top_suite = suite.TestSuite()
 
     if test_loader_name is None:
@@ -76,8 +78,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     yaml_file_glob = '%s/*.yaml' % path
 
-    # Initialize the extensions to the response handling.
-    for handler in RESPONSE_HANDLERS:
+    # Initialize the extensions for response handling.
+    for handler in RESPONSE_HANDLERS + response_handlers:
         handler(case.HTTPTestCase)
 
     # Return an empty suite if we have no host to access, either via

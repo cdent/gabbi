@@ -28,14 +28,14 @@ class ResponseHandler(object):
     test_key_value = []
 
     def __init__(self, test_class):
+        self._key = 'response_%s' % self.test_key_suffix
         self._register(test_class)
 
     def __call__(self, test):
         pass
 
     def _register(self, test_class):
-        test_key = 'response_%s' % self.test_key_suffix
-        test_class.base_test[test_key] = self.test_key_value
+        test_class.base_test[self._key] = self.test_key_value
         if self not in test_class.response_handlers:
             test_class.response_handlers.append(self)
 
@@ -55,7 +55,7 @@ class StringResponseHandler(ResponseHandler):
 
     def __call__(self, test):
         """Compare strings in response body."""
-        for expected in test.test_data['response_strings']:
+        for expected in test.test_data[self._key]:
             expected = test.replace_template(expected)
             test.assertIn(expected, test.output)
 
@@ -72,10 +72,10 @@ class JSONResponseHandler(ResponseHandler):
         # processed (to provided for the magic template replacing).
         # Other handlers that want access to data structures will need
         # to do their own processing.
-        for path in test.test_data['response_json_paths']:
+        for path in test.test_data[self._key]:
             match = test.extract_json_path_value(test.json_data, path)
             expected = test.replace_template(
-                test.test_data['response_json_paths'][path])
+                test.test_data[self._key][path])
             test.assertEqual(expected, match, 'Unable to match %s as %s'
                              % (path, expected))
 
@@ -91,7 +91,7 @@ class HeadersResponseHandler(ResponseHandler):
         If a header value is wrapped in ``/`` it is treated as a raw
         regular expression.
         """
-        headers = test.test_data['response_headers']
+        headers = test.test_data[self._key]
         response = test.response
 
         for header in headers:

@@ -27,6 +27,7 @@ import sys
 
 from gabbi import driver
 from gabbi import fixture
+from gabbi import handlers
 from gabbi import simple_wsgi
 
 TESTS_DIR = 'gabbits_intercept'
@@ -41,6 +42,16 @@ class TestFixtureTwo(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
     pass
 
+class TestResponseHandler(handlers.ResponseHandler):
+    """A sample response handler just to test."""
+
+    test_key_suffix = 'test'
+    test_key_value = []
+
+    def __call__(self, test):
+        for expected in test.test_data[self._key]:
+            expected = expected.replace('COW', '', 1)
+            test.assertIn(expected, test.output)
 
 # Incorporate the SkipAllFixture into this namespace so it can be used
 # by tests (c.f. skipall.yaml).
@@ -54,4 +65,5 @@ def load_tests(loader, tests, pattern):
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
                               intercept=simple_wsgi.SimpleWsgi,
-                              fixture_module=sys.modules[__name__])
+                              fixture_module=sys.modules[__name__],
+                              response_handlers=[TestResponseHandler])
