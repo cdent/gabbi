@@ -36,7 +36,16 @@ class ResponseHandler(object):
     def _register(self, test_class):
         test_key = 'response_%s' % self.test_key_suffix
         test_class.base_test[test_key] = self.test_key_value
-        test_class.response_handlers.append(self)
+        if self not in test_class.response_handlers:
+            test_class.response_handlers.append(self)
+
+    def __eq__(self, other):
+        if isinstance(other, ResponseHandler):
+            return self.__class__ == other.__class__
+        return False
+
+    def __ne__(self, other):
+        return (not self.__eq__(other))
 
 
 class StringResponseHandler(ResponseHandler):
