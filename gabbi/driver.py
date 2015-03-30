@@ -138,8 +138,8 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test_key_set = set(test.keys())
         if test_key_set != base_test_key_set:
             raise AssertionError(
-                'Invalid test keys used in test: %s. <Used: %s>, <Allowed: %s>'
-                % (test_name, test_key_set, base_test_key_set))
+                'Invalid test keys used in test %s: %s'
+                % (test_name, test_key_set - base_test_key_set))
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
