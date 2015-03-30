@@ -9,6 +9,12 @@ tests:
       url: /
       status: 404
 
+    - name: non existent header
+      xfail: True
+      url: /
+      response_headers:
+          unlikely_header: no way
+
     - name: skip me
       skip: Skipping for now because we can't do it
       url: http://nowhere.example.com/house
