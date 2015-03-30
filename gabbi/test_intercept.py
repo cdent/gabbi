@@ -42,16 +42,17 @@ class TestFixtureTwo(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
     pass
 
+
 class TestResponseHandler(handlers.ResponseHandler):
     """A sample response handler just to test."""
 
     test_key_suffix = 'test'
     test_key_value = []
 
-    def __call__(self, test):
-        for expected in test.test_data[self._key]:
-            expected = expected.replace('COW', '', 1)
-            test.assertIn(expected, test.output)
+    def action(self, test, expected, value=None):
+        expected = expected.replace('COW', '', 1)
+        test.assertIn(expected, test.output)
+
 
 # Incorporate the SkipAllFixture into this namespace so it can be used
 # by tests (c.f. skipall.yaml).

@@ -13,12 +13,22 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Handlers for process the body of a response in various ways.
+"""Handlers for processing the body of a response in various ways.
 
 A response handler is a callable that takes a test case (which includes
 a reference to the response body). It should look for matching rules in
 the test data and simply return if none are there. If there are some,
 they should be tested.
+
+A subclass may implement two methods: action and cleanup.
+
+cleanup takes no arguments. It is called exactly once for each test
+before the looping across the assertions. It is rarely used.
+
+action takes two or three arguments. If the test_key_value is a list
+action is called with the test case and a single list item. If the
+test_key_value is a dict action is called with the test case and a
+key and value pair.
 """
 
 
@@ -32,6 +42,25 @@ class ResponseHandler(object):
         self._register(test_class)
 
     def __call__(self, test):
+        self.cleanup()
+        for item in test.test_data[self._key]:
+            try:
+                value = test.test_data[self._key][item]
+            except (TypeError, KeyError):
+                value = None
+            self.action(test, item, value=value)
+
+    def cleanup(self):
+        """Do any pre-single-test cleanup."""
+        pass
+
+    def action(self, test, item, value=None):
+        """Test an individual entry for this response handler.
+
+        If the entry is a key value pair the key is in item and the
+        value in value. Otherwise the entry is considered a single item
+        from a list.
+        """
         pass
 
     def _register(self, test_class):
@@ -49,68 +78,63 @@ class ResponseHandler(object):
 
 
 class StringResponseHandler(ResponseHandler):
+    """Test for matching strings in the the response body."""
 
     test_key_suffix = 'strings'
     test_key_value = []
 
-    def __call__(self, test):
-        """Compare strings in response body."""
-        for expected in test.test_data[self._key]:
-            expected = test.replace_template(expected)
-            test.assertIn(expected, test.output)
+    def action(self, test, expected, value=None):
+        expected = test.replace_template(expected)
+        test.assertIn(expected, test.output)
 
 
 class JSONResponseHandler(ResponseHandler):
+    """Test for matching json paths in the json_data."""
 
     test_key_suffix = 'json_paths'
     test_key_value = {}
 
-    def __call__(self, test):
+    def action(self, test, path, value):
         """Test json_paths against json data."""
         # NOTE: This process has some advantages over other process that
         # might come along because the JSON data has already been
         # processed (to provided for the magic template replacing).
         # Other handlers that want access to data structures will need
         # to do their own processing.
-        for path in test.test_data[self._key]:
-            match = test.extract_json_path_value(test.json_data, path)
-            expected = test.replace_template(
-                test.test_data[self._key][path])
-            test.assertEqual(expected, match, 'Unable to match %s as %s'
-                             % (path, expected))
+        match = test.extract_json_path_value(test.json_data, path)
+        expected = test.replace_template(value)
+        test.assertEqual(expected, match, 'Unable to match %s as %s'
+                         % (path, expected))
 
 
 class HeadersResponseHandler(ResponseHandler):
+    """Compare expected headers with actual headers.
+
+    If a header value is wrapped in ``/`` it is treated as a raw
+    regular expression.
+    """
 
     test_key_suffix = 'headers'
     test_key_value = {}
 
-    def __call__(self, test):
-        """Compare expected headers with actual headers.
-
-        If a header value is wrapped in ``/`` it is treated as a raw
-        regular expression.
-        """
-        headers = test.test_data[self._key]
+    def action(self, test, header, value):
         response = test.response
+        header_value = test.replace_template(value)
 
-        for header in headers:
-            header_value = test.replace_template(headers[header])
+        try:
+            response_value = response[header]
+        except KeyError:
+            # Reform KeyError to something more debuggable.
+            raise KeyError("'%s' header not available in response keys: %s"
+                           % (header, response.keys()))
 
-            try:
-                response_value = response[header]
-            except KeyError:
-                # Reform KeyError to something more debuggable.
-                raise KeyError("'%s' header not available in response keys: %s"
-                               % (header, response.keys()))
-
-            if header_value.startswith('/') and header_value.endswith('/'):
-                header_value = header_value.strip('/').rstrip('/')
-                test.assertRegexpMatches(
-                    response_value, header_value,
-                    'Expect header %s to match /%s/, got %s' %
-                    (header, header_value, response_value))
-            else:
-                test.assertEqual(header_value, response[header],
-                                 'Expect header %s with value %s, got %s' %
-                                 (header, header_value, response[header]))
+        if header_value.startswith('/') and header_value.endswith('/'):
+            header_value = header_value.strip('/').rstrip('/')
+            test.assertRegexpMatches(
+                response_value, header_value,
+                'Expect header %s to match /%s/, got %s' %
+                (header, header_value, response_value))
+        else:
+            test.assertEqual(header_value, response[header],
+                             'Expect header %s with value %s, got %s' %
+                             (header, header_value, response[header]))

@@ -54,6 +54,9 @@ these allow substitutions (explained below).
 * ``data``: A representation to pass as the body of a request. If you
   use this you should set ``content-type`` in ``request_headers`` to
   something meaningful. See `Data`_ below for more details.
+* ``skip``: A string message which if set will cause the test to be
+  skipped with the provided message.
+* ``xfail``: If ``True`` expect this test to fail but run it anyway.
 * ``response_headers``: A dictionary of key-value pairs representing
   expected response headers. If the value of a header is wrapped in
   ``/``, it will be treated as a raw regular expression string.
@@ -61,9 +64,10 @@ these allow substitutions (explained below).
   in the response body.
 * ``response_json_paths``: A dictionary of JSONPath rules paired with
   expected matches.
-* ``skip``: A string message which if set will cause the test to be
-  skipped with the provided message.
-* ``xfail``: If ``True`` expect this test to fail but run it anyway.
+
+The ``response_*`` items are examples of Response Handlers. Additional
+handlers may be created by test authors for specific use cases. See
+:doc:`handlers` for more information.
 
 There are a number of magical variables that can be used to make
 reference to the state of a current test or the one just prior. These

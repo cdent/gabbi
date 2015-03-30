@@ -10,6 +10,7 @@
    format
    host
    fixtures
+   handlers
    gabbi
 
 Gabbi

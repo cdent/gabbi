@@ -25,6 +25,14 @@ gabbi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`handlers` Module
+----------------------
+
+.. automodule:: gabbi.handlers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`suite` Module
 -------------------
 
