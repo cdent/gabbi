@@ -62,7 +62,7 @@ class TestResponseHandler(handlers.ResponseHandler):
 
 
 # Incorporate the SkipAllFixture into this namespace so it can be used
-# by tests (c.f. skipall.yaml).
+# by tests (cf. skipall.yaml).
 SkipAllFixture = fixture.SkipAllFixture
 
 
