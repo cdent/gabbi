@@ -42,13 +42,14 @@ class ResponseHandler(object):
         self._register(test_class)
 
     def __call__(self, test):
-        self.preprocess(test)
-        for item in test.test_data[self._key]:
-            try:
-                value = test.test_data[self._key][item]
-            except (TypeError, KeyError):
-                value = None
-            self.action(test, item, value=value)
+        if test.test_data[self._key]:
+            self.preprocess(test)
+            for item in test.test_data[self._key]:
+                try:
+                    value = test.test_data[self._key][item]
+                except (TypeError, KeyError):
+                    value = None
+                self.action(test, item, value=value)
 
     def preprocess(self, test):
         """Do any pre-single-test preprocessing."""
