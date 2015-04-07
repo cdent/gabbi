@@ -49,6 +49,13 @@ class TestResponseHandler(handlers.ResponseHandler):
     test_key_suffix = 'test'
     test_key_value = []
 
+    def preprocess(self, test):
+        """Add some data if the data is a string."""
+        try:
+            test.output = test.output + '\nAnother line'
+        except TypeError:
+            pass
+
     def action(self, test, expected, value=None):
         expected = expected.replace('COW', '', 1)
         test.assertIn(expected, test.output)

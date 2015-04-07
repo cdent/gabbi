@@ -97,6 +97,7 @@ tests:
   url: /foo?alpha=1
   response_test:
       - 'COW"alpha": ["1"]'
+      - COWAnother line
 
 - name: fail pluggable response
   desc: this one will fail because COW is not removable

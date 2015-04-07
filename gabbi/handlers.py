@@ -20,10 +20,10 @@ a reference to the response body). It should look for matching rules in
 the test data and simply return if none are there. If there are some,
 they should be tested.
 
-A subclass may implement two methods: action and cleanup.
+A subclass may implement two methods: action and preprocess.
 
-cleanup takes no arguments. It is called exactly once for each test
-before the looping across the assertions. It is rarely used.
+preprocess takes one argument, the TestCase. It is called exactly once for
+each test before looping across the assertions. It is rarely used.
 
 action takes two or three arguments. If the test_key_value is a list
 action is called with the test case and a single list item. If the
@@ -42,7 +42,7 @@ class ResponseHandler(object):
         self._register(test_class)
 
     def __call__(self, test):
-        self.cleanup()
+        self.preprocess(test)
         for item in test.test_data[self._key]:
             try:
                 value = test.test_data[self._key][item]
@@ -50,8 +50,8 @@ class ResponseHandler(object):
                 value = None
             self.action(test, item, value=value)
 
-    def cleanup(self):
-        """Do any pre-single-test cleanup."""
+    def preprocess(self, test):
+        """Do any pre-single-test preprocessing."""
         pass
 
     def action(self, test, item, value=None):

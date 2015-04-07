@@ -1,18 +1,19 @@
 Response Handlers
 =================
 
-Response handlers determine how an HTTP response is being processed and checked
-against the expected result. For each entry starting with `response_`, the
-respective class is invoked with the corresponding values:
+Response handlers determine how an HTTP response will be processed and checked
+against the expected result. For each entry starting with `response_`, an
+associated class is invoked with corresponding values. For example
+if the following lines are in a test::
 
     response_strings:
         - "lorem ipsum"
         - "dolor sit amet"
 
-This creates an instance of `StringResponseHandler`, passing the value
-`["lorem ipsum", "dolor sit amet"]` - it is then up to the response handler's
-implementation to interpret both the actual response and the expected values,
-thus determining whether the test passes or fails.
+this creates an instance of ``StringResponseHandler``, passing the value
+``["lorem ipsum", "dolor sit amet"]``. The response handler
+implementation interprets the response and the expected values, determining
+whether the test passes or fails.
 
 While the default handlers (as described in :doc:`format`) are sufficient for
 most cases, it is possible to register additional custom handlers by passing a
@@ -27,12 +28,11 @@ A subclass needs to define at least three things:
 
 * ``test_key_suffix``: This, along with the prefix ``response_``, forms
   the key used in the test structure. It is a class level string.
-* ``test_key_value``: The key's default value, either an empty list or empty
-  dict. It is also a class level value.
+* ``test_key_value``: The key's default value, either an empty list (``[]``)
+  or empty dict (``{}``). It is a class level value.
 * ``action``: An instance method which tests the expected values
   against the HTTP response - it is invoked for each entry, with the parameters
-  depending on the default value. If ``test_key_value`` is a list, then the
-  arguments to ``action`` are (in order):
+  depending on the default value. The arguments to ``action`` are (in order):
 
   * ``self``: The current instance.
   * ``test``: The currently active ``HTTPTestCase``
@@ -41,5 +41,9 @@ A subclass needs to define at least three things:
   * ``value``: None if ``test_key_value`` is a list, otherwise the
     value half of the key/value pair at this entry.
 
-Optionally a subclass may also define a ``cleanup`` method which is
+Optionally a subclass may also define a ``preprocess`` method which is
 called once before the loop that calls ``action`` is run.
+``preprocess`` is passed the current test instance which may be
+modified in place if required. One possible reason to do this would
+be to process the ``test.output`` into another form only once rather
+than per test assertion.
