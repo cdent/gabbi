@@ -33,12 +33,12 @@ class GabbiFixtureError(Exception):
 class GabbiFixture(object):
     """A context manager that operates as a fixture.
 
-    Subclasses must implement start_fixture and stop_fixture, each of which
-    contain the logic for stopping and starting whatever the fixture is.
-    What a fixture is is left as an exercise for the implementor.
+    Subclasses must implement ``start_fixture`` and ``stop_fixture``, each
+    of which contain the logic for stopping and starting whatever the
+    fixture is. What a fixture is is left as an exercise for the implementor.
 
-    These context managers will be nested so any actually work needs to
-    happen in `start_fixture` and `stop_fixture` and not in ``__init__``.
+    These context managers will be nested so any actual work needs to
+    happen in ``start_fixture`` and ``stop_fixture`` and not in ``__init__``.
     Otherwise exception handling will not work properly.
     """
 

@@ -45,5 +45,8 @@ Optionally a subclass may also define a ``preprocess`` method which is
 called once before the loop that calls ``action`` is run.
 ``preprocess`` is passed the current test instance which may be
 modified in place if required. One possible reason to do this would
-be to process the ``test.output`` into another form only once rather
-than per test assertion.
+be to process the ``test.output`` into another form (e.g. a parsed
+DOM) only once rather than per test assertion. Since ``ResponseHandler``
+classes will run in an unpredictable order it is best to add new
+attributes on the test instance instead of changing the value of
+existing attributes.

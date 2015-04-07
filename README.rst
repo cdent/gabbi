@@ -4,7 +4,7 @@
     :target: http://gabbi.readthedocs.org/en/latest/
     :alt: Documentation Status
 
-gabbi
+Gabbi
 =====
 
 Gabbi is a tool for running HTTP tests where requests and responses

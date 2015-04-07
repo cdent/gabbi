@@ -15,20 +15,19 @@
 # under the License.
 """Handlers for processing the body of a response in various ways.
 
-A response handler is a callable that takes a test case (which includes
-a reference to the response body). It should look for matching rules in
-the test data and simply return if none are there. If there are some,
-they should be tested.
+A response handler is a class that adds functionality for making assertions
+about an HTTP response.
 
-A subclass may implement two methods: action and preprocess.
+A subclass may implement two methods: ``action`` and ``preprocess``.
 
-preprocess takes one argument, the TestCase. It is called exactly once for
-each test before looping across the assertions. It is rarely used.
+``preprocess`` takes one argument, the ``TestCase``. It is called exactly
+once for each test before looping across the assertions. It is used, rarely,
+to copy the ``test.output`` into a useful form (such as a parsed DOM).
 
-action takes two or three arguments. If the test_key_value is a list
-action is called with the test case and a single list item. If the
-test_key_value is a dict action is called with the test case and a
-key and value pair.
+``action`` takes two or three arguments. If ``test_key_value`` is a list
+``action`` is called with the test case and a single list item. If
+``test_key_value`` is a dict then ``action`` is called with the test case
+and a key and value pair.
 """
 
 

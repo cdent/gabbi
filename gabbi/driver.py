@@ -17,7 +17,7 @@
 """Generate HTTP tests from YAML files
 
 Each HTTP request is its own TestCase and can be requested to be run in
-isolation from other tests. If it is member of a sequence of requests,
+isolation from other tests. If it is a member of a sequence of requests,
 prior requests will be run.
 
 A sequence is represented by an ordered list in a single YAML file.

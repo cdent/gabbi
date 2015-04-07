@@ -19,9 +19,7 @@ Gabbi
 Gabbi is a tool for running HTTP tests where requests and responses
 are expressed as declarations in a collection of YAML files.
 
-If you're not after the overview and just want to get on with it,
-see the :doc:`gabbi` documentation and the test files in the
-`source distribution`_.
+For a quickstart, see the test files in the `source distribution`_.
 
 The name is derived from "gabby": excessively talkative. In a test
 environment this is a good thing. The "y" to an "i" is an
@@ -58,9 +56,7 @@ and automated CI systems.
 
 Extended functionality, such as the use of `JSONPath`_ to query response
 bodies and reuse the prior response data in the current request,
-exists to make it easier to test relatively complex JSON-driven APIs,
-even those bold enough to lay claim to being fully RESTful with
-HATEOAS.
+exists to make it easier to test relatively complex JSON-driven APIs.
 
 This functionality should not be taken as license to write gloriously
 complex test files. If your API is so complex that it needs complex

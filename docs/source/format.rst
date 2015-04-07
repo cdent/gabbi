@@ -3,7 +3,7 @@ Test Format
 
 Gabbi tests are expressed as YAML containing an HTTP request and an
 expected response. Each YAML file is an ordered sequence of requests.
-The bare minimum YAML file for a single request is:::
+The bare minimum YAML file for a single request is::
 
     tests:
        - name: the name of a test
@@ -13,11 +13,11 @@ This will make a request to ``/`` on whatever the configured
 :doc:`host` is. The test will pass if the status of the HTTP response
 is ``200``.
 
-The ``tests`` key can contain as many requests, in sequence, as
-required. Other top level keys are:
+The ``tests`` sequence can contain as many requests as required.
+Other top level keys are:
 
-* fixtures: A sequence of named :doc:`fixtures`.
-* defaults: A dictionary of local default values for the requests and
+* ``fixtures``: A sequence of named :doc:`fixtures`.
+* ``defaults``: A dictionary of local default values for the requests and
   responses in the ``tests`` in this file. These override the global
   defaults (explained below).
 
@@ -108,10 +108,10 @@ Data
 The ``data`` key has some special handing to allow for a bit more
 flexibility when doing a ``POST`` or ``PUT``. If the value is not a
 string (that is, it is a sequence or structure) it is treated as a
-datastructure which is turned into a JSON string. If the value is a
+data structure which is turned into a JSON string. If the value is a
 string that begins with ``<@`` then the rest of the string is treated
-as a file to be loaded from the same directory as the YAML file. If
-the the value is an undecorated string, that's the value.
+as the name of a file to be loaded from the same directory as the YAML
+file. If the value is an undecorated string, that's the value.
 
 When reading from a file care should be taken to ensure that a
 reasonable content-type is set for the data as this will control if any

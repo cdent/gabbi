@@ -22,7 +22,7 @@ sequence of tests in a YAML file.
 
 For test driven development and local tests the intercept style of
 testing lowers test requirements (no web server required) and is fast.
-Interception is performed as part of fixture processing as the most
+Interception is performed as part of :doc:`fixtures` processing as the most
 deeply nested fixture. This allows any configuration or database
 setup to be performed prior to the WSGI application being created.
 
