@@ -27,7 +27,9 @@ import os
 import re
 import sys
 
+import wsgi_intercept
 import jsonpath_rw
+import six
 from six.moves.urllib import parse as urlparse
 from testtools import testcase
 
@@ -243,14 +245,24 @@ class HTTPTestCase(testcase.TestCase):
                       self._json_replacer, message)
 
     def _run_request(self, url, method, headers, body):
-        """Run the http request and decode output."""
+        """Run the http request and decode output.
 
-        response, content = self.http.request(
-            url,
-            method=method,
-            headers=headers,
-            body=body
-        )
+        The call to make the request will catch a WSGIAppError from
+        wsgi_intercept so that the real traceback from a catastrophic
+        error in the intercepted app can be examined.
+        """
+
+        try:
+            response, content = self.http.request(
+                url,
+                method=method,
+                headers=headers,
+                body=body
+            )
+        except wsgi_intercept.WSGIAppError as exc:
+            # Extract and re-raise the wrapped exception.
+            six.reraise(exc.exception_type, exc.exception_value,
+                        exc.traceback)
 
         # Set headers and location attributes for follow on requests
         self.response = response

@@ -51,6 +51,9 @@ class SimpleWsgi(object):
             ('X-Gabbi-url', request_url),
         ]
 
+        if request_method == 'DIE':
+            raise Exception('because you asked me to')
+
         if request_method not in METHODS:
             headers.append(
                 ('Allow', ', '.join(METHODS)))
