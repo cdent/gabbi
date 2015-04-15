@@ -52,7 +52,8 @@ def run():
     data = yaml.safe_load(sys.stdin.read())
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    sys.exit(not result.wasSuccessful())
 
 
 if __name__ == '__main__':
