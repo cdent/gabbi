@@ -18,7 +18,8 @@ import sys
 import yaml
 import unittest
 
-from . import driver
+from gabbi import driver
+from gabbi import case
 
 
 def run():
@@ -49,6 +50,11 @@ def run():
     except IndexError:
         host, port = 'stub', None
     loader = unittest.defaultTestLoader
+
+    # Initialize the extensions for response handling.
+    for handler in driver.RESPONSE_HANDLERS:
+        handler(case.HTTPTestCase)
+
     data = yaml.safe_load(sys.stdin.read())
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None)
