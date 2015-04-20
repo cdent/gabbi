@@ -42,10 +42,10 @@ tests:
 
       url: /
 
-# If no status or method are provide they default to "200" and
+# If no status or method are provided they default to "200" and
 # "GET".
 
-# A single test can override settings in defaults (above).
+# A single test can override settings in defaults (set above).
 
     - name: root without ssl redirects
       ssl: False
@@ -53,7 +53,7 @@ tests:
       status: 302
 
 # When evaluating response headers it is possible to use a regular
-# expression to not have to test the whole thing.
+# expression to not have to test the whole value.
 
       response_headers:
           location: /https/
@@ -105,7 +105,9 @@ tests:
 
 # If the data is a string prepended with "<@" the value will be
 # treated as the name of a file in the same directory as the YAML
-# file. Again, you must supply an appropriate content-type.
+# file. Again, you must supply an appropriate content-type. If the
+# content-type is one of several "text-like" types, the content will
+# be assumed to be UTF-8 encoded.
 
     - name: post an image
       url: /image_repo
@@ -141,7 +143,7 @@ tests:
       response_strings:
           - normalize.css
 
-# For JSON response, JSONPath rules can be used.
+# For JSON responses, JSONPath rules can be used.
 
     - name: post some json get back json
       url: /json_repo
@@ -179,4 +181,3 @@ tests:
           $.abode: $RESPONSE['$.abode']
       response_headers:
           content-location: /$SCHEME://$NETLOC/
-

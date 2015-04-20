@@ -2,8 +2,9 @@ Test Example
 ============
 
 What follows is a commented example of some tests in a single
-file demonstrating many of the :doc:`format` features. See `Loader`,
-below, for the Python need to integrate with a testing harness.
+file demonstrating many of the :doc:`format` features. See
+`Loader`_, below, for the Python need to integrate with a testing
+harness.
 
 .. literalinclude:: example.yaml
    :language: yaml

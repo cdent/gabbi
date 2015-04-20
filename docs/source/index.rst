@@ -28,7 +28,7 @@ determined backronyms such as: "Garrulous API Barrier Breaking
 Initiative" or "Glorious And Basic Beta Investigator". These
 are not good enough so the search continues.
 
-If you want to get straight to creating tests, look at
+If you want to get straight to creating tests look at
 :doc:`example`, the test files in the `source distribution`_
 and :doc:`format`. A full tutorial is in the works.
 
