@@ -4,6 +4,8 @@
 
 defaults:
     url: /cow?alpha=1
+    request_headers:
+        x-random-header: ya
 
 tests:
 - name: get simple page
