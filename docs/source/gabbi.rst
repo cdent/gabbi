@@ -40,3 +40,19 @@ gabbi Package
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`runner` Module
+--------------------
+
+.. automodule:: gabbi.runner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`utils` Module
+-------------------
+
+.. automodule:: gabbi.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

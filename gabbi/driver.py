@@ -27,6 +27,7 @@ Each sequence becomes a TestSuite.
 An entire directory of YAML files is a TestSuite of TestSuites.
 """
 
+import copy
 import glob
 import inspect
 import os
@@ -34,6 +35,7 @@ from unittest import suite
 import uuid
 
 import httplib2
+import six
 import yaml
 
 from gabbi import case
@@ -104,6 +106,19 @@ def load_yaml(yaml_file):
         return yaml.safe_load(source.read())
 
 
+def test_update(orig_dict, new_dict):
+    """Modify test in place to update with new data."""
+    for key, val in six.iteritems(new_dict):
+        if key == 'data':
+            orig_dict[key] = val
+        elif isinstance(val, dict):
+            orig_dict[key].update(val)
+        elif isinstance(val, list):
+            orig_dict[key] = orig_dict.get(key, []) + val
+        else:
+            orig_dict[key] = val
+
+
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept):
     """Generate a TestSuite from YAML data."""
@@ -114,8 +129,9 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
     # Set defaults from BASE_TESTS then update those defaults
     # with any defaults set in the YAML file.
-    base_test_data = dict(case.HTTPTestCase.base_test)
-    base_test_data.update(test_yaml.get('defaults', {}))
+    base_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
+    defaults = test_yaml.get('defaults', {})
+    test_update(base_test_data, defaults)
 
     # Establish any fixture classes.
     fixture_classes = []
@@ -126,8 +142,8 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
     prior_test = None
     base_test_key_set = set(case.HTTPTestCase.base_test.keys())
     for test_datum in test_data:
-        test = dict(base_test_data)
-        test.update(test_datum)
+        test = copy.deepcopy(base_test_data)
+        test_update(test, test_datum)
 
         if not test['name']:
             raise AssertionError('Test name missing in a test in %s.'

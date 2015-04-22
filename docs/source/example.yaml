@@ -1,0 +1,183 @@
+
+# Fixtures can be used to set any necessary configuration, such as a
+# persistence layer, and establish sample data. They operate per
+# file. They are context managers, each one wrapping the next in the
+# sequence.
+
+fixtures:
+    - ConfigFixture
+    - SampleDataFixture
+
+# There is an included fixture named "SkipAllFixture" which can be
+# used to declare that all the tests in the given file are to be
+# skipped.
+
+# Each test file can specify a set of defaults that will be used for
+# every request. This is useful for always specifying a particular
+# header or always requiring SSL. These values will be used on every
+# test in the file unless overriden. Lists and dicts are merged one
+# level deep, except for "data" which is copied verbatim whether it
+# is a string, list or dict (it can be all three).
+
+defaults:
+    ssl: True
+    request_headers:
+        x-my-token: zoom
+
+# The tests themselves are a list under a "tests" key. It's useful
+# to use plenty of whitespace to help readability.
+
+tests:
+
+# Each request *must* have a name which is unique to the file. When it
+# becomes a TestCase the name will be lowercased and spaces will
+# become "_". Use that generated name when limiting test runs.
+
+    - name: a test for root
+      desc: Some explanatory text that could be used by other tooling
+
+# The URL can either be relative to a host specified elsewhere or
+# be a fully qualified "http" or "https" URL. *You* are responsible
+# for url-encoding the URL.
+
+      url: /
+
+# If no status or method are provided they default to "200" and
+# "GET".
+
+# A single test can override settings in defaults (set above).
+
+    - name: root without ssl redirects
+      ssl: False
+      url: /
+      status: 302
+
+# When evaluating response headers it is possible to use a regular
+# expression to not have to test the whole value.
+
+      response_headers:
+          location: /https/
+
+# By default redirects will not be followed. This can be changed.
+
+    - name: follow root without ssl redirect
+      ssl: False
+      redirects: True
+      url: /
+      status: 200 # This is the response code after the redirect.
+
+# Request headers can be used to declare media-type choices and
+# experiment with authorization handling (amongst other things).
+# Response headers allow evaluating headers in the response. These
+# two together form the core value of gabbi.
+
+    - name: test accept
+      url: /resource
+      request_headers:
+          accept: application/json
+      response_headers:
+          content-type: /application/json/
+
+# All of the above requests have defaulted to a "GET" method. When
+# using "POST", "PUT" or "PATCH", the "data" key provides the
+# request body.
+
+    - name: post some text
+      url: /text_repo
+      method: POST
+      request_headers:
+          content-type: text/plain
+      data: "I'm storing this"
+      status: 201
+
+# If the data is not a string, it will be transformed into JSON.
+# You must supply an appropriate content-type request header.
+
+    - name: post some json
+      url: /json_repo
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          name: smith
+          abode: castle
+      status: 201
+
+# If the data is a string prepended with "<@" the value will be
+# treated as the name of a file in the same directory as the YAML
+# file. Again, you must supply an appropriate content-type. If the
+# content-type is one of several "text-like" types, the content will
+# be assumed to be UTF-8 encoded.
+
+    - name: post an image
+      url: /image_repo
+      method: POST
+      request_headers:
+          content-type: image/png
+      data: <@kittens.png
+
+# A single request can be marked to be skipped.
+
+    - name: patch an image
+      skip: patching images not yet implemented
+      url: /image_repo/12d96fb8-e78c-11e4-8c03-685b35afa334
+      method: PATCH
+
+# Or a single request can be marked that it is expected to fail.
+
+    - name: check allow headers
+      desc: the framework doesn't do allow yet
+      xfail: True
+      url: /post_only_url
+      method: PUT
+      status: 405
+      response_headers:
+          allow: POST
+
+# The body of a response can be evaluated with response handlers.
+# The most simple checks for a set of strings anywhere in the
+# response. Note that the strings are members of a list.
+
+    - name: check for css file
+      url: /blog/posts/12
+      response_strings:
+          - normalize.css
+
+# For JSON responses, JSONPath rules can be used.
+
+    - name: post some json get back json
+      url: /json_repo
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          name: smith
+          abode: castle
+      status: 201
+      response_json_paths:
+          $.name: smith
+          $.abode: castle
+
+# Requests run in sequence. One test can make reference to the test
+# immediately prior using some special variables.
+# "$LOCATION" contains the "location" header in the previous
+# response.
+# "$HEADERS" is a pseudo dictionary containing all the headers of
+# the previous response.
+# "$ENVIRON" is a pseudo dictionary providing access to the current
+# environment.
+# "$RESPONSE" provides access to the JSON in the prior response, via
+# JSONPath.
+# $SCHEME and $NETLOC provide access to the current protocol and
+# location (host and port).
+
+    - name: get the thing we just posted
+      url: $LOCATION
+      request_headers:
+          x-magic-exchange: $HEADERS['x-magic-exchange']
+          x-token: $ENVIRON['OS_TOKEN']
+      response_json_paths:
+          $.name: $RESPONSE['$.name']
+          $.abode: $RESPONSE['$.abode']
+      response_headers:
+          content-location: /$SCHEME://$NETLOC/

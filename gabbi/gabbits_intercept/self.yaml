@@ -4,6 +4,8 @@
 
 defaults:
     url: /cow?alpha=1
+    request_headers:
+        x-random-header: ya
 
 tests:
 - name: get simple page
@@ -19,11 +21,11 @@ tests:
 
 - name: bogus method
   url: /
-  method: DIE
+  method: UNREAL
   status: 405
   response_headers:
       allow: GET, PUT, POST, DELETE, PATCH
-      x-gabbi-method: DIE
+      x-gabbi-method: UNREAL
       x-gabbi-url: $SCHEME://$NETLOC/
 
 - name: query returned
@@ -105,3 +107,9 @@ tests:
   xfail: true
   response_test:
       - 'CO"alpha": ["1"]'
+
+- name: test exception wrapper
+  desc: simple wsgi will raise exception
+  url: /
+  xfail: true
+  method: DIE

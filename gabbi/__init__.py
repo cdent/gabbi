@@ -15,4 +15,4 @@
 # under the License.
 """See gabbi.driver and gabbbi.case."""
 
-__version__ = '0.12.1'
+__version__ = '0.99.0'

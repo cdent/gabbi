@@ -100,7 +100,8 @@ an issue or provide a patch.
 
 As all of these features needed to be tested in the development of
 gabbi itself, `the gabbi tests`_ are a good source of examples on how
-to use the functionality.
+to use the functionality. See also :doc:`example` for a collection
+of examples.
 
 Data
 ----
