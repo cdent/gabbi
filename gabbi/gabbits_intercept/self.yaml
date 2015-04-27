@@ -10,6 +10,7 @@ defaults:
 tests:
 - name: get simple page
   url: /
+  verbose: True
 
 - name: inheritance of defaults
   response_headers:

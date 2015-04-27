@@ -34,13 +34,13 @@ import os
 from unittest import suite
 import uuid
 
-import httplib2
 import six
 import yaml
 
 from gabbi import case
 from gabbi import handlers
 from gabbi import suite as gabbi_suite
+from gabbi import utils
 
 RESPONSE_HANDLERS = [
     handlers.StringResponseHandler,
@@ -159,11 +159,12 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
+        http_class = utils.get_http(verbose=test['verbose'])
         klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
                              'test_directory': test_directory,
                              'fixtures': fixture_classes,
-                             'http': httplib2.Http(),
+                             'http': http_class,
                              'host': host,
                              'intercept': intercept,
                              'port': port,

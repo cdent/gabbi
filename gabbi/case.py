@@ -20,6 +20,8 @@ response headers and body. When the test is run an HTTP request is
 made using httplib2. Assertions are made against the reponse.
 """
 
+from __future__ import print_function
+
 import copy
 import functools
 import json
@@ -49,6 +51,7 @@ REPLACERS = [
 BASE_TEST = {
     'name': '',
     'desc': '',
+    'verbose': False,
     'ssl': False,
     'redirects': False,
     'method': 'GET',
@@ -298,6 +301,13 @@ class HTTPTestCase(testcase.TestCase):
         self.http.follow_redirects = False
         if test['redirects']:
             self.http.follow_redirects = True
+
+        # Print some information about this request is asked.
+        if test['verbose']:
+            print('\n###########################')
+            print('%s %s' % (method, full_url))
+            for key in headers:
+                print('%s: %s' % (key, headers[key]))
 
         self._run_request(full_url, method, headers, body)
         self._assert_response()
