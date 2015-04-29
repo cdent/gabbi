@@ -46,6 +46,8 @@ these allow substitutions (explained below).
 * ``ssl``: Make this request use SSL? Defaults to ``False``. This only
   comes into play if the ``url`` does not provide a scheme (see
   :doc:`host` for more info).
+* ``verbose``: If ``True`` print a representation of the current
+  request and response to ``stdout``. Defaults to ``False``.
 * ``redirects``: If ``True`` automatically follow redirects. Defaults
   to ``False``.
 * ``request_headers``: A dictionary of key-value pairs representing
