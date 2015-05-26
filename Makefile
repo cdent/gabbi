@@ -6,6 +6,8 @@ clean:
 	rm -r dist || true
 	rm -r build || true
 	rm -r .tox || true
+	rm -r .testrepository || true
+	rm -r cover .coverage || true
 	rm -r .eggs || true
 	rm -r gabbi.egg-info || true
 
@@ -20,6 +22,8 @@ cleanagain:
 	rm -r dist || true
 	rm -r build || true
 	rm -r .tox || true
+	rm -r .testrepository || true
+	rm -r cover .coverage || true
 	rm -r .eggs || true
 	rm -r gabbi.egg-info || true
 
