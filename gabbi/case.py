@@ -29,11 +29,11 @@ import os
 import re
 import sys
 
-import wsgi_intercept
 import jsonpath_rw
 import six
 from six.moves.urllib import parse as urlparse
 from testtools import testcase
+import wsgi_intercept
 
 from gabbi import utils
 

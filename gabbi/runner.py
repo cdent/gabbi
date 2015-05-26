@@ -1,7 +1,5 @@
 # Copyright 2014, 2015 Red Hat
 #
-# Authors: Chris Dent <chdent@redhat.com>
-#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -15,11 +13,11 @@
 # under the License.
 
 import sys
-import yaml
 import unittest
+import yaml
 
-from gabbi import driver
 from gabbi import case
+from gabbi import driver
 
 
 def run():
