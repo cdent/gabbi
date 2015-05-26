@@ -31,3 +31,9 @@ If a fixture raises ``unittest.case.SkipTest`` during
 This makes it possible to skip the tests if some optional
 configuration (such as a particular type of database) is not
 available.
+
+If an exception is raised while a fixture is being used, information
+about the exception will be stored on the fixture so that the
+``stop_fixture`` method can decide if the exception should change how
+the fixture should clean up. The exception information can be found on
+``exc_type``, ``exc_value`` and ``traceback`` method attributes.

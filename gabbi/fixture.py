@@ -42,10 +42,18 @@ class GabbiFixture(object):
     Otherwise exception handling will not work properly.
     """
 
+    def __init__(self):
+        self.exc_type = None
+        self.exc_value = None
+        self.traceback = None
+
     def __enter__(self):
         self.start_fixture()
 
     def __exit__(self, exc_type, value, traceback):
+        self.exc_type = exc_type
+        self.exc_value = value
+        self.traceback = traceback
         self.stop_fixture()
 
     def start_fixture(self):
