@@ -65,8 +65,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     Each YAML file represents an ordered sequence of HTTP requests.
     """
 
-    assert bool(host) ^ bool(intercept), \
-        'must specify exactly one of host or intercept'
+    if not (bool(host) ^ bool(intercept)):
+        raise AssertionError('must specify exactly one of host or intercept')
 
     response_handlers = response_handlers or []
     top_suite = suite.TestSuite()
