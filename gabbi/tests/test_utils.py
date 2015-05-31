@@ -35,13 +35,12 @@ class UtilsTest(testtools.TestCase):
         'application/json',
     ]
 
-
     def test_not_binary(self):
         for media_type in self.NON_BINARY_TYPES:
             self.assertTrue(utils.not_binary(media_type),
-                    '%s should not be binary' % media_type)
+                            '%s should not be binary' % media_type)
 
     def test_binary(self):
         for media_type in self.BINARY_TYPES:
             self.assertFalse(utils.not_binary(media_type),
-                    '%s should be binary' % media_type)
+                             '%s should be binary' % media_type)
