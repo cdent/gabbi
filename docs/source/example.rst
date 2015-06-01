@@ -3,7 +3,7 @@ Test Example
 
 What follows is a commented example of some tests in a single
 file demonstrating many of the :doc:`format` features. See
-`Loader`_, below, for the Python need to integrate with a testing
+`Loader`_, below, for the Python needed to integrate with a testing
 harness.
 
 .. literalinclude:: example.yaml
