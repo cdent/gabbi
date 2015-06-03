@@ -16,7 +16,6 @@
 """
 
 import os
-import testtools
 import unittest
 
 from gabbi import driver
@@ -24,7 +23,7 @@ from gabbi import driver
 TESTS_DIR = 'test_gabbits'
 
 
-class DriverTest(testtools.TestCase):
+class DriverTest(unittest.TestCase):
 
     def setUp(self):
         super(DriverTest, self).setUp()
@@ -41,3 +40,29 @@ class DriverTest(testtools.TestCase):
         self.assertEqual('test_driver_single_one',
                          suite._tests[0]._tests[0].__class__.__name__,
                          'test class name maps')
+
+    def test_build_requires_host_or_intercept(self):
+        with self.assertRaises(AssertionError):
+            driver.build_tests(self.test_dir, self.loader)
+
+    def test_name_key_required(self):
+        test_yaml = {'tests': [{'url': '/'}]}
+
+        with self.assertRaises(AssertionError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertEqual('Test name missing in a test in foo.',
+                         str(failure.exception))
+
+    def test_unsupported_key_errors(self):
+        test_yaml = {'tests': [{
+            'url': '/',
+            'name': 'simple',
+            'bad_key': 'wow',
+        }]}
+
+        with self.assertRaises(AssertionError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertIn("Invalid test keys used in test foo_simple:",
+                      str(failure.exception))
