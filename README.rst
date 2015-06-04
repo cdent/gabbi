@@ -12,7 +12,8 @@ are represented in a declarative form.
 
 It is under active development. See the YAML files for examples of
 working tests and the docs_ for more details on features and
-formats.
+formats. It is actively tested with Python 2.7, 3.4 and pypy and
+pypy3.
 
 .. _docs: http://gabbi.readthedocs.org/
 
@@ -50,7 +51,7 @@ To run the built in tests (the YAML files are in the directories
 ``gabbi/gabbits_*`` and loaded by the file ``gabbi/test_*.py``),
 you can use ``tox``::
 
-    tox -epep8,py27,py33
+    tox -epep8,py27,py34
 
 Or if you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
