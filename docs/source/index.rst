@@ -30,9 +30,11 @@ are not good enough so the search continues.
 
 If you want to get straight to creating tests look at
 :doc:`example`, the test files in the `source distribution`_
-and :doc:`format`. A full tutorial is in the works.
+and :doc:`format`. A `gabbi-demo`_ repository provides a tutorial
+of using gabbi to build an API, via the commit history of the repo.
 
 .. _source distribution: https://github.com/cdent/gabbi
+.. _gabbi-demo: https://github.com/cdent/gabbi-demo
 
 Purpose
 -------

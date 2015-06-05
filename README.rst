@@ -15,7 +15,12 @@ working tests and the docs_ for more details on features and
 formats. It is actively tested with Python 2.7, 3.4 and pypy and
 pypy3.
 
+There is a `gabbi-demo`_ repository which provides a tutorial via
+its commit history. The demo builds a simple API using gabbi to
+facilitate test driven development.
+
 .. _docs: http://gabbi.readthedocs.org/
+.. _gabbi-demo: https://github.com/cdent/gabbi-demo
 
 Purpose
 -------
