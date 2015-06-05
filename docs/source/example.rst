@@ -23,17 +23,30 @@ bit like this:
 
 Run Test Loader
 ~~~~~~~~~~~~~~~
-There are *many* options. This outlines two that require minimal knowledge to get started.
 
-testtools
-_________
-By file:
-python -m testtools.run -v test/test_loader.py
+Once the test loader has been created, it needs to be run. There are *many*
+options. Which is appropriate depends very much on your environment. Here are
+some examples using ``unittest`` or ``testtools`` that require minimal
+knowledge to get started.
 
-By module:
-python -m testttols.run -v test.test_loader
+By file::
 
-unittest
-________
+    python -m testtools.run -v test/test_loader.py
 
-python -m unittest -v test_loader
+By module::
+
+    python -m testttols.run -v test.test_loader
+
+    python -m unittest -v test.test_loader
+
+Using test discovery to locate all tests in a directory tree::
+
+    python -m testtools.run discover
+
+    python -m unittest discover test
+
+See the `source distribution`_ and `the tutorial repo`_ for more
+advanced options.
+
+.. _source distribution: https://github.com/cdent/gabbi
+.. _the tutorial repo: https://github.com/cdent/gabbi-demo
