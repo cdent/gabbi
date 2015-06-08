@@ -1,7 +1,7 @@
 Test Format
 ===========
 
-Gabbi tests are expressed as YAML containing an HTTP request and an
+Gabbi tests are expressed in YAML containing an HTTP request and an
 expected response. Each YAML file is an ordered sequence of requests.
 The bare minimum YAML file for a single request is::
 
@@ -76,7 +76,7 @@ reference to the state of a current test or the one just prior. These
 are replaced with real values during test processing. They are
 processed in the order given.
 
-* ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
+* ``$SCHEME``: The current scheme/protocol (usually ``http`` or ``https``).
 * ``$NETLOC``: The host and potentially port of the request.
 * ``$ENVIRON['<environment variable>']``: The name of an environment
   variable. It value will replace the magical variable.

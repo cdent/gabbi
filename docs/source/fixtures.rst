@@ -1,13 +1,13 @@
 Fixtures
 ========
 
-Each suite of tests represented by a single YAML file may optionally
-use one or more fixtures to provide the necessary environment for
-tests to run.
+Each suite of tests is represented by a single YAML file, and may
+optionally use one or more fixtures to provide the necessary
+environment for tests to run.
 
 Fixtures are implemented as nested context managers. Subclasses
 of :class:`~gabbi.fixture.GabbiFixture` must implement 
-``start_fixture`` and ``stop_fixture`` methods creating and
+``start_fixture`` and ``stop_fixture`` methods for creating and
 destroying, respectively, any resources managed by the fixture.
 While the subclass may choose to implement ``__init__`` it is
 important that no exceptions are thrown in that method, otherwise
