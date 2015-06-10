@@ -84,8 +84,8 @@ processed in the order given.
 * ``$HEADERS['<header>']``: Indicate the name of a header from the
   prior response to inject in the value.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
-  response. See http://goessner.net/articles/JsonPath/ for JSONPath
-  formatting.
+  response. See http://jsonpath-rw.readthedocs.org/en/latest/ for
+  jsonpath-rw formatting.
 
 All of these variables may be used in all of the following fields:
 
