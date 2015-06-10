@@ -167,7 +167,8 @@ tests:
 # "$ENVIRON" is a pseudo dictionary providing access to the current
 # environment.
 # "$RESPONSE" provides access to the JSON in the prior response, via
-# JSONPath.
+# JSONPath. See http://goessner.net/articles/JsonPath/ for JSONPath 
+# formatting.
 # $SCHEME and $NETLOC provide access to the current protocol and
 # location (host and port).
 
