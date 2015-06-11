@@ -2,7 +2,7 @@ Response Handlers
 =================
 
 Response handlers determine how an HTTP response will be processed and checked
-against the expected result. For each entry starting with `response_`, an
+against an expected result. For each entry starting with `response_`, an
 associated class is invoked with corresponding values. For example
 if the following lines are in a test::
 
@@ -10,7 +10,7 @@ if the following lines are in a test::
         - "lorem ipsum"
         - "dolor sit amet"
 
-this creates an instance of ``StringResponseHandler``, passing the value
+these lines create an instance of ``StringResponseHandler``, passing the value
 ``["lorem ipsum", "dolor sit amet"]``. The response handler
 implementation interprets the response and the expected values, determining
 whether the test passes or fails.
