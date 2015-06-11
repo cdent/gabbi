@@ -79,7 +79,10 @@ processed in the order given.
 * ``$SCHEME``: The current scheme (usually ``http`` or ``https``).
 * ``$NETLOC``: The host and potentially port of the request.
 * ``$ENVIRON['<environment variable>']``: The name of an environment
-  variable. It value will replace the magical variable.
+  variable. Its value will replace the magical variable. If the
+  string value of the environment variable is ``"True"`` or
+  ``"False"`` then the resulting value will be the corresponding
+  boolean, not a string.
 * ``$LOCATION``: The location header returned in the prior response.
 * ``$HEADERS['<header>']``: Indicate the name of a header from the
   prior response to inject in the value.

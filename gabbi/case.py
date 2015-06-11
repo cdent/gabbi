@@ -151,8 +151,13 @@ class HTTPTestCase(testcase.TestCase):
 
     def _environ_replace(self, message):
         """Replace an indicator in a message with the environment value."""
-        return re.sub(r"\$ENVIRON\['([^']+)'\]",
-                      self._environ_replacer, message)
+        value = re.sub(r"\$ENVIRON\['([^']+)'\]",
+                       self._environ_replacer, message)
+        if value == "False":
+            return False
+        if value == "True":
+            return True
+        return value
 
     @staticmethod
     def _environ_replacer(match):
