@@ -315,11 +315,10 @@ class HTTPTestCase(testcase.TestCase):
                 print('%s: %s' % (key, headers[key]))
 
         if test['poll']:
-            count = test['poll'].get('count', 0)
+            count = test['poll'].get('count', 1)
             delay = test['poll'].get('delay', 1)
             failure = None
             while count:
-                print('counting: %s' % count, file=sys.stderr)
                 try:
                     self._run_request(full_url, method, headers, body)
                     self._assert_response()

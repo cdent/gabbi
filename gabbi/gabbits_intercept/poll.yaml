@@ -4,9 +4,24 @@
 
 tests:
 
+    # This will attempt /poller up to 8 times waiting for a status
+    # 200, waiting one second between attempts. If the test passes
+    # during any attempt then we move on to the next test.
+    # If no pass happens, the last failure is raised as the
+    # assertion failure.
     - name: poller
       url: /poller
       verbose: True
       poll:
           delay: 1
           count: 8
+
+    # This one we expect to fail because /poller in SimpleWSGI only
+    # counts up to five attempts.
+    - name: poller fail
+      url: /poller
+      xfail: True
+      verbose: True
+      poll:
+          delay: 1
+          count: 3
