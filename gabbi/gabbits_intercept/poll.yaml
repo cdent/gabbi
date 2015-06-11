@@ -1,0 +1,12 @@
+#
+# Test waiting on slow responses.
+#
+
+tests:
+
+    - name: poller
+      url: /poller
+      verbose: True
+      poll:
+          delay: 1
+          count: 8

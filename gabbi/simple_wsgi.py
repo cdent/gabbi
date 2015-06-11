@@ -22,6 +22,7 @@ import json
 from six.moves.urllib import parse as urlparse
 
 
+CURRENT_POLL = 0
 METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 
 
@@ -29,6 +30,9 @@ class SimpleWsgi(object):
     """A simple wsgi application to use in tests."""
 
     def __call__(self, environ, start_response):
+        global METHODS
+        global CURRENT_POLL
+
         request_method = environ['REQUEST_METHOD'].upper()
         query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
         request_url = environ.get('REQUEST_URI',
@@ -36,7 +40,7 @@ class SimpleWsgi(object):
         accept_header = environ.get('HTTP_ACCEPT')
         content_type_header = environ.get('CONTENT_TYPE', '')
 
-        request_url = self._fully_qualify(environ, request_url)
+        full_request_url = self._fully_qualify(environ, request_url)
 
         if accept_header:
             response_content_type = accept_header
@@ -46,7 +50,7 @@ class SimpleWsgi(object):
         headers = [
             ('X-Gabbi-method', request_method),
             ('Content-Type', response_content_type),
-            ('X-Gabbi-url', request_url),
+            ('X-Gabbi-url', full_request_url),
         ]
 
         if request_method == 'DIE':
@@ -70,7 +74,23 @@ class SimpleWsgi(object):
                         query_data.update(body_data)
                     else:
                         query_data = body_data
-            headers.append(('Location', request_url))
+            headers.append(('Location', full_request_url))
+
+        import sys
+        if request_url.startswith('/poller'):
+            print('CURRENT_POLL %s'% CURRENT_POLL, file=sys.stderr)
+            if CURRENT_POLL == 0:
+                CURRENT_POLL = query_data.get('count', [5])[0]
+                start_response('400 Bad Reqest', [])
+                return []
+            else:
+                CURRENT_POLL -= 1
+                if CURRENT_POLL > 0:
+                    start_response('400 Bad Reqest', [])
+                    return []
+                else:
+                    CURRENT_POLL = 0
+            # fall through if we've ended the loop
 
         start_response('200 OK', headers)
 
