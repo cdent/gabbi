@@ -99,7 +99,11 @@ class JSONResponseHandler(ResponseHandler):
         # processed (to provided for the magic template replacing).
         # Other handlers that want access to data structures will need
         # to do their own processing.
-        match = test.extract_json_path_value(test.json_data, path)
+        try:
+            match = test.extract_json_path_value(test.json_data, path)
+        except ValueError:
+            raise AssertionError('json path %s cannot match %s' %
+                                 (path, test.json_data))
         expected = test.replace_template(value)
         test.assertEqual(expected, match, 'Unable to match %s as %s'
                          % (path, expected))
