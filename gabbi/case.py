@@ -305,7 +305,7 @@ class HTTPTestCase(testcase.TestCase):
         if test['redirects']:
             self.http.follow_redirects = True
 
-        # Print some information about this request is asked.
+        # Print some information about this request if asked.
         if test['verbose']:
             print('\n###########################')
             print('%s %s' % (method, full_url))
