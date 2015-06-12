@@ -1,5 +1,5 @@
 #
-# Test waiting on slow responses.
+# Test polling until a desired response.
 #
 
 tests:
@@ -11,9 +11,8 @@ tests:
     # assertion failure.
     - name: poller
       url: /poller
-      verbose: True
       poll:
-          delay: 1
+          delay: .01
           count: 8
 
     # This one we expect to fail because /poller in SimpleWSGI only
@@ -21,7 +20,30 @@ tests:
     - name: poller fail
       url: /poller
       xfail: True
+      poll:
+          delay: .01
+          count: 3
+
+    # Confirm that $LOCATION and $RESPONSE behave in poll.
+    - name: create a thing
+      url: /poller?count=2&x=1&y=2
+      method: POST
+      request_headers:
+          content-type: application/json
+      poll:
+          count: 3
+          delay: .01
+      response_json_paths:
+          $.x[0]: '1'
+          $.y[0]: '2'
+
+
+    - name: loop location
+      url: $LOCATION
       verbose: True
       poll:
-          delay: 1
           count: 3
+          delay: .01
+      response_json_paths:
+          $.x[0]: $RESPONSE['$.x[0]']
+          $.y[0]: $RESPONSE['$.y[0]']

@@ -78,7 +78,7 @@ class SimpleWsgi(object):
 
         if request_url.startswith('/poller'):
             if CURRENT_POLL == 0:
-                CURRENT_POLL = query_data.get('count', [5])[0]
+                CURRENT_POLL = int(query_data.get('count', [5])[0])
                 start_response('400 Bad Reqest', [])
                 return []
             else:
