@@ -1,0 +1,49 @@
+#
+# Test polling until a desired response.
+#
+
+tests:
+
+    # This will attempt /poller up to 8 times waiting for a status
+    # 200, waiting one second between attempts. If the test passes
+    # during any attempt then we move on to the next test.
+    # If no pass happens, the last failure is raised as the
+    # assertion failure.
+    - name: poller
+      url: /poller
+      poll:
+          delay: .01
+          count: 8
+
+    # This one we expect to fail because /poller in SimpleWSGI only
+    # counts up to five attempts.
+    - name: poller fail
+      url: /poller
+      xfail: True
+      poll:
+          delay: .01
+          count: 3
+
+    # Confirm that $LOCATION and $RESPONSE behave in poll.
+    - name: create a thing
+      url: /poller?count=2&x=1&y=2
+      method: POST
+      request_headers:
+          content-type: application/json
+      poll:
+          count: 3
+          delay: .01
+      response_json_paths:
+          $.x[0]: '1'
+          $.y[0]: '2'
+
+
+    - name: loop location
+      url: $LOCATION
+      verbose: True
+      poll:
+          count: 3
+          delay: .01
+      response_json_paths:
+          $.x[0]: $RESPONSE['$.x[0]']
+          $.y[0]: $RESPONSE['$.y[0]']

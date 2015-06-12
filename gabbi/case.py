@@ -26,6 +26,7 @@ import json
 import os
 import re
 import sys
+import time
 
 import jsonpath_rw
 import six
@@ -59,6 +60,7 @@ BASE_TEST = {
     'data': '',
     'xfail': False,
     'skip': '',
+    'poll': {},
 }
 
 
@@ -312,8 +314,27 @@ class HTTPTestCase(testcase.TestCase):
             for key in headers:
                 print('%s: %s' % (key, headers[key]))
 
-        self._run_request(full_url, method, headers, body)
-        self._assert_response()
+        if test['poll']:
+            count = test['poll'].get('count', 1)
+            delay = test['poll'].get('delay', 1)
+            failure = None
+            while count:
+                try:
+                    self._run_request(full_url, method, headers, body)
+                    self._assert_response()
+                    failure = None
+                    break
+                except AssertionError as exc:
+                    failure = exc
+
+                count -= 1
+                time.sleep(delay)
+
+            if failure:
+                raise failure
+        else:
+            self._run_request(full_url, method, headers, body)
+            self._assert_response()
 
     def _scheme_replace(self, message):
         """Replace $SCHEME with the current protocol."""
