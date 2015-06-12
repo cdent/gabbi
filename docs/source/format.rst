@@ -66,6 +66,15 @@ these allow substitutions (explained below).
   in the response body.
 * ``response_json_paths``: A dictionary of JSONPath rules paired with
   expected matches.
+* ``poll``: A dictionary of two keys:
+
+  * ``count``: An integer stating the number of times to attempt
+    this test before giving up.
+  * ``delay``: A floating point number of seconds to delay between
+    attemmpts.
+
+  This makes it possible to poll for a resource created via an
+  asynchronous request. Use with caution.
 
 The ``response_*`` items are examples of Response Handlers. Additional
 handlers may be created by test authors for specific use cases. See

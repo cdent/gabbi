@@ -182,3 +182,27 @@ tests:
           $.abode: $RESPONSE['$.abode']
       response_headers:
           content-location: /$SCHEME://$NETLOC/
+
+# For APIs where resource creation is asynchronous it can be
+# necessary to poll for the resulting resource. First we create the
+# resource in one test. The next test uses the "poll" key to loop
+# with a delay for a set number of times.
+
+    - name: create asynch
+      url: /async_creator
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          name: jones
+          abode: bungalow
+      status: 202
+
+    - name: poll for created resource
+      url: $LOCATION
+      poll:
+          count: 10 # try up to ten times
+          delay: .5 # wait .5 seconds between each try
+      response_json_paths:
+          $.name: $RESPONSE['$.name']
+          $.abode: $RESPONSE['$.abode']
