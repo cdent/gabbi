@@ -149,6 +149,10 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
+        if not test['url']:
+            raise AssertionError('Test url missing in test %s.'
+                                 % test_name)
+
         test_key_set = set(test.keys())
         if test_key_set != base_test_key_set:
             raise AssertionError(

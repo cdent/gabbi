@@ -54,6 +54,15 @@ class DriverTest(unittest.TestCase):
         self.assertEqual('Test name missing in a test in foo.',
                          str(failure.exception))
 
+    def test_url_key_required(self):
+        test_yaml = {'tests': [{'name': 'missing url'}]}
+
+        with self.assertRaises(AssertionError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertEqual('Test url missing in test foo_missing_url.',
+                         str(failure.exception))
+
     def test_unsupported_key_errors(self):
         test_yaml = {'tests': [{
             'url': '/',
