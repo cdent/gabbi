@@ -36,7 +36,7 @@ def run():
 
         gabbi-run example.com:9999 < mytest.yaml
 
-    If is also possible to provide a URL prefix which can be useful if the
+    It is also possible to provide a URL prefix which can be useful if the
     target application might be mounted in different locations. An example:
 
         gabbi-run example.com:9999 /mountpoint < mytest.yaml

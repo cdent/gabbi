@@ -67,7 +67,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     :param path: The directory where yaml files are located.
     :param loader: The TestLoader.
-    :param host: The host to test against. Do not used with ``intercept``.
+    :param host: The host to test against. Do not use with ``intercept``.
     :param port: The port to test against. Used with ``host``.
     :param intercept: WSGI app factory for wsgi-intercept.
     :param test_loader_name: Base name for test classes. Rarely used.
@@ -75,7 +75,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param response_handers: ResponseHandler classes.
     :type response_handlers: List of ResponseHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
-    :rtype: TestSuite containing TestSuites (one for each YAML file).
+    :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
     if not (bool(host) ^ bool(intercept)):
