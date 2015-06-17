@@ -36,6 +36,11 @@ def run():
 
         gabbi-run example.com:9999 < mytest.yaml
 
+    It is also possible to provide a URL prefix which can be useful if the
+    target application might be mounted in different locations. An example:
+
+        gabbi-run example.com:9999 /mountpoint < mytest.yaml
+
     Output is formatted as unittest summary information.
     """
     try:
@@ -47,6 +52,12 @@ def run():
             port = None
     except IndexError:
         host, port = 'stub', None
+
+    try:
+        prefix = sys.argv[2]
+    except IndexError:
+        prefix = None
+
     loader = unittest.defaultTestLoader
 
     # Initialize the extensions for response handling.
@@ -55,7 +66,8 @@ def run():
 
     data = yaml.safe_load(sys.stdin.read())
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
-                                        host, port, None, None)
+                                        host, port, None, None,
+                                        prefix=prefix)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     sys.exit(not result.wasSuccessful())
 

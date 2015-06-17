@@ -33,6 +33,7 @@ from unittest import suite
 import uuid
 
 import six
+from six.moves.urllib import parse as urlparse
 import yaml
 
 from gabbi import case
@@ -59,10 +60,22 @@ class TestBuilder(type):
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
-                response_handlers=None):
+                response_handlers=None, prefix=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
+
+    :param path: The directory where yaml files are located.
+    :param loader: The TestLoader.
+    :param host: The host to test against. Do not use with ``intercept``.
+    :param port: The port to test against. Used with ``host``.
+    :param intercept: WSGI app factory for wsgi-intercept.
+    :param test_loader_name: Base name for test classes. Rarely used.
+    :param fixture_module: Python module containing fixture classes.
+    :param response_handers: ResponseHandler classes.
+    :type response_handlers: List of ResponseHandler classes.
+    :param prefix: A URL prefix for all URLs that are not fully qualified.
+    :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
     if not (bool(host) ^ bool(intercept)):
@@ -93,7 +106,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                                    os.path.basename(test_file))[0])
         file_suite = test_suite_from_yaml(loader, test_name, test_yaml,
                                           path, host, port, fixture_module,
-                                          intercept)
+                                          intercept, prefix)
         top_suite.addTest(file_suite)
     return top_suite
 
@@ -118,7 +131,7 @@ def test_update(orig_dict, new_dict):
 
 
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
-                         host, port, fixture_module, intercept):
+                         host, port, fixture_module, intercept, prefix=None):
     """Generate a TestSuite from YAML data."""
 
     file_suite = gabbi_suite.GabbiSuite()
@@ -152,6 +165,12 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         if not test['url']:
             raise AssertionError('Test url missing in test %s.'
                                  % test_name)
+
+        if prefix:
+            # Only add prefix to urls that have no scheme or netloc
+            parsed_url = urlparse.urlsplit(test['url'])
+            if not (parsed_url[0] and parsed_url[1]):
+                test['url'] = '%s%s' % (prefix, test['url'])
 
         test_key_set = set(test.keys())
         if test_key_set != base_test_key_set:

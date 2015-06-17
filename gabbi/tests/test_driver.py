@@ -30,16 +30,30 @@ class DriverTest(unittest.TestCase):
         self.loader = unittest.defaultTestLoader
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
 
-    def test_driver_loads_one_test(self):
+    def test_driver_loads_two_tests(self):
         suite = driver.build_tests(self.test_dir, self.loader,
                                    host='localhost', port=8001)
         self.assertEqual(1, len(suite._tests),
                          'top level suite contains one suite')
-        self.assertEqual(1, len(suite._tests[0]._tests),
-                         'contained suite contains one test')
-        self.assertEqual('test_driver_single_one',
-                         suite._tests[0]._tests[0].__class__.__name__,
+        self.assertEqual(2, len(suite._tests[0]._tests),
+                         'contained suite contains two tests')
+        the_one_test = suite._tests[0]._tests[0]
+        self.assertEqual('test_driver_sample_one',
+                         the_one_test.__class__.__name__,
                          'test class name maps')
+        self.assertEqual('one',
+                         the_one_test.test_data['name'])
+        self.assertEqual('/', the_one_test.test_data['url'])
+
+    def test_driver_prefix(self):
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost', port=8001,
+                                   prefix='/mountpoint')
+        the_one_test = suite._tests[0]._tests[0]
+        the_two_test = suite._tests[0]._tests[1]
+        self.assertEqual('/mountpoint/', the_one_test.test_data['url'])
+        self.assertEqual('http://example.com/moo',
+                         the_two_test.test_data['url'])
 
     def test_build_requires_host_or_intercept(self):
         with self.assertRaises(AssertionError):

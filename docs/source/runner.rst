@@ -14,3 +14,12 @@ expressed directly in the YAML file or provided on the command
 line::
 
     gabbi-run [host[:port]] < /my/test.yaml
+
+To facilitate using the same tests against the same application mounted
+in different locations in a WSGI server, a `prefix` may be provided
+as a second argument::
+
+    gabbi-run host[:port] [prefix] < /my/test.yaml
+
+The value of prefix will be prepended to the path portion of URLs that
+are not fully qualified.
