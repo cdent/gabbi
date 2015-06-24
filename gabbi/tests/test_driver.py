@@ -51,9 +51,8 @@ class DriverTest(unittest.TestCase):
                                    prefix='/mountpoint')
         the_one_test = suite._tests[0]._tests[0]
         the_two_test = suite._tests[0]._tests[1]
-        self.assertEqual('/mountpoint/', the_one_test.test_data['url'])
-        self.assertEqual('http://example.com/moo',
-                         the_two_test.test_data['url'])
+        self.assertEqual('/mountpoint', the_one_test.prefix)
+        self.assertEqual('/mountpoint', the_two_test.prefix)
 
     def test_build_requires_host_or_intercept(self):
         with self.assertRaises(AssertionError):

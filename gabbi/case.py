@@ -216,7 +216,10 @@ class HTTPTestCase(testcase.TestCase):
 
     def _netloc_replace(self, message):
         """Replace $NETLOC with the current host and port."""
-        return message.replace('$NETLOC', self.netloc)
+        netloc = self.netloc
+        if self.prefix:
+            netloc = '%s%s' % (netloc, self.prefix)
+        return message.replace('$NETLOC', netloc)
 
     def _parse_url(self, url, ssl=False):
         """Create a url from test data.
@@ -236,7 +239,10 @@ class HTTPTestCase(testcase.TestCase):
                 netloc = '%s:%s' % (self.host, self.port)
             if ssl:
                 scheme = 'https'
-            full_url = urlparse.urlunsplit((scheme, netloc, parsed_url[2],
+            path = parsed_url[2]
+            if self.prefix:
+                path = '%s%s' % (self.prefix, path)
+            full_url = urlparse.urlunsplit((scheme, netloc, path,
                                             parsed_url[3], ''))
             self.scheme = scheme
             self.netloc = netloc

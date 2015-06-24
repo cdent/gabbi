@@ -33,7 +33,6 @@ from unittest import suite
 import uuid
 
 import six
-from six.moves.urllib import parse as urlparse
 import yaml
 
 from gabbi import case
@@ -166,12 +165,6 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
             raise AssertionError('Test url missing in test %s.'
                                  % test_name)
 
-        if prefix:
-            # Only add prefix to urls that have no scheme or netloc
-            parsed_url = urlparse.urlsplit(test['url'])
-            if not (parsed_url[0] and parsed_url[1]):
-                test['url'] = '%s%s' % (prefix, test['url'])
-
         test_key_set = set(test.keys())
         if test_key_set != base_test_key_set:
             raise AssertionError(
@@ -189,6 +182,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                              'host': host,
                              'intercept': intercept,
                              'port': port,
+                             'prefix': prefix,
                              'prior': prior_test})
 
         tests = loader.loadTestsFromTestCase(klass)
