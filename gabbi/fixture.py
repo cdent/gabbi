@@ -68,13 +68,15 @@ class InterceptFixture(GabbiFixture):
 
     httplib2_intercept.install()
 
-    def __init__(self, host, port, app):
+    def __init__(self, host, port, app, prefix):
         self.host = host
         self.port = port
         self.app = app
+        self.script_name = prefix or ''
 
     def start_fixture(self):
-        wsgi_intercept.add_wsgi_intercept(self.host, self.port, self.app)
+        wsgi_intercept.add_wsgi_intercept(self.host, self.port, self.app,
+                                          script_name=self.script_name)
 
     def stop_fixture(self):
         wsgi_intercept.remove_wsgi_intercept(self.host, self.port)

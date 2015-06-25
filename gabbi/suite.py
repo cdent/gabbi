@@ -49,6 +49,7 @@ class GabbiSuite(suite.TestSuite):
             fixtures = first_test.fixtures
             host = first_test.host
             port = first_test.port
+            prefix = first_test.prefix
             intercept = first_test.intercept
 
             # Unbind a passed in WSGI application. During the
@@ -63,7 +64,8 @@ class GabbiSuite(suite.TestSuite):
         try:
             with fixture.nest([fix() for fix in fixtures]):
                 if intercept:
-                    with fixture.InterceptFixture(host, port, intercept):
+                    with fixture.InterceptFixture(host, port, intercept,
+                                                  prefix):
                         result = super(GabbiSuite, self).run(result, debug)
                 else:
                     result = super(GabbiSuite, self).run(result, debug)
