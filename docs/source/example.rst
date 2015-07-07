@@ -21,6 +21,9 @@ bit like this:
 .. literalinclude:: example.py
    :language: python
 
+For details on the arguments available when building tests see
+:func:`~gabbi.driver.build_tests`.
+
 Run Test Loader
 ~~~~~~~~~~~~~~~
 
@@ -46,7 +49,8 @@ Using test discovery to locate all tests in a directory tree::
     python -m unittest discover test
 
 See the `source distribution`_ and `the tutorial repo`_ for more
-advanced options.
+advanced options, including using ``testrepository`` and
+``subunit``.
 
 .. _source distribution: https://github.com/cdent/gabbi
 .. _the tutorial repo: https://github.com/cdent/gabbi-demo

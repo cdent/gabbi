@@ -22,10 +22,12 @@ Other top level keys are:
   defaults (explained below).
 
 Each test can use the following structure. Only ``name`` and ``url``
-are required. For examples see `the gabbi tests`_. Most of
-these allow substitutions (explained below).
+are required. For examples see `the gabbi tests`_, :doc:`example`
+and the `gabbi-demo`_ tutorial.
 
-* ``name``: The name of the test. Should be unique in this file. When
+Many of these items allow substitutions (explained below).
+
+* ``name``: The name of the test. Must be unique in this file. When
   tests are dynamically generated the ``TestCase`` name will include
   this name, lowercased with spaces transformed to ``_``. In at least
   some test runners this will allow you to select and filter on test
@@ -93,8 +95,8 @@ processed in the order given.
   ``"False"`` then the resulting value will be the corresponding
   boolean, not a string.
 * ``$LOCATION``: The location header returned in the prior response.
-* ``$HEADERS['<header>']``: Indicate the name of a header from the
-  prior response to inject in the value.
+* ``$HEADERS['<header>']``: The value of any header from the
+  prior response.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
   response. See http://jsonpath-rw.readthedocs.org/en/latest/ for
   jsonpath-rw formatting.
@@ -116,7 +118,7 @@ an issue or provide a patch.
 As all of these features needed to be tested in the development of
 gabbi itself, `the gabbi tests`_ are a good source of examples on how
 to use the functionality. See also :doc:`example` for a collection
-of examples.
+of examples and the `gabbi-demo`_ tutorial.
 
 Data
 ----
@@ -135,3 +137,4 @@ encoding is done of the resulting string value. If it is text, json, xml
 or javascript it will be encoded to UTF-8.
 
 .. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
+.. _gabbi-demo: https://github.com/cdent/gabbi-demo
