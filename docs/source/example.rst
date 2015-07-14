@@ -9,6 +9,8 @@ harness.
 .. literalinclude:: example.yaml
    :language: yaml
 
+.. _test_loaders:
+
 Loader
 ------
 
