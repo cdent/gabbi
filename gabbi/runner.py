@@ -17,8 +17,8 @@ import unittest
 import yaml
 
 from gabbi import case
-from gabbi.concise_reporter import TestRunner as ConciseTestRunner
 from gabbi import driver
+from gabbi.reporter import ConciseTestRunner
 
 
 def run():

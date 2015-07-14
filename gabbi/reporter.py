@@ -16,10 +16,11 @@ from unittest import TextTestResult
 from unittest import TextTestRunner
 
 
-class TestResult(TextTestResult):
+class ConciseTestResult(TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity):
-        super(TestResult, self).__init__(stream, descriptions, verbosity)
+        super(ConciseTestResult, self).__init__(
+            stream, descriptions, verbosity)
 
     def startTest(self, test):
         super(TextTestResult, self).startTest(test)
@@ -83,5 +84,5 @@ class TestResult(TextTestResult):
             self.stream.writeln('\t%s' % details)
 
 
-class TestRunner(TextTestRunner):
-    resultclass = TestResult
+class ConciseTestRunner(TextTestRunner):
+    resultclass = ConciseTestResult
