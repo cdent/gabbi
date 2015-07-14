@@ -18,6 +18,7 @@ import yaml
 
 from gabbi import case
 from gabbi import driver
+from gabbi.reporter import ConciseTestRunner
 
 
 def run():
@@ -80,7 +81,7 @@ def run():
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None,
                                         prefix=prefix)
-    result = unittest.TextTestRunner(verbosity=2, failfast=failfast).run(suite)
+    result = ConciseTestRunner(verbosity=2, failfast=failfast).run(suite)
     sys.exit(not result.wasSuccessful())
 
 
