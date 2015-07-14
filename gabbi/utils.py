@@ -18,9 +18,9 @@ from __future__ import print_function
 import httplib2
 
 
-try: # Python 3
+try:  # Python 3
     ConnectionRefused = ConnectionRefusedError
-except NameError: # Python 2
+except NameError:  # Python 2
     import socket
     ConnectionRefused = socket.error
 
