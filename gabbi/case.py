@@ -330,7 +330,7 @@ class HTTPTestCase(testcase.TestCase):
                     self._assert_response()
                     failure = None
                     break
-                except (AssertionError, ConnectionRefusedError) as exc:
+                except (AssertionError, utils.ConnectionRefused) as exc:
                     failure = exc
 
                 count -= 1

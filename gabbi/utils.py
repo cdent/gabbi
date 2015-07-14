@@ -18,6 +18,13 @@ from __future__ import print_function
 import httplib2
 
 
+try: # Python 3
+    ConnectionRefused = ConnectionRefusedError
+except NameError: # Python 2
+    import socket
+    ConnectionRefused = socket.error
+
+
 class VerboseHttp(httplib2.Http):
     """A subclass of Http that verbosely reports on activity."""
 
