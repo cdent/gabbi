@@ -45,9 +45,9 @@ def run():
     """
     try:
         hostport = sys.argv[1]
-        try:
+        if ':' in hostport:
             host, port = hostport.split(':')
-        except ValueError:
+        else:
             host = hostport
             port = None
     except IndexError:
