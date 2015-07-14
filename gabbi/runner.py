@@ -41,10 +41,22 @@ def run():
 
         gabbi-run example.com:9999 /mountpoint < mytest.yaml
 
+    Use `-x` to abort after the first error or failure:
+
+        gabbi-run -x example.com:9999 /mountpoint < mytest.yaml
+
     Output is formatted as unittest summary information.
     """
+    args = sys.argv[1:]
+
     try:
-        hostport = sys.argv[1]
+        args.remove("-x")
+        failfast = True
+    except ValueError:
+        failfast = False
+
+    try:
+        hostport = args[0]
         if ':' in hostport:
             host, port = hostport.split(':')
         else:
@@ -54,7 +66,7 @@ def run():
         host, port = 'stub', None
 
     try:
-        prefix = sys.argv[2]
+        prefix = args[1]
     except IndexError:
         prefix = None
 
@@ -68,7 +80,7 @@ def run():
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None,
                                         prefix=prefix)
-    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    result = unittest.TextTestRunner(verbosity=2, failfast=failfast).run(suite)
     sys.exit(not result.wasSuccessful())
 
 
