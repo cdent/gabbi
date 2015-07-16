@@ -44,3 +44,8 @@ class EnvironReplaceTest(testtools.TestCase):
 
         os.environ['moo'] = "cow"
         self.assertEqual("cow", http_case._environ_replace(message))
+
+        message = '$ENVIRON["moo"]'
+
+        os.environ['moo'] = "True"
+        self.assertEqual(True, http_case._environ_replace(message))
