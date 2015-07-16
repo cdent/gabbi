@@ -120,6 +120,8 @@ class HeadersResponseHandler(ResponseHandler):
     test_key_value = {}
 
     def action(self, test, header, value):
+        header = header.lower()  # case-insensitive comparison
+
         response = test.response
         header_value = test.replace_template(value)
 

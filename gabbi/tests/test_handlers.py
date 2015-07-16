@@ -94,10 +94,16 @@ class HandlersTest(unittest.TestCase):
 
     def test_response_headers(self):
         handler = handlers.HeadersResponseHandler(self.test_class)
+        self.test.response = {'content-type': 'text/plain'}
+
         self.test.test_data = {'response_headers': {
             'content-type': 'text/plain',
         }}
-        self.test.response = {'content-type': 'text/plain'}
+        self._assert_handler(handler)
+
+        self.test.test_data = {'response_headers': {
+            'Content-Type': 'text/plain',
+        }}
         self._assert_handler(handler)
 
     def test_response_headers_regex(self):
