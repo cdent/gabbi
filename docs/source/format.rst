@@ -101,6 +101,10 @@ processed in the order given.
   response. See http://jsonpath-rw.readthedocs.org/en/latest/ for
   jsonpath-rw formatting.
 
+Where a single-quote character, ``'``, is shown above you may also use a
+double-quote character, ``"``, but in any given expression the same
+character must be used at both ends.
+
 All of these variables may be used in all of the following fields:
 
 * ``url``
