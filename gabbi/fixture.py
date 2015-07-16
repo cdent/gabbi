@@ -69,6 +69,7 @@ class InterceptFixture(GabbiFixture):
     httplib2_intercept.install()
 
     def __init__(self, host, port, app, prefix):
+        super(InterceptFixture, self).__init__()
         self.host = host
         self.port = port
         self.app = app
