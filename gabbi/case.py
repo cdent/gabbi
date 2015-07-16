@@ -153,7 +153,7 @@ class HTTPTestCase(testcase.TestCase):
 
     def _environ_replace(self, message):
         """Replace an indicator in a message with the environment value."""
-        value = re.sub(r"\$ENVIRON\['([^']+)'\]",
+        value = re.sub(self._replacer_regex('ENVIRON'),
                        self._environ_replacer, message)
         if value == "False":
             return False
@@ -167,7 +167,7 @@ class HTTPTestCase(testcase.TestCase):
 
         Let KeyError raise if variable not present.
         """
-        environ_name = match.group(1)
+        environ_name = match.group('arg')
         return os.environ[environ_name]
 
     @staticmethod
@@ -188,17 +188,17 @@ class HTTPTestCase(testcase.TestCase):
         """Replace a header indicator in a message with that headers value from
         the prior request.
         """
-        return re.sub(r"\$HEADERS\['([^']+)'\]",
+        return re.sub(self._replacer_regex('HEADERS'),
                       self._header_replacer, message)
 
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
-        header_key = match.group(1)
+        header_key = match.group('arg')
         return self.prior.response[header_key.lower()]
 
     def _json_replacer(self, match):
         """Replace a regex match with the value of a JSON Path."""
-        path = match.group(1)
+        path = match.group('arg')
         return str(self.extract_json_path_value(self.prior.json_data, path))
 
     def _location_replace(self, message):
@@ -253,9 +253,14 @@ class HTTPTestCase(testcase.TestCase):
 
         return full_url
 
+    @staticmethod
+    def _replacer_regex(key):
+        message = r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
+        return message
+
     def _response_replace(self, message):
         """Replace a JSON Path from the prior request with a value."""
-        return re.sub(r"\$RESPONSE\['([^']+)'\]",
+        return re.sub(self._replacer_regex('RESPONSE'),
                       self._json_replacer, message)
 
     def _run_request(self, url, method, headers, body):
