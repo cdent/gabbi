@@ -81,7 +81,7 @@ class ConciseTestResult(TextTestResult):
             details = details.strip().splitlines()[-1]  # traceback's last line
             if ':' in details:
                 details = details.split(':', 1)[1]  # discard exception name
-            self.stream.writeln('\t%s' % details)
+            self.stream.writeln('\t%s' % details.strip())
 
 
 class ConciseTestRunner(TextTestRunner):
