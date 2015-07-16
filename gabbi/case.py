@@ -255,8 +255,7 @@ class HTTPTestCase(testcase.TestCase):
 
     @staticmethod
     def _replacer_regex(key):
-        message = r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
-        return message
+        return r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
 
     def _response_replace(self, message):
         """Replace a JSON Path from the prior request with a value."""
