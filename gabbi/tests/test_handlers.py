@@ -133,9 +133,9 @@ class HandlersTest(unittest.TestCase):
             'location': '/somewhere',
         }}
         self.test.response = {'content-type': 'application/json'}
-        with self.assertRaises(KeyError) as failure:
+        with self.assertRaises(AssertionError) as failure:
             self._assert_handler(handler)
-        self.assertIn("'location' header not available in response keys:",
+        self.assertIn("'location' header not present in response:",
                       str(failure.exception))
 
     def _assert_handler(self, handler):

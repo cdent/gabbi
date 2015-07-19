@@ -128,9 +128,9 @@ class HeadersResponseHandler(ResponseHandler):
         try:
             response_value = response[header]
         except KeyError:
-            # Reform KeyError to something more debuggable.
-            raise KeyError("'%s' header not available in response keys: %s"
-                           % (header, response.keys()))
+            raise AssertionError(
+                "'%s' header not present in response: %s" % (
+                    header, response.keys()))
 
         if header_value.startswith('/') and header_value.endswith('/'):
             header_value = header_value.strip('/').rstrip('/')
