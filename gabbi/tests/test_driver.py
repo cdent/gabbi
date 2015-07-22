@@ -56,10 +56,35 @@ class DriverTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             driver.build_tests(self.test_dir, self.loader)
 
+    def test_tests_key_required(self):
+        test_yaml = {'name': 'house', 'url': '/'}
+
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertEqual('malformed test file, "tests" key required',
+                         str(failure.exception))
+
+    def test_upper_dict_required(self):
+        test_yaml = [{'name': 'house', 'url': '/'}]
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertEqual('malformed test file, invalid format',
+                         str(failure.exception))
+
+    def test_inner_list_required(self):
+        test_yaml = {'tests': {'name': 'house', 'url': '/'}}
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertIn('test chunk is not a dict at',
+                      str(failure.exception))
+
     def test_name_key_required(self):
         test_yaml = {'tests': [{'url': '/'}]}
 
-        with self.assertRaises(AssertionError) as failure:
+        with self.assertRaises(driver.GabbiFormatError) as failure:
             driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('Test name missing in a test in foo.',
@@ -68,7 +93,7 @@ class DriverTest(unittest.TestCase):
     def test_url_key_required(self):
         test_yaml = {'tests': [{'name': 'missing url'}]}
 
-        with self.assertRaises(AssertionError) as failure:
+        with self.assertRaises(driver.GabbiFormatError) as failure:
             driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('Test url missing in test foo_missing_url.',
@@ -81,7 +106,7 @@ class DriverTest(unittest.TestCase):
             'bad_key': 'wow',
         }]}
 
-        with self.assertRaises(AssertionError) as failure:
+        with self.assertRaises(driver.GabbiFormatError) as failure:
             driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn("Invalid test keys used in test foo_simple:",

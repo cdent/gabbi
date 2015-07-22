@@ -46,6 +46,11 @@ RESPONSE_HANDLERS = [
 ]
 
 
+class GabbiFormatError(ValueError):
+    """An exception to encapsulate poorly formed test data."""
+    pass
+
+
 class TestBuilder(type):
     """Metaclass to munge a dynamically created test."""
 
@@ -133,7 +138,16 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
     """Generate a TestSuite from YAML data."""
 
     file_suite = gabbi_suite.GabbiSuite()
-    test_data = test_yaml['tests']
+    try:
+        test_data = test_yaml['tests']
+    except KeyError:
+        raise GabbiFormatError(
+            'malformed test file, "tests" key required')
+    except TypeError:
+        # Swallow this exception as displaying it does not shine a
+        # light on the path to fix it.
+        raise GabbiFormatError('malformed test file, invalid format')
+
     fixtures = test_yaml.get('fixtures', None)
 
     # Set defaults from BASE_TESTS then update those defaults
@@ -152,23 +166,34 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
     base_test_key_set = set(case.HTTPTestCase.base_test.keys())
     for test_datum in test_data:
         test = copy.deepcopy(base_test_data)
-        test_update(test, test_datum)
+        try:
+            test_update(test, test_datum)
+        except AttributeError as exc:
+            if not isinstance(test_datum, dict):
+                raise GabbiFormatError(
+                    'test chunk is not a dict at "%s"' % test_datum)
+            else:
+                # NOTE(cdent): Not clear this can ever happen but just in
+                # case.
+                raise GabbiFormatError(
+                    'malformed test chunk "%s": %s' % (test_datum, exc))
 
         if not test['name']:
-            raise AssertionError('Test name missing in a test in %s.'
-                                 % test_base_name)
+            raise GabbiFormatError('Test name missing in a test in %s.'
+                                   % test_base_name)
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
         if not test['url']:
-            raise AssertionError('Test url missing in test %s.'
-                                 % test_name)
+            raise GabbiFormatError('Test url missing in test %s.'
+                                   % test_name)
 
         test_key_set = set(test.keys())
         if test_key_set != base_test_key_set:
-            raise AssertionError(
+            raise GabbiFormatError(
                 'Invalid test keys used in test %s: %s'
-                % (test_name, test_key_set - base_test_key_set))
+                % (test_name,
+                   ', '.join(list(test_key_set - base_test_key_set))))
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
