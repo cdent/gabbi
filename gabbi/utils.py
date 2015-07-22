@@ -53,7 +53,8 @@ def decode_content(response, content):
                                 'application/binary').strip().lower()
     charset = 'utf-8'
     if ';' in content_type:
-        content_type, parameter_strings = content_type.split(';', 1)
+        content_type, parameter_strings = (attr.strip() for attr
+                                           in content_type.split(';', 1))
         try:
             parameter_pairs = [atom.strip().split('=')
                                for atom in parameter_strings.split(';')]
