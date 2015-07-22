@@ -51,11 +51,16 @@ def decode_content(response, content):
     """Decode content to a proper string."""
     content_type = response.get('content-type',
                                 'application/binary').lower()
+    charset = None
     if ';' in content_type:
-        content_type, charset = (attr.strip() for attr in
+        content_type_params = (attr.strip() for attr in
                                  content_type.split(';'))
-        charset = charset.split('=')[1].strip()
-    else:
+        content_type = content_type_params[0]
+        for param in content_type_params[1:]:
+            if param.startswith("charset=") :
+                charset = charset.split('=')[1].strip()
+                
+    if charset is None :
         charset = 'utf-8'
 
     if not_binary(content_type):
