@@ -15,12 +15,12 @@
 
 import os
 
-import testtools
+import unittest
 
 from gabbi import case
 
 
-class EnvironReplaceTest(testtools.TestCase):
+class EnvironReplaceTest(unittest.TestCase):
 
     def test_environ_boolean(self):
         """Environment variables are always strings

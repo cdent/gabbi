@@ -1,6 +1,5 @@
 pbr
 six
-testtools
 PyYAML
 httplib2
 jsonpath-rw

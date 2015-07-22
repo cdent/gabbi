@@ -13,7 +13,6 @@
 """Test response handlers.
 """
 
-from testtools import matchers
 import unittest
 
 from gabbi import case
@@ -120,7 +119,6 @@ class HandlersTest(unittest.TestCase):
         self.test.response = {'content-type': 'application/json'}
         with self.assertRaises(AssertionError) as failure:
             self._assert_handler(handler)
-        self.assertIsInstance(failure.exception, matchers.MismatchError)
         self.assertIn("Expect header content-type with value text/plain,"
                       " got application/json",
                       str(failure.exception))
