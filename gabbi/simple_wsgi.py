@@ -44,7 +44,10 @@ class SimpleWsgi(object):
         if accept_header:
             response_content_type = accept_header
         else:
-            response_content_type = 'application/json'
+            # JSON doesn't need a charset but we throw one in here
+            # to exercise the decoding code
+            response_content_type = (
+                'application/json ; charset=utf-8 ; stop=no')
 
         headers = [
             ('X-Gabbi-method', request_method),

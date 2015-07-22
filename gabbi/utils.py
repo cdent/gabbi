@@ -50,13 +50,20 @@ class VerboseHttp(httplib2.Http):
 def decode_content(response, content):
     """Decode content to a proper string."""
     content_type = response.get('content-type',
-                                'application/binary').lower()
+                                'application/binary').strip().lower()
+    charset = 'utf-8'
     if ';' in content_type:
-        content_type, charset = (attr.strip() for attr in
-                                 content_type.split(';'))
-        charset = charset.split('=')[1].strip()
-    else:
-        charset = 'utf-8'
+        content_type, parameter_strings = content_type.split(';', 1)
+        try:
+            parameter_pairs = [atom.strip().split('=')
+                               for atom in parameter_strings.split(';')]
+            parameters = {name: value for name, value in parameter_pairs}
+            charset = parameters['charset']
+        except (ValueError, KeyError):
+            # KeyError when no charset found.
+            # ValueError when the parameter_strings are poorly
+            # formed (for example trailing ;)
+            pass
 
     if not_binary(content_type):
         return content.decode(charset)
