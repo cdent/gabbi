@@ -35,6 +35,7 @@ class SimpleWsgi(object):
         query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
         request_url = environ.get('REQUEST_URI',
                                   environ.get('RAW_URI', 'unknown'))
+        path_info = environ.get('PATH_INFO', '')
         accept_header = environ.get('HTTP_ACCEPT')
         content_type_header = environ.get('CONTENT_TYPE', '')
 
@@ -74,7 +75,7 @@ class SimpleWsgi(object):
                         query_data = body_data
             headers.append(('Location', full_request_url))
 
-        if request_url.startswith('/poller'):
+        if path_info.startswith('/poller'):
             if CURRENT_POLL == 0:
                 CURRENT_POLL = int(query_data.get('count', [5])[0])
                 start_response('400 Bad Reqest', [])
