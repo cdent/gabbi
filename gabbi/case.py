@@ -128,7 +128,12 @@ class HTTPTestCase(testcase.TestCase):
             method = '_%s_replace' % replacer.lower()
             try:
                 if template in message:
-                    message = getattr(self, method)(message)
+                    try:
+                        message = getattr(self, method)(message)
+                    except (KeyError, AttributeError, ValueError) as exc:
+                        raise AssertionError(
+                            'unable to replace %s in %s, data unavailable: %s'
+                            % (template, message, exc))
             except TypeError:
                 # Message is not a string
                 pass

@@ -64,3 +64,12 @@ tests:
      location: $SCHEME://$NETLOC$RESPONSE['c']
      x-gabbi-url: $SCHEME://$NETLOC/v2
      content-type: $HEADERS['content-type']
+
+- name: backref json fail start
+  url:  /
+  method: POST
+  data: ''
+
+- name: backref json fail end
+  xfail: true
+  url: $RESPONSE['url']

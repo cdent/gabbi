@@ -2,7 +2,7 @@
 # Run the tests and confirm that the stuff we expect to skip or fail
 # does.
 
-GREP_FAIL_MATCH='expected failures=5'
+GREP_FAIL_MATCH='expected failures=8'
 GREP_SKIP_MATCH='skips=2'
 
 python setup.py testr && \

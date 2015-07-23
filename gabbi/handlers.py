@@ -100,6 +100,8 @@ class JSONResponseHandler(ResponseHandler):
         # to do their own processing.
         try:
             match = test.extract_json_path_value(test.json_data, path)
+        except AttributeError:
+            raise AssertionError('unable to extract JSON from test results')
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.json_data))

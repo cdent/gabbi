@@ -96,6 +96,11 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/takingnames
 
+- name: confirm environ no key fail
+  desc: this confirms that no key leads to failure rather than error
+  xfail: true
+  url: /$ENVIRON['1385F1EB-DC5C-4A95-8928-58673FB272DC']
+
 - name: test pluggable response
   url: /foo?alpha=1
   response_test:
@@ -114,3 +119,13 @@ tests:
   url: /
   xfail: true
   method: DIE
+
+- name: non json response failure
+  desc: asking for json in a non json test should be failure not error
+  url: /
+  xfail: true
+  method: GET
+  request_headers:
+      accept: text/plain
+  response_json_paths:
+      $.data: hello
