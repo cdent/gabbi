@@ -40,9 +40,9 @@ from gabbi import suite as gabbi_suite
 from gabbi import utils
 
 RESPONSE_HANDLERS = [
+    handlers.HeadersResponseHandler,
     handlers.StringResponseHandler,
     handlers.JSONResponseHandler,
-    handlers.HeadersResponseHandler,
 ]
 
 
