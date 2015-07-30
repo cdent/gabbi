@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import traceback
 from unittest import TextTestResult
 from unittest import TextTestRunner
 
@@ -82,16 +83,12 @@ class ConciseTestResult(TextTestResult):
 
     def printErrorList(self, flavor, errors):
         for test, err in errors:
+            # err[0] is the type of exception
+            # err[1] is the args of the exception
+            # err[3] is the traceback, not currently used
             self.stream.writeln('%s: %s' % (flavor, self.getDescription(test)))
-            self.stream.writeln('%s:%s:%s' % (err[0], err[1][0][:70], err[2]))
-# The rest is left as an exercise for FND
-#             details = err.strip().splitlines()[-1]  # traceback's last line
-#             if ':' in details:
-#                 details = details.split(':', 1)[1]  # discard exception name
-#             if True:  # some kind of flag here?
-#                 self.stream.writeln('\t%s' % details[:70].strip())
-#             else:
-#                 self.stream.writeln('%s' % err)
+            message = str(err[1]).replace('\n', '\\r')
+            self.stream.writeln('\t%s' % message)
 
 
 class ConciseTestRunner(TextTestRunner):
