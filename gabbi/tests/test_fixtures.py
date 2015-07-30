@@ -14,7 +14,7 @@
 """
 
 import mock
-import testtools
+import unittest
 
 from gabbi import fixture
 
@@ -34,7 +34,7 @@ class FakeFixture(fixture.GabbiFixture):
         self.mock.stop()
 
 
-class FixtureTest(testtools.TestCase):
+class FixtureTest(unittest.TestCase):
 
     def setUp(self):
         super(FixtureTest, self).setUp()

@@ -13,12 +13,12 @@
 """Test functions from the utils module.
 """
 
-import testtools
+import unittest
 
 from gabbi import utils
 
 
-class UtilsTest(testtools.TestCase):
+class UtilsTest(unittest.TestCase):
 
     BINARY_TYPES = [
         'image/png',

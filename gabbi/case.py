@@ -26,11 +26,12 @@ import os
 import re
 import sys
 import time
+import unittest
+from unittest import case
 
 import jsonpath_rw
 import six
 from six.moves.urllib import parse as urlparse
-from testtools import testcase
 import wsgi_intercept
 
 from gabbi import utils
@@ -71,14 +72,18 @@ def potentialFailure(func):
             try:
                 func(self)
             except Exception:
-                raise testcase._ExpectedFailure(sys.exc_info())
-            raise testcase._UnexpectedSuccess
+                if hasattr(case, '_ExpectedFailure'):
+                    raise case._ExpectedFailure(sys.exc_info())
+                else:
+                    self._addExpectedFailure(self.result, sys.exc_info())
+            else:
+                raise case._UnexpectedSuccess
         else:
             func(self)
     return wrapper
 
 
-class HTTPTestCase(testcase.TestCase):
+class HTTPTestCase(unittest.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
@@ -99,6 +104,11 @@ class HTTPTestCase(testcase.TestCase):
         if not self.has_run:
             super(HTTPTestCase, self).tearDown()
         self.has_run = True
+
+    def run(self, result=None):
+        """Store the current result handler on this test."""
+        self.result = result
+        super(HTTPTestCase, self).run(result)
 
     @potentialFailure
     def test_request(self):

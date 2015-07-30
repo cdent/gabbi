@@ -72,16 +72,22 @@ class ConciseTestResult(TextTestResult):
         desc = test.test_data.get('desc', None)
         return ': '.join((name, desc)) if desc else name
 
+    def _exc_info_to_string(self, err, test):
+        """Override exception to string handling
+
+        The default does too much. We don't want doctoring. We want
+        information!
+        """
+        return err
+
     def printErrorList(self, flavor, errors):
         for test, err in errors:
+            # err[0] is the type of exception
+            # err[1] is the args of the exception
+            # err[3] is the traceback, not currently used
             self.stream.writeln('%s: %s' % (flavor, self.getDescription(test)))
-            # extract details from traceback
-            # XXX: fugly workaround, for lack of a better solution
-            details = str(err)
-            details = details.strip().splitlines()[-1]  # traceback's last line
-            if ':' in details:
-                details = details.split(':', 1)[1]  # discard exception name
-            self.stream.writeln('\t%s' % details.strip())
+            message = str(err[1]).replace('\n', '\\r')
+            self.stream.writeln('\t%s' % message)
 
 
 class ConciseTestRunner(TextTestRunner):
