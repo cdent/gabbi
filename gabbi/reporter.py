@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import traceback
 from unittest import TextTestResult
 from unittest import TextTestRunner
 
