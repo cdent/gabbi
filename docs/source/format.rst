@@ -67,7 +67,10 @@ Many of these items allow substitutions (explained below).
 * ``response_strings``: A sequence of string fragments expected to be
   in the response body.
 * ``response_json_paths``: A dictionary of JSONPath rules paired with
-  expected matches.
+  expected matches. Using this rule requires that the content being
+  sent from the server is content-type ``application/json`` or is
+  a content-type derived from JSON and thus includes ``+json`` in
+  the content-type value.
 * ``poll``: A dictionary of two keys:
 
   * ``count``: An integer stating the number of times to attempt

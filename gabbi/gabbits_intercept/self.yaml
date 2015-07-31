@@ -134,3 +134,22 @@ tests:
       accept: text/plain
   response_json_paths:
       $.data: hello
+
+- name: json derived content type
+  desc: +json types should work for json paths
+  url: /?data=hello
+  method: GET
+  request_headers:
+      accept: application/vnd.complex+json
+  response_json_paths:
+      $.data[0]: hello
+
+- name: xml derived content type
+  desc: +xml types should not work for json paths
+  xfail: true
+  url: /?data=hello
+  method: GET
+  request_headers:
+      accept: application/vnd.complex+xml
+  response_json_paths:
+      $.data[0]: hello

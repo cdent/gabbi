@@ -306,8 +306,10 @@ class HTTPTestCase(unittest.TestCase):
 
         # Decode and store response
         decoded_output = utils.decode_content(response, content)
+        content_type = response.get('content-type', '')
         if (decoded_output and
-                'application/json' in response.get('content-type', '')):
+                ('application/json' in content_type or
+                 '+json' in content_type)):
             self.json_data = json.loads(decoded_output)
         self.output = decoded_output
 
