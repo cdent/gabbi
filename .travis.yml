@@ -12,6 +12,9 @@ env:
       - TOXENV=pypy
       - TOXENV=pypy3
       - TOXENV=pep8
+      - TOXENV=py34-failskip
+      - TOXENV=py34-limit
+      - TOXENV=py34-prefix
 
 notifications:
       irc: "chat.freenode.net#gabbi"

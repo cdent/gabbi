@@ -12,6 +12,11 @@ tests:
   url: /
   verbose: True
 
+- name: get simple page xfail uxsuccess
+  xfail: true
+  url: /
+  verbose: True
+
 - name: inheritance of defaults
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/cow?alpha=1

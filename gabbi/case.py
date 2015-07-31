@@ -77,7 +77,10 @@ def potentialFailure(func):
                 else:
                     self._addExpectedFailure(self.result, sys.exc_info())
             else:
-                raise case._UnexpectedSuccess
+                if hasattr(self, '_addUnexpectedSuccess'):
+                    self._addUnexpectedSuccess(self.result)
+                else:
+                    raise case._UnexpectedSuccess
         else:
             func(self)
     return wrapper
