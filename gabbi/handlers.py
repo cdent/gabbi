@@ -106,8 +106,8 @@ class JSONResponseHandler(ResponseHandler):
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.json_data))
         expected = test.replace_template(value)
-        test.assertEqual(expected, match, 'Unable to match %s as %s'
-                         % (path, expected))
+        test.assertEqual(expected, match, 'Unable to match %s as %s in %s'
+                         % (path, expected, test.json_data))
 
 
 class HeadersResponseHandler(ResponseHandler):
