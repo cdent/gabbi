@@ -253,8 +253,8 @@ class HTTPTestCase(unittest.TestCase):
 
         if not url_scheme:
             if (self.port
-                    and not (self.port == 443 and ssl)
-                    and not (self.port == 80 and not ssl)):
+                    and not (int(self.port) == 443 and ssl)
+                    and not (int(self.port) == 80 and not ssl)):
                 netloc = '%s:%s' % (self.host, self.port)
             if ssl:
                 scheme = 'https'
