@@ -10,10 +10,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""A place to put tests of url parsing.
+"""A place to put tests of URL parsing.
 
 These verbosely cover the _parse_url method to make sure it
-behavese.
+behaves.
 """
 
 import unittest
