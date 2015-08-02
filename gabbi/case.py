@@ -57,6 +57,7 @@ BASE_TEST = {
     'url': '',
     'status': '200',
     'request_headers': {},
+    'query_parameters': {},
     'data': '',
     'xfail': False,
     'skip': '',
@@ -168,6 +169,14 @@ class HTTPTestCase(unittest.TestCase):
         for handler in self.response_handlers:
             handler(self)
 
+    def _clean_query_value(self, value):
+        """Clean up a single query from query_parameters."""
+        value = self.replace_template(value)
+        # stringify ints in Python version independent fashion
+        value = '%s' % value
+        value = value.encode('UTF-8')
+        return value
+
     def _environ_replace(self, message):
         """Replace an indicator in a message with the environment value."""
         value = re.sub(self._replacer_regex('ENVIRON'),
@@ -247,27 +256,49 @@ class HTTPTestCase(unittest.TestCase):
         Scheme and netloc are saved for later use in comparisons.
         """
         parsed_url = urlparse.urlsplit(url)
-        url_scheme = parsed_url[0]
         scheme = 'http'
         netloc = self.host
+        query_params = self.test_data['query_parameters']
 
-        if not url_scheme:
+        if not parsed_url.scheme:
             if (self.port
                     and not (int(self.port) == 443 and ssl)
                     and not (int(self.port) == 80 and not ssl)):
                 netloc = '%s:%s' % (self.host, self.port)
+
             if ssl:
                 scheme = 'https'
+
             path = parsed_url[2]
             if self.prefix:
                 path = '%s%s' % (self.prefix, path)
+
+            if query_params:
+                encoded_query_params = {}
+                for param, value in query_params.items():
+                    # isinstance used because we can iter a string
+                    if isinstance(value, list):
+                        encoded_query_params[param] = [
+                            self._clean_query_value(subvalue)
+                            for subvalue in value]
+                    else:
+                        encoded_query_params[param] = (
+                            self._clean_query_value(value))
+
+                query_string = urlparse.urlencode(
+                    encoded_query_params, doseq=True)
+                if parsed_url.query:
+                    query_string = '&'.join([parsed_url.query, query_string])
+            else:
+                query_string = parsed_url.query
+
             full_url = urlparse.urlunsplit((scheme, netloc, path,
-                                            parsed_url[3], ''))
+                                            query_string, ''))
             self.scheme = scheme
             self.netloc = netloc
         else:
             full_url = url
-            self.scheme = url_scheme
+            self.scheme = parsed_url.scheme
             self.netloc = parsed_url[1]
 
         return full_url

@@ -39,6 +39,9 @@ Many of these items allow substitutions (explained below).
   fully qualified URL (with host and scheme). If not qualified the
   test builder will be responsible for determining host and scheme.
   **Required**
+* ``query_parameters``: An optional dictionary of query parameters
+  that will be added to the ``url``. If there is an existing set of
+  query parameters they wil be extended.
 * ``method``: The request method to use. Defaults to ``GET``.
 * ``status``: The expected response status code. The default is
   ``200``. If necessary you may indicate multiple response codes
@@ -111,6 +114,7 @@ character must be used at both ends.
 All of these variables may be used in all of the following fields:
 
 * ``url``
+* ``query_parameters``
 * ``data``
 * ``request_headers``
 * ``response_strings``
