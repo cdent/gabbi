@@ -26,9 +26,11 @@ class UrlParseTest(unittest.TestCase):
 
     @staticmethod
     def make_test_case(host, port=8000, prefix=''):
-        # attributes used are port, prefix and host and they must
-        # be set manually here, due to metaclass magics elsewhere
+        # Attributes used are port, prefix and host and they must
+        # be set manually here, due to metaclass magics elsewhere.
+        # test_data must have a base value.
         http_case = case.HTTPTestCase('test_request')
+        http_case.test_data = case.BASE_TEST
         http_case.host = host
         http_case.port = port
         http_case.prefix = prefix

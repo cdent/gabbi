@@ -1,0 +1,57 @@
+#
+# As a convenience a URL can be augmented with structured declaration
+# of query parameters.
+#
+
+tests:
+
+    - name: simple param
+      url: /foo
+      query_parameters:
+          bar: 1
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?bar=1
+
+    - name: joined params
+      url: /foo?cow=moo
+      query_parameters:
+          bar: 1
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?cow=moo&bar=1
+
+    - name: multi params
+      url: /foo
+      request_headers:
+          accept: application/json
+      query_parameters:
+          bar:
+            - 1
+            - 2 
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?bar=1&bar=2
+          content-type: application/json
+      response_json_paths:
+          $.bar[0]: "1"
+          $.bar[1]: "2"
+
+    - name: replacers in params
+      url: /foo
+      query_parameters:
+          fromjson: $RESPONSE['$.bar[0]']
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?fromjson=1
+
+    - name: unicode
+      url: /foo
+      query_parameters:
+          snowman: ☃
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?snowman=%E2%98%83
+
+    - name: url in param
+      url: /foo
+      query_parameters:
+          redirect: http://example.com/treehouse?secret=true&password=hello
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foo?redirect=http%3A%2F%2Fexample.com%2Ftreehouse%3Fsecret%3Dtrue%26password%3Dhello
+
