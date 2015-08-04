@@ -31,6 +31,7 @@ class UtilsTest(unittest.TestCase):
         'application/vnd.custom+json',
         'application/javascript',
         'application/json',
+        'application/json-home',
     ]
 
     def test_not_binary(self):

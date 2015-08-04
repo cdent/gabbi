@@ -144,6 +144,22 @@ tests:
   response_json_paths:
       $.data[0]: hello
 
+- name: json home content type is json
+  url: /?data=hello
+  method: GET
+  request_headers:
+      accept: application/json-home
+  response_json_paths:
+      $.data[0]: hello
+
+- name: json content type detection case insensitive
+  url: /?data=hello
+  method: GET
+  request_headers:
+      accept: ApPlIcAtIoN/JsOn-hOmE
+  response_json_paths:
+      $.data[0]: hello
+
 - name: xml derived content type
   desc: +xml types should not work for json paths
   xfail: true

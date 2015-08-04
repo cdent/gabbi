@@ -85,4 +85,4 @@ def not_binary(content_type):
             content_type.endswith('+xml') or
             content_type.endswith('+json') or
             content_type == 'application/javascript' or
-            content_type == 'application/json')
+            content_type.startswith('application/json'))
