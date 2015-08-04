@@ -25,6 +25,7 @@ tests:
       response_json_paths:
           $[0]: 1
           $[1]: 2
+          $.`len`: 2
 
     - name: load json file
       url: /
