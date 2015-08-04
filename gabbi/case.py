@@ -29,11 +29,11 @@ import time
 import unittest
 from unittest import case
 
-import jsonpath_rw
 import six
 from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
+from gabbi import json_parser
 from gabbi import utils
 
 REPLACERS = [
@@ -193,7 +193,7 @@ class HTTPTestCase(unittest.TestCase):
 
         The input data is a Python datastructre, not a JSON string.
         """
-        path_expr = jsonpath_rw.parse(path)
+        path_expr = json_parser.parse(path)
         matches = [match.value for match in path_expr.find(data)]
         try:
             return matches[0]
