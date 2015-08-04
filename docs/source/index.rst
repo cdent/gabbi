@@ -9,6 +9,7 @@
 
    format
    example
+   jsonpath
    host
    fixtures
    handlers

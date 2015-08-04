@@ -101,8 +101,7 @@ processed in the order given.
 * ``$HEADERS['<header>']``: The value of any header from the
   prior response.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
-  response. See http://jsonpath-rw.readthedocs.org/en/latest/ for
-  jsonpath-rw formatting.
+  response. See :doc:`jsonpath` for more on formatting.
 
 Where a single-quote character, ``'``, is shown above you may also use a
 double-quote character, ``"``, but in any given expression the same

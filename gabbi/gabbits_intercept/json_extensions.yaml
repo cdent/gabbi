@@ -1,0 +1,27 @@
+#
+# Gabbi has extensions to JSONPath, so far just `len`,
+# we need to test it.
+#
+
+tests:
+
+    - name: test len
+      url: /foobar
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          alpha:
+              - one
+              - two
+          beta: hello
+      response_json_paths:
+          # the dict has two keys
+          $.`len`: 2
+          $.alpha[0]: one
+          $.alpha.[1]: two
+          # the list at alpha has two items
+          $.alpha.`len`: 2
+          $.beta: hello
+          # the string at beta has five chars
+          $.beta.`len`: 5
