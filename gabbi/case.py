@@ -36,6 +36,8 @@ import wsgi_intercept
 from gabbi import json_parser
 from gabbi import utils
 
+MAX_CHARS_OUTPUT = 2000
+
 REPLACERS = [
     'SCHEME',
     'NETLOC',
@@ -308,11 +310,13 @@ class HTTPTestCase(unittest.TestCase):
 
         # Decode and store response
         decoded_output = utils.decode_content(response, content)
-        content_type = response.get('content-type', '').lower()
+        self.content_type = response.get('content-type', '').lower()
         if (decoded_output and
-                ('application/json' in content_type or
-                 '+json' in content_type)):
+                ('application/json' in self.content_type or
+                 '+json' in self.content_type)):
             self.json_data = json.loads(decoded_output)
+        else:
+            self.json_data = None
         self.output = decoded_output
 
     def _run_test(self):
@@ -402,7 +406,37 @@ class HTTPTestCase(unittest.TestCase):
             statii = [stat.strip() for stat in expected_status.split('||')]
         else:
             statii = [expected_status.strip()]
-        self.assertIn(observed_status, statii)
+
+        self.assert_in_or_print_output(observed_status, statii)
+
+    def assert_in_or_print_output(self, expected, iterable):
+        if utils.not_binary(self.content_type):
+            if expected in iterable:
+                return
+
+            if self.json_data:
+                full_response = json.dumps(self.json_data, indent=2,
+                                           separators=(',', ': '))
+            else:
+                full_response = self.output
+
+            max_chars = os.getenv('GABBIT_MAX_CHARS_OUTPUT', MAX_CHARS_OUTPUT)
+            response = full_response[0:max_chars]
+            is_truncated = (len(response) != len(full_response))
+
+            if iterable == self.output:
+                msg = "'%s' not found in %s%s" % (
+                    expected, response,
+                    '\n...truncated...' if is_truncated else ''
+                )
+            else:
+                msg = "'%s' not found in %s, %sresponse:\n%s" % (
+                    expected, iterable,
+                    'truncated ' if is_truncated else '',
+                    response)
+            self.fail(msg)
+        else:
+            self.assertIn(expected, iterable)
 
 
 class ServerError(Exception):
