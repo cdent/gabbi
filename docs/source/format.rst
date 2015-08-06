@@ -41,7 +41,8 @@ Many of these items allow substitutions (explained below).
   **Required**
 * ``query_parameters``: An optional dictionary of query parameters
   that will be added to the ``url``. If there is an existing set of
-  query parameters they wil be extended.
+  query parameters they wil be extended. See :doc:`example` for a
+  demonstration of how the data is structured.
 * ``method``: The request method to use. Defaults to ``GET``.
 * ``status``: The expected response status code. The default is
   ``200``. If necessary you may indicate multiple response codes

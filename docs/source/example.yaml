@@ -66,6 +66,21 @@ tests:
       url: /
       status: 200 # This is the response code after the redirect.
 
+# URLs can express query parameters in two ways: either in the url
+# value directly, or as query_parameters. If both are used then
+# query_parameters are appended. In this example the resulting URL
+# will be equivalient to
+# /foo?section=news&article=1&article=2&date=yesterday
+# but not necessarily in that order.
+
+    - name: create a url with parameters
+      url: /foo?section=news
+      query_parameters:
+          article:
+              - 1
+              - 2
+          date: yesterday
+
 # Request headers can be used to declare media-type choices and
 # experiment with authorization handling (amongst other things).
 # Response headers allow evaluating headers in the response. These
