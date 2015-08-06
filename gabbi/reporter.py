@@ -17,11 +17,6 @@ from unittest import TextTestRunner
 
 import colorama
 
-def _colorize(color, message):
-    try:
-        return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
-    except AttributeError:
-        return message
 
 class ConciseTestResult(TextTestResult):
 
@@ -104,3 +99,10 @@ class ConciseTestResult(TextTestResult):
 
 class ConciseTestRunner(TextTestRunner):
     resultclass = ConciseTestResult
+
+
+def _colorize(color, message):
+    try:
+        return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
+    except AttributeError:
+        return message
