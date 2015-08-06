@@ -9,7 +9,8 @@ it. These contributions come in many forms:
 * Reporting and reviewing bugs in the
   [issues](https://github.com/cdent/gabbi/issues)
 * Providing [pull requests](https://github.com/cdent/gabbi/pulls)
-  containing fixes and new features.
+  containing fixes and new features. See [below](#pull-requests) for
+  guidelines.
 
 If you have an idea for a new feature it is best to review the
 [Ideas](https://github.com/cdent/gabbi/wiki/Ideas) wiki page and the
@@ -23,3 +24,19 @@ as clean and readable as possible.
 
 If you reach an impasse, create an issue and provide as much info as you
 can about your situation and together we can try to figure it out.
+
+# Pull Requests
+
+If you want to make a pull request, fork the gabbi repository and create
+a new branch that will contain your changes. Name the branch something
+meaningful and related to your change.
+
+You should provide verbose commit messages on each of your commits. You
+should not feel obliged to squash your commits into one commit. We want
+to the see the full expression of your process and thinking.
+
+When you push your branch back to Github please never force push.
+
+If your pull request receives some comments and you need to make some
+changes, please do them as _an additional commit_ on the branch used for
+the pull request.
