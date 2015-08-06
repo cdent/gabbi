@@ -13,6 +13,7 @@
 """Test response handlers.
 """
 
+import json
 import unittest
 
 from gabbi import case
@@ -35,19 +36,55 @@ class HandlersTest(unittest.TestCase):
 
     def test_response_strings(self):
         handler = handlers.StringResponseHandler(self.test_class)
+        self.test.content_type = "text/plain"
+        self.test.json_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbeta\n'
         self._assert_handler(handler)
 
     def test_response_strings_fail(self):
         handler = handlers.StringResponseHandler(self.test_class)
+        self.test.content_type = "text/plain"
+        self.test.json_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbta\n'
         with self.assertRaises(AssertionError):
             self._assert_handler(handler)
 
+    def test_response_strings_fail_big_output(self):
+        handler = handlers.StringResponseHandler(self.test_class)
+        self.test.content_type = "text/plain"
+        self.test.json_data = None
+        self.test.test_data = {'response_strings': ['alpha', 'beta']}
+        self.test.output = 'alpha\nbta\n' * 1000
+        with self.assertRaises(AssertionError) as cm:
+            self._assert_handler(handler)
+
+        msg = str(cm.exception)
+        self.assertEqual(2036, len(msg))
+
+    def test_response_strings_fail_big_payload(self):
+        handler = handlers.StringResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_strings': ['foobar']}
+        self.test.json_data = {
+            'objects': [{'name': 'cw',
+                         'location': 'barn'},
+                        {'name': 'chris',
+                         'location': 'house'}] * 100
+        }
+        self.test.output = json.dumps(self.test.json_data)
+        with self.assertRaises(AssertionError) as cm:
+            self._assert_handler(handler)
+
+        msg = str(cm.exception)
+        self.assertEqual(2038, len(msg))
+        # Check the pprint of the json
+        self.assertIn('      "location": "house"', msg)
+
     def test_response_json_paths(self):
         handler = handlers.JSONResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
@@ -62,6 +99,7 @@ class HandlersTest(unittest.TestCase):
 
     def test_response_json_paths_fail_data(self):
         handler = handlers.JSONResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
@@ -77,6 +115,7 @@ class HandlersTest(unittest.TestCase):
 
     def test_response_json_paths_fail_path(self):
         handler = handlers.JSONResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
         }}

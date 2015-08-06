@@ -82,7 +82,7 @@ class StringResponseHandler(ResponseHandler):
 
     def action(self, test, expected, value=None):
         expected = test.replace_template(expected)
-        test.assertIn(expected, test.output)
+        test.assert_in_or_print_output(expected, test.output)
 
 
 class JSONResponseHandler(ResponseHandler):
