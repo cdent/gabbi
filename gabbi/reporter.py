@@ -15,12 +15,19 @@
 from unittest import TextTestResult
 from unittest import TextTestRunner
 
+import colorama
+
 
 class ConciseTestResult(TextTestResult):
 
     def __init__(self, stream, descriptions, verbosity):
         super(ConciseTestResult, self).__init__(
             stream, descriptions, verbosity)
+        if stream.isatty():
+            colorama.init()
+            self.colorize = _colorize
+        else:
+            self.colorize = lambda x, y: y
 
     def startTest(self, test):
         super(TextTestResult, self).startTest(test)
@@ -31,19 +38,19 @@ class ConciseTestResult(TextTestResult):
     def addSuccess(self, test):
         super(TextTestResult, self).addSuccess(test)
         if self.showAll:
-            self.stream.write('✓ ')
+            self.stream.write(self.colorize('GREEN', '✓ '))
             self.stream.writeln(self.getDescription(test))
 
     def addFailure(self, test, err):
         super(TextTestResult, self).addFailure(test, err)
         if self.showAll:
-            self.stream.write('✗ ')
+            self.stream.write(self.colorize('RED', '✗ '))
             self.stream.writeln(self.getDescription(test))
 
     def addError(self, test, err):
         super(TextTestResult, self).addError(test, err)
         if self.showAll:
-            self.stream.write('E ')
+            self.stream.write(self.colorize('RED', 'E '))
             self.stream.writeln(self.getDescription(test))
 
     def addSkip(self, test, reason):
@@ -92,3 +99,10 @@ class ConciseTestResult(TextTestResult):
 
 class ConciseTestRunner(TextTestRunner):
     resultclass = ConciseTestResult
+
+
+def _colorize(color, message):
+    try:
+        return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
+    except AttributeError:
+        return message
