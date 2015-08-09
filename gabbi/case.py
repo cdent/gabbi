@@ -373,13 +373,6 @@ class HTTPTestCase(unittest.TestCase):
         if test['redirects']:
             self.http.follow_redirects = True
 
-        # Print some information about this request if asked.
-        if test['verbose']:
-            print('\n###########################')
-            print('%s %s' % (method, full_url))
-            for key in headers:
-                print('%s: %s' % (key, headers[key]))
-
         if test['poll']:
             count = test['poll'].get('count', 1)
             delay = test['poll'].get('delay', 1)

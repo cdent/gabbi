@@ -12,10 +12,6 @@
 # under the License.
 """Utility functions grab bag."""
 
-from __future__ import print_function
-
-import httplib2
-
 
 try:  # Python 3
     ConnectionRefused = ConnectionRefusedError
@@ -24,33 +20,20 @@ except NameError:  # Python 2
     ConnectionRefused = socket.error
 
 
-class VerboseHttp(httplib2.Http):
-    """A subclass of Http that verbosely reports on activity."""
-
-    def _request(self, conn, host, absolute_uri, request_uri, method, body,
-                 headers, redirections, cachekey):
-        """Display request parameters before requesting."""
-
-        print('\n%s %s\nHost: %s' % (method, request_uri, host))
-        for key in headers:
-            print('%s: %s' % (key, headers[key]))
-
-        (response, content) = httplib2.Http._request(
-            self, conn, host, absolute_uri, request_uri, method, body,
-            headers, redirections, cachekey
-        )
-
-        print()
-        for key in response.dict:
-            print('%s: %s' % (key, response.dict[key]))
-
-        return (response, content)
-
-
-def decode_content(response, content):
+def decode_content(header_dict, content):
     """Decode content to a proper string."""
-    content_type = response.get('content-type',
-                                'application/binary').strip().lower()
+    content_type, charset = extract_content_type(header_dict)
+
+    if not_binary(content_type):
+        return content.decode(charset)
+    else:
+        return content
+
+
+def extract_content_type(header_dict):
+    """Extract content-type from headers."""
+    content_type = header_dict.get('content-type',
+                                   'application/binary').strip().lower()
     charset = 'utf-8'
     if ';' in content_type:
         content_type, parameter_strings = (attr.strip() for attr
@@ -66,17 +49,7 @@ def decode_content(response, content):
             # formed (for example trailing ;)
             pass
 
-    if not_binary(content_type):
-        return content.decode(charset)
-    else:
-        return content
-
-
-def get_http(verbose=False):
-    """Return an Http class for making requests."""
-    if verbose:
-        return VerboseHttp()
-    return httplib2.Http()
+    return (content_type, charset)
 
 
 def not_binary(content_type):
