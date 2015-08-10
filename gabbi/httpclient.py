@@ -39,7 +39,7 @@ class VerboseHttp(httplib2.Http):
         """Display request parameters before requesting."""
 
         self._verbose_output('#### %s ####' % self.test_name)
-        self._verbose_output('%s %s\nHost: %s' % (method, request_uri, host))
+        self._verbose_output('> %s %s\n> Host: %s' % (method, request_uri, host))
 
         self._do_show_headers(headers, prefix='>')
         self._do_show_body(headers, body)
@@ -52,7 +52,7 @@ class VerboseHttp(httplib2.Http):
         # Blank line for division
         self._verbose_output('')
         status = response.pop('status')
-        self._verbose_output('%s %s' % (status, response.reason))
+        self._verbose_output('< %s %s' % (status, response.reason))
         self._do_show_headers(response, prefix='<')
 
         # response body
