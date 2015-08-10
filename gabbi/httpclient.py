@@ -39,7 +39,7 @@ class VerboseHttp(httplib2.Http):
         """Display request parameters before requesting."""
 
         self._verbose_output('#### %s ####' % self.test_name)
-        self._verbose_output('%s %s\nHost: %s' % (method, request_uri, host))
+        self._verbose_output('> %s %s\n> Host: %s' % (method, request_uri, host))
 
         self._do_show_headers(headers, prefix='>')
         self._do_show_body(headers, body)
@@ -51,7 +51,8 @@ class VerboseHttp(httplib2.Http):
 
         # Blank line for division
         self._verbose_output('')
-        self._do_show_headers(response, prefix='<')
+        self._verbose_output('< %s %s' % (response['status'], response.reason))
+        self._do_show_headers(response, prefix='<', blacklist=['status'])
 
         # response body
         self._do_show_body(response, content)
@@ -59,11 +60,12 @@ class VerboseHttp(httplib2.Http):
 
         return (response, content)
 
-    def _do_show_headers(self, headers, prefix=''):
+    def _do_show_headers(self, headers, prefix='', blacklist=None):
         if self._show_headers:
             for key in headers:
-                self._verbose_output('%s: %s' % (key, headers[key]),
-                                     prefix=prefix)
+                if not blacklist or not key in blacklist:
+                    self._verbose_output('%s: %s' % (key, headers[key]),
+                                         prefix=prefix)
 
     def _do_show_body(self, headers, content):
         if self._show_body and utils.not_binary(
