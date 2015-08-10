@@ -24,8 +24,16 @@ from gabbi import utils
 class VerboseHttp(httplib2.Http):
     """A subclass of Http that verbosely reports on activity."""
 
+    # A list of headers to never display
+    HEADER_BLACKLIST = [
+        'status',
+    ]
+
+    REQUEST_PREFIX = '>'
+    RESPONSE_PREFIX = '<'
+
     def __init__(self, **kwargs):
-        self.test_name = kwargs.pop('test_name')
+        self.caption = kwargs.pop('caption')
         self._show_body = kwargs.pop('body')
         self._show_headers = kwargs.pop('headers')
         self._use_color = kwargs.pop('colorize')
@@ -38,10 +46,13 @@ class VerboseHttp(httplib2.Http):
                  headers, redirections, cachekey):
         """Display request parameters before requesting."""
 
-        self._verbose_output('#### %s ####' % self.test_name)
-        self._verbose_output('> %s %s\n> Host: %s' % (method, request_uri, host))
+        self._verbose_output('#### %s ####' % self.caption)
+        self._verbose_output('%s %s' % (method, request_uri),
+                             prefix=self.REQUEST_PREFIX)
+        self._verbose_output('Host: %s' % host,
+                             prefix=self.REQUEST_PREFIX)
 
-        self._do_show_headers(headers, prefix='>')
+        self._do_show_headers(headers, prefix=self.REQUEST_PREFIX)
         self._do_show_body(headers, body)
 
         (response, content) = httplib2.Http._request(
@@ -51,8 +62,9 @@ class VerboseHttp(httplib2.Http):
 
         # Blank line for division
         self._verbose_output('')
-        self._verbose_output('< %s %s' % (response['status'], response.reason))
-        self._do_show_headers(response, prefix='<', blacklist=['status'])
+        self._verbose_output('%s %s' % (response['status'], response.reason),
+                             prefix=self.RESPONSE_PREFIX)
+        self._do_show_headers(response, prefix=self.RESPONSE_PREFIX)
 
         # response body
         self._do_show_body(response, content)
@@ -60,10 +72,10 @@ class VerboseHttp(httplib2.Http):
 
         return (response, content)
 
-    def _do_show_headers(self, headers, prefix='', blacklist=None):
+    def _do_show_headers(self, headers, prefix=''):
         if self._show_headers:
             for key in headers:
-                if not blacklist or not key in blacklist:
+                if key not in self.HEADER_BLACKLIST:
                     self._verbose_output('%s: %s' % (key, headers[key]),
                                          prefix=prefix)
 
@@ -71,7 +83,8 @@ class VerboseHttp(httplib2.Http):
         if self._show_body and utils.not_binary(
                 utils.extract_content_type(headers)[0]):
             self._verbose_output('')
-            self._verbose_output(utils.decode_content(headers, content))
+            self._verbose_output(
+                utils.decode_response_content(headers, content))
 
     def _verbose_output(self, message, prefix='', color=None, stream=None):
         """Output a message."""
@@ -81,7 +94,7 @@ class VerboseHttp(httplib2.Http):
         print(message, file=self._stream)
 
 
-def get_http(verbose=False, test_name=''):
+def get_http(verbose=False, caption=''):
     """Return an Http class for making requests."""
     if verbose:
         body = True
@@ -93,5 +106,5 @@ def get_http(verbose=False, test_name=''):
         if verbose == 'headers':
             body = False
         return VerboseHttp(body=body, headers=headers, colorize=colorize,
-                           stream=stream, test_name=test_name)
+                           stream=stream, caption=caption)
     return httplib2.Http()

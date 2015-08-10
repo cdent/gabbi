@@ -20,7 +20,7 @@ except NameError:  # Python 2
     ConnectionRefused = socket.error
 
 
-def decode_content(header_dict, content):
+def decode_response_content(header_dict, content):
     """Decode content to a proper string."""
     content_type, charset = extract_content_type(header_dict)
 

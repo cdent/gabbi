@@ -340,7 +340,7 @@ class HTTPTestCase(unittest.TestCase):
             self.location = response['location']
 
         # Decode and store response
-        decoded_output = utils.decode_content(response, content)
+        decoded_output = utils.decode_response_content(response, content)
         self.content_type = response.get('content-type', '').lower()
         if (decoded_output and
                 ('application/json' in self.content_type or
