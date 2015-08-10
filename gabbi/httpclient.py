@@ -38,15 +38,15 @@ class VerboseHttp(httplib2.Http):
         self._show_headers = kwargs.pop('headers')
         self._use_color = kwargs.pop('colorize')
         self._stream = kwargs.pop('stream')
-        if not self._stream.isatty():
-            self._use_color = False
+        if self._use_color:
+            self.colorize = utils.get_colorizer(self._stream)
         super(VerboseHttp, self).__init__(**kwargs)
 
     def _request(self, conn, host, absolute_uri, request_uri, method, body,
                  headers, redirections, cachekey):
         """Display request parameters before requesting."""
 
-        self._verbose_output('#### %s ####' % self.caption)
+        self._verbose_output('#### %s ####' % self.caption, color='BLUE')
         self._verbose_output('%s %s' % (method, request_uri),
                              prefix=self.REQUEST_PREFIX)
         self._verbose_output('Host: %s' % host,
@@ -91,6 +91,8 @@ class VerboseHttp(httplib2.Http):
         stream = stream or self._stream
         if prefix and message:
             print(prefix, end=' ', file=self._stream)
+        if color:
+            message = self.colorize(color, message)
         print(message, file=self._stream)
 
 
@@ -99,7 +101,7 @@ def get_http(verbose=False, caption=''):
     if verbose:
         body = True
         headers = True
-        colorize = False
+        colorize = True
         stream = sys.stdout
         if verbose == 'body':
             headers = False

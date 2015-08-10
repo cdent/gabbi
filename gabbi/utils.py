@@ -12,6 +12,8 @@
 # under the License.
 """Utility functions grab bag."""
 
+import colorama
+
 
 try:  # Python 3
     ConnectionRefused = ConnectionRefusedError
@@ -52,6 +54,18 @@ def extract_content_type(header_dict):
     return (content_type, charset)
 
 
+def get_colorizer(stream):
+    """Return a function to colorize a string.
+
+    Only if stream is a tty .
+    """
+    if stream.isatty():
+        colorama.init()
+        return _colorize
+    else:
+        return lambda x, y: y
+
+
 def not_binary(content_type):
     """Decide if something is content we'd like to treat as a string."""
     return (content_type.startswith('text/') or
@@ -59,3 +73,11 @@ def not_binary(content_type):
             content_type.endswith('+json') or
             content_type == 'application/javascript' or
             content_type.startswith('application/json'))
+
+
+def _colorize(color, message):
+    """Add a color to the message."""
+    try:
+        return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
+    except AttributeError:
+        return message
