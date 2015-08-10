@@ -51,6 +51,8 @@ class VerboseHttp(httplib2.Http):
 
         # Blank line for division
         self._verbose_output('')
+        status = response.pop('status')
+        self._verbose_output('%s %s' % (status, response.reason))
         self._do_show_headers(response, prefix='<')
 
         # response body
