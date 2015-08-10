@@ -12,6 +12,8 @@
 # under the License.
 """Utility functions grab bag."""
 
+import os
+
 import colorama
 
 
@@ -59,7 +61,7 @@ def get_colorizer(stream):
 
     Only if stream is a tty .
     """
-    if stream.isatty():
+    if stream.isatty() or os.environ.get('GABBI_FORCE_COLOR', False):
         colorama.init()
         return _colorize
     else:
