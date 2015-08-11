@@ -24,7 +24,9 @@ from gabbi import utils
 class VerboseHttp(httplib2.Http):
     """A subclass of Http that verbosely reports on activity."""
 
-    # A list of headers to never display
+    # A list of request and response headers to never display.
+    # Can include httplib2 response object attributes that are not
+    # technically headers.
     HEADER_BLACKLIST = [
         'status',
     ]
