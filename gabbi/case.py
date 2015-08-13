@@ -324,7 +324,7 @@ class HTTPTestCase(unittest.TestCase):
         """
 
         if 'user-agent' not in (key.lower() for key in headers):
-            headers['user-agent'] = "Python-gabbi/%s" % __version__
+            headers['user-agent'] = "gabbi/%s (Python httplib2)" % __version__
 
         try:
             response, content = self.http.request(
