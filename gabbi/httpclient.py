@@ -33,6 +33,12 @@ class VerboseHttp(httplib2.Http):
 
     REQUEST_PREFIX = '>'
     RESPONSE_PREFIX = '<'
+    COLORMAP = {
+        'caption': 'BLUE',
+        'header': 'YELLOW',
+        'request': 'CYAN',
+        'status': 'CYAN',
+    }
 
     def __init__(self, **kwargs):
         self.caption = kwargs.pop('caption')
@@ -48,9 +54,11 @@ class VerboseHttp(httplib2.Http):
                  headers, redirections, cachekey):
         """Display request parameters before requesting."""
 
-        self._verbose_output('#### %s ####' % self.caption, color='BLUE')
+        self._verbose_output('#### %s ####' % self.caption,
+                             color=self.COLORMAP['caption'])
         self._verbose_output('%s %s' % (method, request_uri),
-                             prefix=self.REQUEST_PREFIX, color='CYAN')
+                             prefix=self.REQUEST_PREFIX,
+                             color=self.COLORMAP['request'])
         self._print_header("Host", host, prefix=self.REQUEST_PREFIX)
 
         self._print_headers(headers, prefix=self.REQUEST_PREFIX)
@@ -64,7 +72,8 @@ class VerboseHttp(httplib2.Http):
         # Blank line for division
         self._verbose_output('')
         self._verbose_output('%s %s' % (response['status'], response.reason),
-                             prefix=self.RESPONSE_PREFIX, color='CYAN')
+                             prefix=self.RESPONSE_PREFIX,
+                             color=self.COLORMAP['status'])
         self._print_headers(response, prefix=self.RESPONSE_PREFIX)
 
         # response body
@@ -87,7 +96,7 @@ class VerboseHttp(httplib2.Http):
                 utils.decode_response_content(headers, content))
 
     def _print_header(self, name, value, prefix='', stream=None):
-        header = self.colorize('YELLOW', "%s:" % name)
+        header = self.colorize(self.COLORMAP['header'], "%s:" % name)
         self._verbose_output("%s %s" % (header, value), prefix=prefix,
                              stream=stream)
 
