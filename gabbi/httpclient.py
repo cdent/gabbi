@@ -92,10 +92,10 @@ class VerboseHttp(httplib2.Http):
         """Output a message."""
         stream = stream or self._stream
         if prefix and message:
-            print(prefix, end=' ', file=self._stream)
+            print(prefix, end=' ', file=stream)
         if color:
             message = self.colorize(color, message)
-        print(message, file=self._stream)
+        print(message, file=stream)
 
 
 def get_http(verbose=False, caption=''):
