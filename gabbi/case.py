@@ -344,7 +344,7 @@ class HTTPTestCase(unittest.TestCase):
             self.location = response['location']
 
         # Decode and store response
-        decoded_output = utils.decode_content(response, content)
+        decoded_output = utils.decode_response_content(response, content)
         self.content_type = response.get('content-type', '').lower()
         if (decoded_output and
                 ('application/json' in self.content_type or
@@ -376,13 +376,6 @@ class HTTPTestCase(unittest.TestCase):
         self.http.follow_redirects = False
         if test['redirects']:
             self.http.follow_redirects = True
-
-        # Print some information about this request if asked.
-        if test['verbose']:
-            print('\n###########################')
-            print('%s %s' % (method, full_url))
-            for key in headers:
-                print('%s: %s' % (key, headers[key]))
 
         if test['poll']:
             count = test['poll'].get('count', 1)

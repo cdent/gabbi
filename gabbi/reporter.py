@@ -15,7 +15,7 @@
 from unittest import TextTestResult
 from unittest import TextTestRunner
 
-import colorama
+from gabbi import utils
 
 
 class ConciseTestResult(TextTestResult):
@@ -23,11 +23,7 @@ class ConciseTestResult(TextTestResult):
     def __init__(self, stream, descriptions, verbosity):
         super(ConciseTestResult, self).__init__(
             stream, descriptions, verbosity)
-        if stream.isatty():
-            colorama.init()
-            self.colorize = _colorize
-        else:
-            self.colorize = lambda x, y: y
+        self.colorize = utils.get_colorizer(stream)
 
     def startTest(self, test):
         super(TextTestResult, self).startTest(test)
@@ -99,10 +95,3 @@ class ConciseTestResult(TextTestResult):
 
 class ConciseTestRunner(TextTestRunner):
     resultclass = ConciseTestResult
-
-
-def _colorize(color, message):
-    try:
-        return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
-    except AttributeError:
-        return message

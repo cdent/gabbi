@@ -36,8 +36,8 @@ import yaml
 
 from gabbi import case
 from gabbi import handlers
+from gabbi import httpclient
 from gabbi import suite as gabbi_suite
-from gabbi import utils
 
 RESPONSE_HANDLERS = [
     handlers.HeadersResponseHandler,
@@ -197,7 +197,8 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
-        http_class = utils.get_http(verbose=test['verbose'])
+        http_class = httpclient.get_http(verbose=test['verbose'],
+                                         caption=test_name)
         klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
                              'test_directory': test_directory,
