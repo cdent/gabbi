@@ -86,9 +86,10 @@ class VerboseHttp(httplib2.Http):
             self._verbose_output(
                 utils.decode_response_content(headers, content))
 
-    def _do_show_header(self, name, value, prefix='', stream=None): # XXX: rename?
+    def _do_show_header(self, name, value, prefix='', stream=None):
         header = self.colorize('YELLOW', "%s:" % name)
-        self._verbose_output("%s %s" % (header, value), prefix=prefix, stream=stream)
+        self._verbose_output("%s %s" % (header, value), prefix=prefix,
+                             stream=stream)
 
     def _verbose_output(self, message, prefix='', color=None, stream=None):
         """Output a message."""
