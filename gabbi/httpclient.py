@@ -51,10 +51,10 @@ class VerboseHttp(httplib2.Http):
         self._verbose_output('#### %s ####' % self.caption, color='BLUE')
         self._verbose_output('%s %s' % (method, request_uri),
                              prefix=self.REQUEST_PREFIX, color='CYAN')
-        self._do_show_header("Host", host, prefix=self.REQUEST_PREFIX)
+        self._print_header("Host", host, prefix=self.REQUEST_PREFIX)
 
-        self._do_show_headers(headers, prefix=self.REQUEST_PREFIX)
-        self._do_show_body(headers, body)
+        self._print_headers(headers, prefix=self.REQUEST_PREFIX)
+        self._print_body(headers, body)
 
         (response, content) = httplib2.Http._request(
             self, conn, host, absolute_uri, request_uri, method, body,
@@ -65,28 +65,28 @@ class VerboseHttp(httplib2.Http):
         self._verbose_output('')
         self._verbose_output('%s %s' % (response['status'], response.reason),
                              prefix=self.RESPONSE_PREFIX, color='CYAN')
-        self._do_show_headers(response, prefix=self.RESPONSE_PREFIX)
+        self._print_headers(response, prefix=self.RESPONSE_PREFIX)
 
         # response body
-        self._do_show_body(response, content)
+        self._print_body(response, content)
         self._verbose_output('')
 
         return (response, content)
 
-    def _do_show_headers(self, headers, prefix=''):
+    def _print_headers(self, headers, prefix=''):
         if self._show_headers:
             for key in headers:
                 if key not in self.HEADER_BLACKLIST:
-                    self._do_show_header(key, headers[key], prefix=prefix)
+                    self._print_header(key, headers[key], prefix=prefix)
 
-    def _do_show_body(self, headers, content):
+    def _print_body(self, headers, content):
         if self._show_body and utils.not_binary(
                 utils.extract_content_type(headers)[0]):
             self._verbose_output('')
             self._verbose_output(
                 utils.decode_response_content(headers, content))
 
-    def _do_show_header(self, name, value, prefix='', stream=None):
+    def _print_header(self, name, value, prefix='', stream=None):
         header = self.colorize('YELLOW', "%s:" % name)
         self._verbose_output("%s %s" % (header, value), prefix=prefix,
                              stream=stream)
