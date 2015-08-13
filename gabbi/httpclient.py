@@ -50,9 +50,8 @@ class VerboseHttp(httplib2.Http):
 
         self._verbose_output('#### %s ####' % self.caption, color='BLUE')
         self._verbose_output('%s %s' % (method, request_uri),
-                             prefix=self.REQUEST_PREFIX)
-        self._verbose_output('Host: %s' % host,
-                             prefix=self.REQUEST_PREFIX)
+                             prefix=self.REQUEST_PREFIX, color='CYAN')
+        self._do_show_header("Host", host, prefix=self.REQUEST_PREFIX)
 
         self._do_show_headers(headers, prefix=self.REQUEST_PREFIX)
         self._do_show_body(headers, body)
@@ -65,7 +64,7 @@ class VerboseHttp(httplib2.Http):
         # Blank line for division
         self._verbose_output('')
         self._verbose_output('%s %s' % (response['status'], response.reason),
-                             prefix=self.RESPONSE_PREFIX)
+                             prefix=self.RESPONSE_PREFIX, color='CYAN')
         self._do_show_headers(response, prefix=self.RESPONSE_PREFIX)
 
         # response body
@@ -78,8 +77,7 @@ class VerboseHttp(httplib2.Http):
         if self._show_headers:
             for key in headers:
                 if key not in self.HEADER_BLACKLIST:
-                    self._verbose_output('%s: %s' % (key, headers[key]),
-                                         prefix=prefix)
+                    self._do_show_header(key, headers[key], prefix=prefix)
 
     def _do_show_body(self, headers, content):
         if self._show_body and utils.not_binary(
@@ -87,6 +85,10 @@ class VerboseHttp(httplib2.Http):
             self._verbose_output('')
             self._verbose_output(
                 utils.decode_response_content(headers, content))
+
+    def _do_show_header(self, name, value, prefix='', stream=None): # XXX: rename?
+        header = self.colorize('YELLOW', "%s:" % name)
+        self._verbose_output("%s %s" % (header, value), prefix=prefix, stream=stream)
 
     def _verbose_output(self, message, prefix='', color=None, stream=None):
         """Output a message."""
