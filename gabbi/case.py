@@ -33,6 +33,7 @@ import six
 from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
+from gabbi import __version__
 from gabbi import json_parser
 from gabbi import utils
 
@@ -321,6 +322,9 @@ class HTTPTestCase(unittest.TestCase):
         wsgi_intercept so that the real traceback from a catastrophic
         error in the intercepted app can be examined.
         """
+
+        if 'user-agent' not in (key.lower() for key in headers):
+            headers['user-agent'] = "gabbi/%s (Python httplib2)" % __version__
 
         try:
             response, content = self.http.request(
