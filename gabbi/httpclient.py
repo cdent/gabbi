@@ -14,6 +14,7 @@
 
 from __future__ import print_function
 
+import os
 import sys
 
 import httplib2
@@ -22,7 +23,24 @@ from gabbi import utils
 
 
 class VerboseHttp(httplib2.Http):
-    """A subclass of Http that verbosely reports on activity."""
+    """A subclass of Http that verbosely reports on activity.
+
+    If the output is a tty or ``GABBI_FORCE_COLOR`` is set in the
+    environment, then output will be colorized according to ``COLORMAP``.
+
+    Output can include request and response headers, request and
+    response body content (if of a printable content-type), or both.
+
+    The color of the output has reasonable defaults. These may be overridden
+    by setting the following environment variables
+
+    * GABBI_CAPTION_COLOR
+    * GABBI_HEADER_COLOR
+    * GABBI_REQUEST_COLOR
+    * GABBI_STATUS_COLOR
+
+    to any of: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE
+    """
 
     # A list of request and response headers to never display.
     # Can include httplib2 response object attributes that are not
@@ -34,10 +52,10 @@ class VerboseHttp(httplib2.Http):
     REQUEST_PREFIX = '>'
     RESPONSE_PREFIX = '<'
     COLORMAP = {
-        'caption': 'BLUE',
-        'header': 'YELLOW',
-        'request': 'CYAN',
-        'status': 'CYAN',
+        'caption': os.environ.get('GABBI_CAPTION_COLOR', 'BLUE').upper(),
+        'header': os.environ.get('GABBI_HEADER_COLOR', 'YELLOW').upper(),
+        'request': os.environ.get('GABBI_REQUEST_COLOR', 'CYAN').upper(),
+        'status': os.environ.get('GABBI_STATUS_COLOR', 'CYAN').upper(),
     }
 
     def __init__(self, **kwargs):
