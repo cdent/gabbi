@@ -13,6 +13,8 @@
 
 import jsonpath_rw
 
+PARSER = None
+
 
 class Len(jsonpath_rw.JSONPath):
     """The JSONPath referring to the len of the current object.
@@ -53,4 +55,7 @@ class GabbiJsonPathParser(jsonpath_rw.parser.JsonPathParser):
 
 
 def parse(path):
-    return GabbiJsonPathParser().parse(path)
+    global PARSER
+    if not PARSER:
+        PARSER = GabbiJsonPathParser()
+    return PARSER.parse(path)
