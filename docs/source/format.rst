@@ -55,9 +55,10 @@ Many of these items allow substitutions (explained below).
 * ``verbose``: If ``True`` print a representation of the current
   request and response, including both headers and body to ``stdout``.
   If set to ``headers`` or ``body`` then only the corresponding part
-  of the request and response will be displayed. If the output is a
-  tty, colors will be used. See :class:`~gabbi.httpclient.VerboseHttp`
-  for more details. Defaults to ``False``.
+  of the request and response will be displayed. ``all`` is a
+  synonym for ``True``. If the output is a tty, colors will be used.
+  See :class:`~gabbi.httpclient.VerboseHttp` for more details. Defaults
+  to ``False``.
 * ``redirects``: If ``True`` automatically follow redirects. Defaults
   to ``False``.
 * ``request_headers``: A dictionary of key-value pairs representing
