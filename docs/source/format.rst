@@ -53,7 +53,11 @@ Many of these items allow substitutions (explained below).
   comes into play if the ``url`` does not provide a scheme (see
   :doc:`host` for more info).
 * ``verbose``: If ``True`` print a representation of the current
-  request and response to ``stdout``. Defaults to ``False``.
+  request and response, including both headers and body to ``stdout``.
+  If set to ``headers`` or ``body`` then only the corresponding part
+  of the request and response will be displayed. If the output is a
+  tty, colors will be used. See :class:`~gabbi.httpclient.VerboseHttp`
+  for more details. Defaults to ``False``.
 * ``redirects``: If ``True`` automatically follow redirects. Defaults
   to ``False``.
 * ``request_headers``: A dictionary of key-value pairs representing

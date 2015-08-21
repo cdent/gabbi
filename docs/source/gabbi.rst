@@ -56,3 +56,11 @@ gabbi Package
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`httpclient` Module
+------------------------
+
+.. automodule:: gabbi.httpclient
+    :members:
+    :undoc-members:
+    :show-inheritance:
