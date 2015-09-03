@@ -15,14 +15,22 @@ line::
 
     gabbi-run [host[:port]] < /my/test.yaml
 
+or::
+
+    gabbi-run http://host:port < /my/test.yaml
+
 To facilitate using the same tests against the same application mounted
 in different locations in a WSGI server, a ``prefix`` may be provided
 as a second argument::
 
     gabbi-run host[:port] [prefix] < /my/test.yaml
 
+or in the target URL::
+
+    gabbi-run http://host:port/prefix < /my/test.yaml
+
 The value of prefix will be prepended to the path portion of URLs that
 are not fully qualified.
 
-If a ``-x`` argument is provided then ``gabbi-run`` will "fail fast"
-exiting after the first test failure.
+If a ``-x`` or ``--failfast`` argument is provided then ``gabbi-run`` will
+"fail fast", exiting after the first test failure.
