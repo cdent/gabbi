@@ -33,4 +33,4 @@ The value of prefix will be prepended to the path portion of URLs that
 are not fully qualified.
 
 If a ``-x`` or ``--failfast`` argument is provided then ``gabbi-run`` will
-"fail fast", exiting after the first test failure.
+exit after the first test failure.
