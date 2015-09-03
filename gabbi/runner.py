@@ -11,6 +11,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import argparse
 import sys
 import unittest
 import yaml
@@ -47,28 +48,22 @@ def run():
 
     Output is formatted as unittest summary information.
     """
-    args = sys.argv[1:]
 
-    try:
-        args.remove("-x")
-        failfast = True
-    except ValueError:
-        failfast = False
+    parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
+    parser.add_argument('target',
+                        help='The primary host and port, : separated')
+    parser.add_argument('prefix', nargs='?', default=None,
+                        help='URL prefix where app is mounted')
+    parser.add_argument('-x', '--failfast', help='Exit on first failure',
+                        action='store_true')
 
-    try:
-        hostport = args[0]
-        if ':' in hostport:
-            host, port = hostport.split(':')
-        else:
-            host = hostport
-            port = None
-    except IndexError:
-        host, port = 'stub', None
+    args = parser.parse_args()
 
-    try:
-        prefix = args[1]
-    except IndexError:
-        prefix = None
+    if ':' in args.target:
+        host, port = args.target.split(':')
+    else:
+        host = args.target
+        port = None
 
     loader = unittest.defaultTestLoader
 
@@ -79,8 +74,8 @@ def run():
     data = yaml.safe_load(sys.stdin.read())
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None,
-                                        prefix=prefix)
-    result = ConciseTestRunner(verbosity=2, failfast=failfast).run(suite)
+                                        prefix=args.prefix)
+    result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
     sys.exit(not result.wasSuccessful())
 
 
