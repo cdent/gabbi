@@ -89,7 +89,7 @@ def run():
         prefix = args.prefix
 
     if ':' in target:
-        host, port = args.target.split(':')
+        host, port = target.split(':')
     else:
         host = target
         port = None
