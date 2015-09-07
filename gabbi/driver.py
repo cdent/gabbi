@@ -178,6 +178,21 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                 raise GabbiFormatError(
                     'malformed test chunk "%s": %s' % (test_datum, exc))
 
+        # use uppercase keys as HTTP method
+        method_key = None
+        for key, val in six.iteritems(test):
+            if key.isupper():
+                if method_key:
+                    raise GabbiFormatError(
+                        'duplicate method/URL directive in "%s"' %
+                        test_base_name)
+
+                test['method'] = key
+                test['url'] = val
+                method_key = key
+        if method_key:
+            del test[method_key]
+
         if not test['name']:
             raise GabbiFormatError('Test name missing in a test in %s.'
                                    % test_base_name)
