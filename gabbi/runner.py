@@ -63,6 +63,7 @@ def run():
     parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
     parser.add_argument(
         'target',
+        nargs='?', default='stub',
         help='A fully qualified URL (with optional path as prefix) '
              'to the primary target or a host and port, : separated'
     )
