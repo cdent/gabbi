@@ -100,7 +100,7 @@ class SimpleWsgi(object):
     @staticmethod
     def _fully_qualify(environ, url):
         """Turn a URL path into a fully qualified URL."""
-        path, query, fragment = urlparse.urlsplit(url)[2:]
+        split_url = urlparse.urlsplit(url)
         server_name = environ.get('SERVER_NAME')
         server_port = environ.get('SERVER_PORT')
         server_scheme = environ.get('wsgi.url_scheme')
@@ -109,5 +109,5 @@ class SimpleWsgi(object):
         else:
             netloc = server_name
 
-        return urlparse.urlunsplit((server_scheme, netloc, path,
-                                    query, fragment))
+        return urlparse.urlunsplit((server_scheme, netloc, split_url.path,
+                                    split_url.query, split_url.fragment))

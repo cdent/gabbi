@@ -272,7 +272,7 @@ class HTTPTestCase(unittest.TestCase):
             if ssl:
                 scheme = 'https'
 
-            path = parsed_url[2]
+            path = parsed_url.path
             if self.prefix:
                 path = '%s%s' % (self.prefix, path)
 
@@ -302,7 +302,7 @@ class HTTPTestCase(unittest.TestCase):
         else:
             full_url = url
             self.scheme = parsed_url.scheme
-            self.netloc = parsed_url[1]
+            self.netloc = parsed_url.netloc
 
         return full_url
 
