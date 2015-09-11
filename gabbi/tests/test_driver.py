@@ -111,3 +111,25 @@ class DriverTest(unittest.TestCase):
                                         'localhost', 80, None, None)
         self.assertIn("Invalid test keys used in test foo_simple:",
                       str(failure.exception))
+
+    def test_method_url_pair_format_error(self):
+        test_yaml = {'defaults': {'GET': '/foo'}, 'tests': []}
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertIn('"METHOD: url" pairs not allowed in defaults',
+                      str(failure.exception))
+
+    def test_method_url_pair_duplication_format_error(self):
+        test_yaml = {'tests': [{
+            'GET': '/',
+            'POST': '/',
+            'name': 'duplicate methods',
+        }]}
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertIn(
+            'duplicate method/URL directive in "foo_duplicate_methods"',
+            str(failure.exception)
+        )
