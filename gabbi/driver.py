@@ -187,7 +187,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         # use uppercase keys as HTTP method
         method_key = None
         for key, val in six.iteritems(test):
-            if key.isupper():
+            if _is_method_shortcut(key):
                 if method_key:
                     raise GabbiFormatError(
                         'duplicate method/URL directive in "%s"' %
@@ -234,7 +234,11 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
 
 def _validate_defaults(default_dict):
-    if [key for key in default_dict if key.isupper()]:
+    if [key for key in default_dict if _is_method_shortcut(key)]:
         raise GabbiFormatError(
             '"METHOD: url" pairs not allowed in defaults')
     return default_dict
+
+
+def _is_method_shortcut(key):
+    return key.isupper()
