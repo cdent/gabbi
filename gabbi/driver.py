@@ -238,7 +238,7 @@ def _validate_defaults(defaults):
 
     Raises GabbiFormatError for invalid settings.
     """
-    if [key for key in defaults if _is_method_shortcut(key)]:
+    if any(_is_method_shortcut(key) for key in defaults):
         raise GabbiFormatError(
             '"METHOD: url" pairs not allowed in defaults')
     return defaults
