@@ -234,6 +234,10 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
 
 def _validate_defaults(default_dict):
+    """Ensure test presets are acceptable
+
+    Raises GabbiFormatError for invalid settings.
+    """
     if [key for key in default_dict if _is_method_shortcut(key)]:
         raise GabbiFormatError(
             '"METHOD: url" pairs not allowed in defaults')
