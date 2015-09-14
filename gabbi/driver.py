@@ -234,7 +234,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
 
 def _validate_defaults(defaults):
-    """Ensure test presets are acceptable
+    """Ensure default test settings are acceptable
 
     Raises GabbiFormatError for invalid settings.
     """
