@@ -3,13 +3,20 @@ Test Format
 
 Gabbi tests are expressed in YAML containing an HTTP request and an
 expected response. Each YAML file is an ordered sequence of requests.
-The bare minimum YAML file for a single request is::
+A minimal YAML file for a single request is::
 
     tests:
        - name: the name of a test
+         GET: /
+
+This is :ref:`short <method-shortcut>` for::
+
+    tests:
+       - name: the name of a test
+         method: GET
          url: /
 
-This will make a request to ``/`` on whatever the configured
+This will make a ``GET`` request to ``/`` on whatever the configured
 :doc:`host` is. The test will pass if the status of the HTTP response
 is ``200``.
 
@@ -89,6 +96,21 @@ Many of these items allow substitutions (explained below).
 
   This makes it possible to poll for a resource created via an
   asynchronous request. Use with caution.
+
+.. _method-shortcut:
+
+Note that it's possible to combine ``method`` and ``url`` into a single
+statement by exchanging the ``url`` key for the actual method::
+
+    method: PATCH
+    url: /
+
+corresponds to::
+
+    PATCH: /
+
+Any uppercase key is considered an HTTP method, there is no pre-defined
+list of approved methods.
 
 The ``response_*`` items are examples of Response Handlers. Additional
 handlers may be created by test authors for specific use cases. See

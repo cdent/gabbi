@@ -1,0 +1,42 @@
+
+tests:
+- name: simple POST
+  POST: /somewhere
+  data:
+      cow: barn
+  request_headers:
+      content-type: application/json
+  response_json_paths:
+      $.cow: barn
+
+- name: POST with query
+  POST: /somewhere?chicken=coop
+  data:
+      cow: barn
+  request_headers:
+      content-type: application/json
+  response_json_paths:
+      $.cow: barn
+      $.chicken[0]: coop
+
+- name: simple GET
+  GET: /
+  ssl: True
+  response_headers:
+      x-gabbi-url: https://$NETLOC/
+
+- name: arbitrary method
+  IMAGINARY: /
+  status: 405
+  response_headers:
+      allow: GET, PUT, POST, DELETE, PATCH
+      x-gabbi-method: IMAGINARY
+      x-gabbi-url: $SCHEME://$NETLOC/
+
+# Can't do this because format validation is during test generation not
+# test running. xfail only works during test running :(
+# See gabbi/tests/test_driver for a test of this.
+# - name: duplicate shortcut
+#   GET: /
+#   POST: /
+#   xfail: true

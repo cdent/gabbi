@@ -153,7 +153,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
     # Set defaults from BASE_TESTS then update those defaults
     # with any defaults set in the YAML file.
     base_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
-    defaults = test_yaml.get('defaults', {})
+    defaults = _validate_defaults(test_yaml.get('defaults', {}))
     test_update(base_test_data, defaults)
 
     # Establish any fixture classes.
@@ -183,6 +183,21 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                                    % test_base_name)
         test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
+
+        # use uppercase keys as HTTP method
+        method_key = None
+        for key, val in six.iteritems(test):
+            if _is_method_shortcut(key):
+                if method_key:
+                    raise GabbiFormatError(
+                        'duplicate method/URL directive in "%s"' %
+                        test_name)
+
+                test['method'] = key
+                test['url'] = val
+                method_key = key
+        if method_key:
+            del test[method_key]
 
         if not test['url']:
             raise GabbiFormatError('Test url missing in test %s.'
@@ -216,3 +231,18 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         prior_test = this_test
 
     return file_suite
+
+
+def _validate_defaults(defaults):
+    """Ensure default test settings are acceptable
+
+    Raises GabbiFormatError for invalid settings.
+    """
+    if any(_is_method_shortcut(key) for key in defaults):
+        raise GabbiFormatError(
+            '"METHOD: url" pairs not allowed in defaults')
+    return defaults
+
+
+def _is_method_shortcut(key):
+    return key.isupper()
