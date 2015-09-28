@@ -106,7 +106,7 @@ html_theme = 'default'
 html_context = {'css_files': [
     'https://media.readthedocs.org/css/sphinx_rtd_theme.css',
     'https://media.readthedocs.org/css/readthedocs-doc-embed.css',
-    '_static/theme_overrides.css',
+    '_static/theme_override.css',
 ]}
 
 # Theme options are theme-specific and customize the look and feel of a theme
