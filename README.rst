@@ -66,3 +66,8 @@ virtualenv) you can run the tests by hand and exit on the first
 failure::
 
     python -m subunit.run discover -f gabbi | subunit2pyunit
+
+Testing can be limited to individual modules by specifying them
+after the tox invocation::
+
+    tox -epep8,py27,py34 -- test_driver test_handlers
