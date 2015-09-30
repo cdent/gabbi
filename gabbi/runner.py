@@ -16,6 +16,8 @@ import sys
 import unittest
 import yaml
 
+from importlib import import_module
+
 from six.moves.urllib import parse as urlparse
 
 from gabbi import case
@@ -75,11 +77,25 @@ def run():
     )
     parser.add_argument(
         '-x', '--failfast',
-        help='Exit on first failure',
-        action='store_true'
+        action='store_true',
+        help='Exit on first failure'
+    )
+    parser.add_argument(
+        '-r', '--response-handler',
+        nargs='?', default=None,
+        dest='response_handlers',
+        action='append',
+        help='Custom response handler. Should be an import path of the '
+             'form package.module:class.'
     )
 
     args = parser.parse_args()
+
+    for import_path in (args.response_handlers or []):
+        module, handler = import_path.rsplit(":", 1)
+        module = import_module(module)
+        handler = getattr(module, handler)
+        driver.RESPONSE_HANDLERS.append(handler)
 
     split_url = urlparse.urlsplit(args.target)
     if split_url.scheme:
