@@ -40,15 +40,11 @@ class RunnerTest(unittest.TestCase):
         self._argv = sys.argv
         sys.argv = ['gabbi-run']
 
-        self._exit = sys.exit
-        sys.exit = lambda status: setattr(self, 'exit_status', int(status)) # TODO: catch `SystemExit` instead?
-
     def tearDown(self):
         sys.stdin = self._stdin
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
-        sys.exit = self._exit
 
     def test_exit_code(self):
         sys.stdin = StringIO()
@@ -61,8 +57,10 @@ class RunnerTest(unittest.TestCase):
           GET: /
           status: 666
         """)
-        runner.run()
-        self.assertEqual(self.exit_status, 1)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertEqual(err.args[0], True)
 
         sys.stdin = StringIO("""
         tests:
@@ -73,5 +71,7 @@ class RunnerTest(unittest.TestCase):
         host, port = ('example.com', '80')
         sys.argv.append('%s:%s' % (host, port))
         with InterceptFixture(host, port, SimpleWsgi, ''):
-            runner.run()
-        self.assertEqual(self.exit_status, 0)
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertEqual(err.args[0], False)
