@@ -70,7 +70,7 @@ class InterceptFixture(GabbiFixture):
     def __init__(self, host, port, app, prefix):
         super(InterceptFixture, self).__init__()
         self.host = host
-        self.port = port
+        self.port = int(port)
         self.app = app
         self.script_name = prefix or ''
 
