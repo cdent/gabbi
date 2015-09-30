@@ -168,6 +168,8 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         test = copy.deepcopy(base_test_data)
         try:
             test_update(test, test_datum)
+        except KeyError as exc:
+            raise GabbiFormatError('invalid key in test: %s' % exc)
         except AttributeError as exc:
             if not isinstance(test_datum, dict):
                 raise GabbiFormatError(

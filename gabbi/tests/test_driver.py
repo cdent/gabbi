@@ -133,3 +133,21 @@ class DriverTest(unittest.TestCase):
             'duplicate method/URL directive in "foo_duplicate_methods"',
             str(failure.exception)
         )
+
+    def test_dict_on_invalid_key(self):
+        test_yaml = {'tests': [{
+            'name': '...',
+            'GET': '/',
+            'response_html': {
+                'foo': 'hello',
+                'bar': 'world',
+            }
+        }]}
+
+        with self.assertRaises(driver.GabbiFormatError) as failure:
+            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+                                        'localhost', 80, None, None)
+        self.assertIn(
+            "invalid key in test: 'response_html'",
+            str(failure.exception)
+        )
