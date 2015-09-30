@@ -122,11 +122,26 @@ class RunnerTest(unittest.TestCase):
 
     def assertSuccess(self, exitError):
         errors = exitError.args[0]
+        if errors:
+            self._dump_captured()
         self.assertEqual(errors, False)
 
     def assertFailure(self, exitError):
         errors = exitError.args[0]
+        if not errors:
+            self._dump_captured()
         self.assertEqual(errors, True)
+
+    def _dump_captured(self):
+        self._stdout.write('\n==> captured STDOUT <==\n')
+        sys.stdout.flush()
+        sys.stdout.seek(0)
+        self._stdout.write(sys.stdout.read())
+
+        self._stderr.write('\n==> captured STDERR <==\n')
+        sys.stderr.flush()
+        sys.stderr.seek(0)
+        self._stdout.write(sys.stderr.read())
 
 
 class HTMLResponseHandler(handlers.ResponseHandler):
