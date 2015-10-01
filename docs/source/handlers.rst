@@ -24,6 +24,10 @@ subclass of :class:`~gabbi.handlers.ResponseHandler` to
                        intercept=simple_wsgi.SimpleWsgi,
                        response_handlers=[MyResponseHandler])
 
+With ``gabbi-run``, custom handlers can be loaded via the
+``--response-handler`` option -- see
+:func:`~gabbi.runner.load_response_handlers` for details.
+
 A subclass needs to define at least three things:
 
 * ``test_key_suffix``: This, along with the prefix ``response_``, forms
