@@ -88,22 +88,12 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
-
     args = parser.parse_args()
 
+    custom_response_handlers = []
     for import_path in (args.response_handlers or []):
-        if ":" in import_path:  # package.module:class
-            module_name, handler_name = import_path.rsplit(":", 1)
-            module = import_module(module_name)
-            handler = getattr(module, handler_name)
-            driver.RESPONSE_HANDLERS.append(handler)
-        else:  # package.module shorthand, expecting gabbi_response_handlers
-            module = import_module(import_path)
-            handlers = module.gabbi_response_handlers
-            if callable(handlers):
-                handlers = handlers()
-            for handler in handlers:
-                driver.RESPONSE_HANDLERS.append(handler)
+        for handler in load_response_handlers(import_path):
+            custom_response_handlers.append(handler)
 
     split_url = urlparse.urlsplit(args.target)
     if split_url.scheme:
@@ -119,18 +109,42 @@ def run():
         host = target
         port = None
 
-    loader = unittest.defaultTestLoader
-
     # Initialize the extensions for response handling.
-    for handler in driver.RESPONSE_HANDLERS:
+    for handler in (driver.RESPONSE_HANDLERS + custom_response_handlers):
         handler(case.HTTPTestCase)
 
     data = yaml.safe_load(sys.stdin.read())
+    loader = unittest.defaultTestLoader
     suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
                                         host, port, None, None,
                                         prefix=prefix)
     result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
     sys.exit(not result.wasSuccessful())
+
+
+def load_response_handlers(import_path):
+    """Load and return custom response handlers from the given Python package
+    or module.
+
+    The import path references either a specific response handler class
+    (package.module:class) or a module that contains one or more response
+    handler classes (package.module).
+
+    For the latter, the module is expected to contain a gabbi_response_handlers
+    object, which is either a list of response handler classes or a function
+    returning such a list.
+    """
+    if ":" in import_path:  # package.module:class
+        module_name, handler_name = import_path.rsplit(":", 1)
+        module = import_module(module_name)
+        handler = getattr(module, handler_name)
+        handlers = [handler]
+    else:  # package.module shorthand, expecting gabbi_response_handlers
+        module = import_module(import_path)
+        handlers = module.gabbi_response_handlers
+        if callable(handlers):
+            handlers = handlers()
+    return handlers
 
 
 if __name__ == '__main__':
