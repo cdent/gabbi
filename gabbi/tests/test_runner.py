@@ -92,6 +92,24 @@ class RunnerTest(unittest.TestCase):
             except SystemExit as err:
                 self.assertFailure(err)
 
+        sys.argv.insert(3, "-r")
+        sys.argv.insert(4, "gabbi.test_intercept:TestResponseHandler")
+
+        sys.stdin = StringIO("""
+        tests:
+        - name: additional custom response handler
+          GET: /presenter
+          response_html:
+              h1: Hello World
+          response_test:
+          - COWAnother line
+        """)
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
     def test_exit_code(self):
         sys.stdin = StringIO()
         with self.assertRaises(driver.GabbiFormatError):
