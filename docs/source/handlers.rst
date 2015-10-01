@@ -42,7 +42,7 @@ A subclass needs to define at least three things:
   * ``test``: The currently active ``HTTPTestCase``
   * ``item``: The current entry if ``test_key_value`` is a
     list, otherwise the key half of the key/value pair at this entry.
-  * ``value``: None if ``test_key_value`` is a list, otherwise the
+  * ``value``: ``None`` if ``test_key_value`` is a list, otherwise the
     value half of the key/value pair at this entry.
 
 Optionally a subclass may also define a ``preprocess`` method which is

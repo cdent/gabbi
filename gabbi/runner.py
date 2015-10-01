@@ -127,12 +127,12 @@ def load_response_handlers(import_path):
     or module.
 
     The import path references either a specific response handler class
-    (package.module:class) or a module that contains one or more response
-    handler classes (package.module).
+    ("package.module:class") or a module that contains one or more response
+    handler classes ("package.module").
 
-    For the latter, the module is expected to contain a gabbi_response_handlers
-    object, which is either a list of response handler classes or a function
-    returning such a list.
+    For the latter, the module is expected to contain a
+    ``gabbi_response_handlers`` object, which is either a list of response
+    handler classes or a function returning such a list.
     """
     if ":" in import_path:  # package.module:class
         module_name, handler_name = import_path.rsplit(":", 1)
