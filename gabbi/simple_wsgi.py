@@ -78,7 +78,21 @@ class SimpleWsgi(object):
                         query_data = body_data
             headers.append(('Location', full_request_url))
 
-        if path_info.startswith('/poller'):
+        if path_info == '/presenter':
+            start_response('200 OK', [('Content-Type', 'text/html')])
+            return [b"""<!DOCTYPE html>
+                    <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <title>Hello World</title>
+                        </head>
+                        <body>
+                            <h1>Hello World</h1>
+                            <p>lorem ipsum dolor sit amet</p>
+                        </body>
+                    </html>
+                    """]
+        elif path_info.startswith('/poller'):
             if CURRENT_POLL == 0:
                 CURRENT_POLL = int(query_data.get('count', [5])[0])
                 start_response('400 Bad Reqest', [])
