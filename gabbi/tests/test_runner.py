@@ -16,8 +16,6 @@
 import sys
 import unittest
 
-from uuid import uuid4
-
 from six import StringIO
 
 from gabbi import driver
@@ -32,7 +30,9 @@ class RunnerTest(unittest.TestCase):
     def setUp(self):
         super(RunnerTest, self).setUp()
 
-        host, port = (str(uuid4()), 8000)
+        # NB: random host ensures that we're not accidentally connecting to an
+        #     actual server
+        host, port = ('eefc1156-b364-4d2f-a652-ff6aec23c7f6', 8000)
         self.server = lambda: InterceptFixture(host, port, SimpleWsgi, '')
 
         self._stdin = sys.stdin
