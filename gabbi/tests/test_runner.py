@@ -168,15 +168,15 @@ class RunnerTest(unittest.TestCase):
         self.assertEqual(errors, True)
 
     def _dump_captured(self):
-        self._stdout.write('\n==> captured STDOUT <==\n')
+        self._stderr.write('\n==> captured STDOUT <==\n')
         sys.stdout.flush()
         sys.stdout.seek(0)
-        self._stdout.write(sys.stdout.read())
+        self._stderr.write(sys.stdout.read())
 
         self._stderr.write('\n==> captured STDERR <==\n')
         sys.stderr.flush()
         sys.stderr.seek(0)
-        self._stdout.write(sys.stderr.read())
+        self._stderr.write(sys.stderr.read())
 
 
 class HTMLResponseHandler(handlers.ResponseHandler):
