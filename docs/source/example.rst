@@ -24,7 +24,7 @@ bit like this:
    :language: python
 
 For details on the arguments available when building tests see
-:func:`~gabbi.driver.build_tests`.
+:meth:`~gabbi.driver.build_tests`.
 
 Run Test Loader
 ~~~~~~~~~~~~~~~
