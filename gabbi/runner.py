@@ -86,16 +86,24 @@ def run():
         dest='response_handlers',
         action='append',
         help='Custom response handler. Should be an import path of the '
-             'form package.module:class.'
+             'form package.module or package.module:class.'
     )
 
     args = parser.parse_args()
 
     for import_path in (args.response_handlers or []):
-        module, handler = import_path.rsplit(":", 1)
-        module = import_module(module)
-        handler = getattr(module, handler)
-        driver.RESPONSE_HANDLERS.append(handler)
+        if ":" in import_path:  # package.module:class
+            module_name, handler_name = import_path.rsplit(":", 1)
+            module = import_module(module_name)
+            handler = getattr(module, handler_name)
+            driver.RESPONSE_HANDLERS.append(handler)
+        else:  # package.module shorthand, expecting gabbi_response_handlers
+            module = import_module(import_path)
+            handlers = module.gabbi_response_handlers
+            if callable(handlers):
+                handlers = handlers()
+            for handler in handlers:
+                driver.RESPONSE_HANDLERS.append(handler)
 
     split_url = urlparse.urlsplit(args.target)
     if split_url.scheme:
