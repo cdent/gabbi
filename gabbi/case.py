@@ -19,6 +19,7 @@ made using httplib2. Assertions are made against the reponse.
 
 from __future__ import print_function
 
+from collections import OrderedDict
 import copy
 import functools
 import json
@@ -412,8 +413,12 @@ class HTTPTestCase(unittest.TestCase):
         self.assert_in_or_print_output(observed_status, statii)
 
     def _update_query_params(self, original_query_string, query_params):
-        """Update a query string from query_params dict."""
-        encoded_query_params = {}
+        """Update a query string from query_params dict.
+
+        An OrderedDict is used to allow easier testing and greater
+        predictability when doing query updates.
+        """
+        encoded_query_params = OrderedDict()
 
         for param, value in query_params.items():
             # isinstance used because we can iter a string
