@@ -18,7 +18,7 @@ import unittest
 from gabbi import utils
 
 
-class UtilsTest(unittest.TestCase):
+class BinaryTypesTest(unittest.TestCase):
 
     BINARY_TYPES = [
         'image/png',
@@ -43,6 +43,9 @@ class UtilsTest(unittest.TestCase):
         for media_type in self.BINARY_TYPES:
             self.assertFalse(utils.not_binary(media_type),
                              '%s should be binary' % media_type)
+
+
+class ExtractContentTypeTest(unittest.TestCase):
 
     def test_extract_content_type_default_both(self):
         """Empty dicts returns default type and chartset."""
@@ -80,6 +83,9 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual('text/colorful', content_type)
         self.assertEqual('utf-8', charset)
 
+
+class ColorozieTest(unittest.TestCase):
+
     def test__colorize_missing_color(self):
         """Make sure that choosing a non-existent color is safe."""
         message = utils._colorize('CERULEAN', 'hello')
@@ -87,3 +93,42 @@ class UtilsTest(unittest.TestCase):
 
         message = utils._colorize('BLUE', 'hello')
         self.assertNotEqual('hello', message)
+
+
+class CreateUrlTest(unittest.TestCase):
+
+    def test_create_url_simple(self):
+        url = utils.create_url('/foo/bar', 'test.host.com')
+        self.assertEqual('http://test.host.com/foo/bar', url)
+
+    def test_create_url_ssl(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', ssl=True)
+        self.assertEqual('https://test.host.com/foo/bar', url)
+
+    def test_create_url_prefix(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', prefix='/zoom')
+        self.assertEqual('http://test.host.com/zoom/foo/bar', url)
+
+    def test_create_url_port(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', port=8000)
+        self.assertEqual('http://test.host.com:8000/foo/bar', url)
+
+    def test_create_url_port_and_ssl(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', ssl=True,
+                               port=8000)
+        self.assertEqual('https://test.host.com:8000/foo/bar', url)
+
+    def test_create_url_not_ssl_on_443(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', ssl=False,
+                               port=443)
+        self.assertEqual('http://test.host.com:443/foo/bar', url)
+
+    def test_create_url_ssl_on_80(self):
+        url = utils.create_url('/foo/bar', 'test.host.com', ssl=True,
+                               port=80)
+        self.assertEqual('https://test.host.com:80/foo/bar', url)
+
+    def test_create_url_preserve_query(self):
+        url = utils.create_url('/foo/bar?x=1&y=2', 'test.host.com', ssl=True,
+                               port=80)
+        self.assertEqual('https://test.host.com:80/foo/bar?x=1&y=2', url)

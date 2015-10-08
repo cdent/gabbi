@@ -15,6 +15,7 @@
 import os
 
 import colorama
+from six.moves.urllib import parse as urlparse
 
 
 try:  # Python 3
@@ -22,6 +23,28 @@ try:  # Python 3
 except NameError:  # Python 2
     import socket
     ConnectionRefused = socket.error
+
+
+def create_url(base_url, host, port=None, prefix=None, ssl=False):
+    """Given pieces of a path-based url, return a fully qualified url."""
+    parsed_url = urlparse.urlsplit(base_url)
+    scheme = 'http'
+    netloc = host
+
+    if (port and not (int(port) == 443 and ssl)
+            and not (int(port) == 80 and not ssl)):
+        netloc = '%s:%s' % (host, port)
+
+    if ssl:
+        scheme = 'https'
+
+    query_string = parsed_url.query
+    path = parsed_url.path
+
+    if prefix:
+        path = '%s%s' % (prefix, path)
+
+    return urlparse.urlunsplit((scheme, netloc, path, query_string, ''))
 
 
 def decode_response_content(header_dict, content):

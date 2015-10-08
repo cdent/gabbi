@@ -25,7 +25,7 @@ from gabbi import case
 class UrlParseTest(unittest.TestCase):
 
     @staticmethod
-    def make_test_case(host, port=8000, prefix=''):
+    def make_test_case(host, port=8000, prefix='', ssl=False):
         # Attributes used are port, prefix and host and they must
         # be set manually here, due to metaclass magics elsewhere.
         # test_data must have a base value.
@@ -34,6 +34,7 @@ class UrlParseTest(unittest.TestCase):
         http_case.host = host
         http_case.port = port
         http_case.prefix = prefix
+        http_case.test_data['ssl'] = ssl
         return http_case
 
     def test_parse_url(self):
@@ -59,8 +60,8 @@ class UrlParseTest(unittest.TestCase):
 
     def test_with_ssl(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host)
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s:8000/foobar' % host, parsed_url)
 
@@ -80,8 +81,8 @@ class UrlParseTest(unittest.TestCase):
 
     def test_default_port_https(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host, port='443')
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, port='443', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s/foobar' % host, parsed_url)
 
@@ -94,7 +95,7 @@ class UrlParseTest(unittest.TestCase):
 
     def test_https_port_80_ssl(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host, port='80')
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, port='80', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s:80/foobar' % host, parsed_url)

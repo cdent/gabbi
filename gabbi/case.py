@@ -250,7 +250,7 @@ class HTTPTestCase(unittest.TestCase):
             netloc = '%s%s' % (netloc, self.prefix)
         return message.replace('$NETLOC', netloc)
 
-    def _parse_url(self, url, ssl=False):
+    def _parse_url(self, url):
         """Create a url from test data.
 
         If provided with a full URL, just return that. If SSL is requested
@@ -258,53 +258,27 @@ class HTTPTestCase(unittest.TestCase):
 
         Scheme and netloc are saved for later use in comparisons.
         """
-        parsed_url = urlparse.urlsplit(url)
-        scheme = 'http'
-        netloc = self.host
         query_params = self.test_data['query_parameters']
+        ssl = self.test_data['ssl']
 
+        parsed_url = urlparse.urlsplit(url)
         if not parsed_url.scheme:
-            if (self.port
-                    and not (int(self.port) == 443 and ssl)
-                    and not (int(self.port) == 80 and not ssl)):
-                netloc = '%s:%s' % (self.host, self.port)
+            full_url = utils.create_url(url, self.host, port=self.port,
+                                        prefix=self.prefix, ssl=ssl)
+            # parse again to set updated netloc and scheme
+            parsed_url = urlparse.urlsplit(full_url)
 
-            if ssl:
-                scheme = 'https'
+        self.scheme = parsed_url.scheme
+        self.netloc = parsed_url.netloc
 
-            path = parsed_url.path
-            if self.prefix:
-                path = '%s%s' % (self.prefix, path)
-
-            if query_params:
-                encoded_query_params = {}
-                for param, value in query_params.items():
-                    # isinstance used because we can iter a string
-                    if isinstance(value, list):
-                        encoded_query_params[param] = [
-                            self._clean_query_value(subvalue)
-                            for subvalue in value]
-                    else:
-                        encoded_query_params[param] = (
-                            self._clean_query_value(value))
-
-                query_string = urlparse.urlencode(
-                    encoded_query_params, doseq=True)
-                if parsed_url.query:
-                    query_string = '&'.join([parsed_url.query, query_string])
-            else:
-                query_string = parsed_url.query
-
-            full_url = urlparse.urlunsplit((scheme, netloc, path,
-                                            query_string, ''))
-            self.scheme = scheme
-            self.netloc = netloc
+        if query_params:
+            query_string = self._update_query_params(parsed_url.query,
+                                                     query_params)
         else:
-            full_url = url
-            self.scheme = parsed_url.scheme
-            self.netloc = parsed_url.netloc
+            query_string = parsed_url.query
 
-        return full_url
+        return urlparse.urlunsplit((parsed_url.scheme, parsed_url.netloc,
+                                    parsed_url.path, query_string, ''))
 
     @staticmethod
     def _replacer_regex(key):
@@ -359,7 +333,7 @@ class HTTPTestCase(unittest.TestCase):
         test = self.test_data
 
         base_url = self.replace_template(test['url'])
-        full_url = self._parse_url(base_url, test['ssl'])
+        full_url = self._parse_url(base_url)
 
         method = test['method'].upper()
         headers = test['request_headers']
@@ -436,6 +410,27 @@ class HTTPTestCase(unittest.TestCase):
             statii = [expected_status.strip()]
 
         self.assert_in_or_print_output(observed_status, statii)
+
+    def _update_query_params(self, original_query_string, query_params):
+        """Update a query string from query_params dict."""
+        encoded_query_params = {}
+
+        for param, value in query_params.items():
+            # isinstance used because we can iter a string
+            if isinstance(value, list):
+                encoded_query_params[param] = [
+                    self._clean_query_value(subvalue)
+                    for subvalue in value]
+            else:
+                encoded_query_params[param] = (
+                    self._clean_query_value(value))
+
+        query_string = urlparse.urlencode(
+            encoded_query_params, doseq=True)
+        if original_query_string:
+            query_string = '&'.join([original_query_string, query_string])
+
+        return query_string
 
     def assert_in_or_print_output(self, expected, iterable):
         if utils.not_binary(self.content_type):
