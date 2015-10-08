@@ -43,3 +43,47 @@ class UtilsTest(unittest.TestCase):
         for media_type in self.BINARY_TYPES:
             self.assertFalse(utils.not_binary(media_type),
                              '%s should be binary' % media_type)
+
+    def test_extract_content_type_default_both(self):
+        """Empty dicts returns default type and chartset."""
+        content_type, charset = utils.extract_content_type({})
+
+        self.assertEqual('application/binary', content_type)
+        self.assertEqual('utf-8', charset)
+
+    def test_extract_content_type_default_charset(self):
+        """Empty dicts returns default type and chartset."""
+        content_type, charset = utils.extract_content_type({
+            'content-type': 'text/colorful'})
+
+        self.assertEqual('text/colorful', content_type)
+        self.assertEqual('utf-8', charset)
+
+    def test_extract_content_type_with_charset(self):
+        content_type, charset = utils.extract_content_type(
+            {'content-type': 'text/colorful; charset=latin-10'})
+
+        self.assertEqual('text/colorful', content_type)
+        self.assertEqual('latin-10', charset)
+
+    def test_extract_content_type_multiple_params(self):
+        content_type, charset = utils.extract_content_type(
+            {'content-type': 'text/colorful; version=1.24; charset=latin-10'})
+
+        self.assertEqual('text/colorful', content_type)
+        self.assertEqual('latin-10', charset)
+
+    def test_extract_content_type_bad_params(self):
+        content_type, charset = utils.extract_content_type(
+            {'content-type': 'text/colorful; version=1.24; charset=latin-10;'})
+
+        self.assertEqual('text/colorful', content_type)
+        self.assertEqual('utf-8', charset)
+
+    def test__colorize_missing_color(self):
+        """Make sure that choosing a non-existent color is safe."""
+        message = utils._colorize('CERULEAN', 'hello')
+        self.assertEqual('hello', message)
+
+        message = utils._colorize('BLUE', 'hello')
+        self.assertNotEqual('hello', message)

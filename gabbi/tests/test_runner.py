@@ -15,6 +15,7 @@
 
 import sys
 import unittest
+from uuid import uuid4
 
 from six import StringIO
 
@@ -32,7 +33,9 @@ class RunnerTest(unittest.TestCase):
 
         # NB: random host ensures that we're not accidentally connecting to an
         #     actual server
-        host, port = ('eefc1156-b364-4d2f-a652-ff6aec23c7f6', 8000)
+        host, port = (str(uuid4()), 8000)
+        self.host = host
+        self.port = port
         self.server = lambda: InterceptFixture(host, port, SimpleWsgi, '')
 
         self._stdin = sys.stdin
@@ -51,6 +54,41 @@ class RunnerTest(unittest.TestCase):
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
+
+    def test_target_url_parsing(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        sys.stdin = StringIO("""
+        tests:
+        - name: expected success
+          GET: /baz
+          status: 200
+          response_headers:
+            x-gabbi-url: http://%s:%s/foo/baz
+        """ % (self.host, self.port))
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+    def test_target_url_parsing_standard_port(self):
+        self.server = lambda: InterceptFixture(self.host, 80, SimpleWsgi, '')
+        sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
+
+        sys.stdin = StringIO("""
+        tests:
+        - name: expected success
+          GET: /baz
+          status: 200
+          response_headers:
+            x-gabbi-url: http://%s/foo/baz
+        """ % self.host)
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
 
     def test_custom_response_handler(self):
         sys.stdin = StringIO("""

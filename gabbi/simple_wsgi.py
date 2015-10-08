@@ -116,7 +116,7 @@ class SimpleWsgi(object):
         """Turn a URL path into a fully qualified URL."""
         split_url = urlparse.urlsplit(url)
         server_name = environ.get('SERVER_NAME')
-        server_port = environ.get('SERVER_PORT')
+        server_port = str(environ.get('SERVER_PORT'))
         server_scheme = environ.get('wsgi.url_scheme')
         if server_port not in ['80', '443']:
             netloc = '%s:%s' % (server_name, server_port)
