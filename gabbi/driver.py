@@ -51,33 +51,26 @@ class GabbiFormatError(ValueError):
     pass
 
 
-class TestMaker(object):
-    """A class for encapsulating test invariants.
+def get_test_maker(test_base_name, base_test_data, test_directory,
+                   fixture_classes, loader, intercept):
+    """Get a function for make one test.
 
     All of the tests in a single gabbi file have invariants which are
     provided when creating each HTTPTestCase. It is not useful
     to pass these around when making each test case. So they are
-    wrapped in this class which then has make_one_test called multiple
-    times to generate all the tests in the suite.
+    enclosed by this function which returns make_one_test which can be
+    called multiple times to generate all the tests in the suite.
     """
 
-    def __init__(self, test_base_name, base_test_data, test_directory,
-                 fixture_classes, loader, intercept):
-        self.test_base_name = test_base_name
-        self.base_test_data = base_test_data
-        self.base_test_key_set = set(base_test_data.keys())
-        self.test_directory = test_directory
-        self.fixture_classes = fixture_classes
-        self.intercept = intercept
-        self.loader = loader
+    base_test_key_set = set(base_test_data.keys())
 
-    def make_one_test(self, test_datum, host, port, prefix, prior_test):
+    def make_one_test(test_datum, host, port, prefix, prior_test):
         """Create one single HTTPTestCase.
 
         The returned HTTPTestCase is added to the TestSuite currently
         being built (one per YAML file).
         """
-        test = copy.deepcopy(self.base_test_data)
+        test = copy.deepcopy(base_test_data)
         try:
             test_update(test, test_datum)
         except KeyError as exc:
@@ -94,8 +87,8 @@ class TestMaker(object):
 
         if not test['name']:
             raise GabbiFormatError('Test name missing in a test in %s.'
-                                   % self.test_base_name)
-        test_name = '%s_%s' % (self.test_base_name,
+                                   % test_base_name)
+        test_name = '%s_%s' % (test_base_name,
                                test['name'].lower().replace(' ', '_'))
 
         # use uppercase keys as HTTP method
@@ -118,11 +111,11 @@ class TestMaker(object):
                                    % test_name)
 
         test_key_set = set(test.keys())
-        if test_key_set != self.base_test_key_set:
+        if test_key_set != base_test_key_set:
             raise GabbiFormatError(
                 'Invalid test keys used in test %s: %s'
                 % (test_name,
-                   ', '.join(list(test_key_set - self.base_test_key_set))))
+                   ', '.join(list(test_key_set - base_test_key_set))))
 
         http_class = httpclient.get_http(verbose=test['verbose'],
                                          caption=test_name)
@@ -131,18 +124,20 @@ class TestMaker(object):
         # and name with relevant arguments.
         klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
-                             'test_directory': self.test_directory,
-                             'fixtures': self.fixture_classes,
+                             'test_directory': test_directory,
+                             'fixtures': fixture_classes,
                              'http': http_class,
                              'host': host,
-                             'intercept': self.intercept,
+                             'intercept': intercept,
                              'port': port,
                              'prefix': prefix,
                              'prior': prior_test})
 
-        tests = self.loader.loadTestsFromTestCase(klass)
+        tests = loader.loadTestsFromTestCase(klass)
         this_test = tests._tests[0]
         return this_test
+
+    return make_one_test
 
 
 class TestBuilder(type):
@@ -256,12 +251,11 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         for fixture_class in fixtures:
             fixture_classes.append(getattr(fixture_module, fixture_class))
 
-    test_maker = TestMaker(test_base_name, base_test_data, test_directory,
-                           fixture_classes, loader, intercept)
+    test_maker = get_test_maker(test_base_name, base_test_data, test_directory,
+                                fixture_classes, loader, intercept)
     prior_test = None
     for test_datum in test_data:
-        this_test = test_maker.make_one_test(test_datum, host, port,
-                                             prefix, prior_test)
+        this_test = test_maker(test_datum, host, port, prefix, prior_test)
         file_suite.addTest(this_test)
         prior_test = this_test
 
