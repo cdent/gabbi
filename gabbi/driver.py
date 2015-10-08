@@ -51,6 +51,100 @@ class GabbiFormatError(ValueError):
     pass
 
 
+class TestMaker(object):
+    """A class for encapsulating test invariants.
+
+    All of the tests in a single gabbi file have invariants which are
+    provided when creating each HTTPTestCase. It is not useful
+    to pass these around when making each test case. So they are
+    wrapped in this class which then has make_one_test called multiple
+    times to generate all the tests in the suite.
+    """
+
+    def __init__(self, test_base_name, base_test_data, test_directory,
+                 fixture_classes, loader, intercept):
+        self.test_base_name = test_base_name
+        self.base_test_data = base_test_data
+        self.base_test_key_set = set(base_test_data.keys())
+        self.test_directory = test_directory
+        self.fixture_classes = fixture_classes
+        self.intercept = intercept
+        self.loader = loader
+
+    def make_one_test(self, test_datum, host, port, prefix, prior_test):
+        """Create one single HTTPTestCase.
+
+        The returned HTTPTestCase is added to the TestSuite currently
+        being built (one per YAML file).
+        """
+        test = copy.deepcopy(self.base_test_data)
+        try:
+            test_update(test, test_datum)
+        except KeyError as exc:
+            raise GabbiFormatError('invalid key in test: %s' % exc)
+        except AttributeError as exc:
+            if not isinstance(test_datum, dict):
+                raise GabbiFormatError(
+                    'test chunk is not a dict at "%s"' % test_datum)
+            else:
+                # NOTE(cdent): Not clear this can ever happen but just in
+                # case.
+                raise GabbiFormatError(
+                    'malformed test chunk "%s": %s' % (test_datum, exc))
+
+        if not test['name']:
+            raise GabbiFormatError('Test name missing in a test in %s.'
+                                   % self.test_base_name)
+        test_name = '%s_%s' % (self.test_base_name,
+                               test['name'].lower().replace(' ', '_'))
+
+        # use uppercase keys as HTTP method
+        method_key = None
+        for key, val in six.iteritems(test):
+            if _is_method_shortcut(key):
+                if method_key:
+                    raise GabbiFormatError(
+                        'duplicate method/URL directive in "%s"' %
+                        test_name)
+
+                test['method'] = key
+                test['url'] = val
+                method_key = key
+        if method_key:
+            del test[method_key]
+
+        if not test['url']:
+            raise GabbiFormatError('Test url missing in test %s.'
+                                   % test_name)
+
+        test_key_set = set(test.keys())
+        if test_key_set != self.base_test_key_set:
+            raise GabbiFormatError(
+                'Invalid test keys used in test %s: %s'
+                % (test_name,
+                   ', '.join(list(test_key_set - self.base_test_key_set))))
+
+        http_class = httpclient.get_http(verbose=test['verbose'],
+                                         caption=test_name)
+
+        # Use metaclasses to build a class of the necessary type
+        # and name with relevant arguments.
+        klass = TestBuilder(test_name, (case.HTTPTestCase,),
+                            {'test_data': test,
+                             'test_directory': self.test_directory,
+                             'fixtures': self.fixture_classes,
+                             'http': http_class,
+                             'host': host,
+                             'intercept': self.intercept,
+                             'port': port,
+                             'prefix': prefix,
+                             'prior': prior_test})
+
+        tests = self.loader.loadTestsFromTestCase(klass)
+        this_test = tests._tests[0]
+        return this_test
+
+
 class TestBuilder(type):
     """Metaclass to munge a dynamically created test."""
 
@@ -135,7 +229,7 @@ def test_update(orig_dict, new_dict):
 
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept, prefix=None):
-    """Generate a TestSuite from YAML data."""
+    """Generate a TestSuite from YAML-sourced data."""
 
     file_suite = gabbi_suite.GabbiSuite()
     try:
@@ -150,85 +244,24 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
     fixtures = test_yaml.get('fixtures', None)
 
-    # Set defaults from BASE_TESTS then update those defaults
+    # Set defaults from BASE_TEST then update those defaults
     # with any defaults set in the YAML file.
     base_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
     defaults = _validate_defaults(test_yaml.get('defaults', {}))
     test_update(base_test_data, defaults)
 
-    # Establish any fixture classes.
+    # Establish any fixture classes used in this file.
     fixture_classes = []
     if fixtures and fixture_module:
         for fixture_class in fixtures:
             fixture_classes.append(getattr(fixture_module, fixture_class))
 
+    test_maker = TestMaker(test_base_name, base_test_data, test_directory,
+                           fixture_classes, loader, intercept)
     prior_test = None
-    base_test_key_set = set(case.HTTPTestCase.base_test.keys())
     for test_datum in test_data:
-        test = copy.deepcopy(base_test_data)
-        try:
-            test_update(test, test_datum)
-        except KeyError as exc:
-            raise GabbiFormatError('invalid key in test: %s' % exc)
-        except AttributeError as exc:
-            if not isinstance(test_datum, dict):
-                raise GabbiFormatError(
-                    'test chunk is not a dict at "%s"' % test_datum)
-            else:
-                # NOTE(cdent): Not clear this can ever happen but just in
-                # case.
-                raise GabbiFormatError(
-                    'malformed test chunk "%s": %s' % (test_datum, exc))
-
-        if not test['name']:
-            raise GabbiFormatError('Test name missing in a test in %s.'
-                                   % test_base_name)
-        test_name = '%s_%s' % (test_base_name,
-                               test['name'].lower().replace(' ', '_'))
-
-        # use uppercase keys as HTTP method
-        method_key = None
-        for key, val in six.iteritems(test):
-            if _is_method_shortcut(key):
-                if method_key:
-                    raise GabbiFormatError(
-                        'duplicate method/URL directive in "%s"' %
-                        test_name)
-
-                test['method'] = key
-                test['url'] = val
-                method_key = key
-        if method_key:
-            del test[method_key]
-
-        if not test['url']:
-            raise GabbiFormatError('Test url missing in test %s.'
-                                   % test_name)
-
-        test_key_set = set(test.keys())
-        if test_key_set != base_test_key_set:
-            raise GabbiFormatError(
-                'Invalid test keys used in test %s: %s'
-                % (test_name,
-                   ', '.join(list(test_key_set - base_test_key_set))))
-
-        # Use metaclasses to build a class of the necessary type
-        # and name with relevant arguments.
-        http_class = httpclient.get_http(verbose=test['verbose'],
-                                         caption=test_name)
-        klass = TestBuilder(test_name, (case.HTTPTestCase,),
-                            {'test_data': test,
-                             'test_directory': test_directory,
-                             'fixtures': fixture_classes,
-                             'http': http_class,
-                             'host': host,
-                             'intercept': intercept,
-                             'port': port,
-                             'prefix': prefix,
-                             'prior': prior_test})
-
-        tests = loader.loadTestsFromTestCase(klass)
-        this_test = tests._tests[0]
+        this_test = test_maker.make_one_test(test_datum, host, port,
+                                             prefix, prior_test)
         file_suite.addTest(this_test)
         prior_test = this_test
 
