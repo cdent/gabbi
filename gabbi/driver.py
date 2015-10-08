@@ -63,7 +63,7 @@ class TestBuilder(type):
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
-                response_handlers=None, prefix=None):
+                response_handlers=None, prefix=''):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -134,7 +134,7 @@ def test_update(orig_dict, new_dict):
 
 
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
-                         host, port, fixture_module, intercept, prefix=None):
+                         host, port, fixture_module, intercept, prefix=''):
     """Generate a TestSuite from YAML data."""
 
     file_suite = gabbi_suite.GabbiSuite()

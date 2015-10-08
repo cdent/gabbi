@@ -25,22 +25,22 @@ except NameError:  # Python 2
     ConnectionRefused = socket.error
 
 
-def create_url(base_url, host, port=None, prefix=None, ssl=False):
+def create_url(base_url, host, port=None, prefix='', ssl=False):
     """Given pieces of a path-based url, return a fully qualified url."""
-    parsed_url = urlparse.urlsplit(base_url)
     scheme = 'http'
     netloc = host
 
-    if (port and not (int(port) == 443 and ssl)
-            and not (int(port) == 80 and not ssl)):
+    if (port and not _port_follows_standard(port, ssl)):
         netloc = '%s:%s' % (host, port)
 
     if ssl:
         scheme = 'https'
 
+    parsed_url = urlparse.urlsplit(base_url)
     query_string = parsed_url.query
     path = parsed_url.path
 
+    # Guard against a prefix of None
     if prefix:
         path = '%s%s' % (prefix, path)
 
@@ -106,3 +106,9 @@ def _colorize(color, message):
         return getattr(colorama.Fore, color) + message + colorama.Fore.RESET
     except AttributeError:
         return message
+
+
+def _port_follows_standard(port, ssl):
+    """Return True if a standard port is using a non-standard ssl setting."""
+    port = int(port)
+    return (port == 443 and ssl) or (port == 80 and not ssl)
