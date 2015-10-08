@@ -84,7 +84,7 @@ class ExtractContentTypeTest(unittest.TestCase):
         self.assertEqual('utf-8', charset)
 
 
-class ColorozieTest(unittest.TestCase):
+class ColorizeTest(unittest.TestCase):
 
     def test__colorize_missing_color(self):
         """Make sure that choosing a non-existent color is safe."""
@@ -95,7 +95,7 @@ class ColorozieTest(unittest.TestCase):
         self.assertNotEqual('hello', message)
 
 
-class CreateUrlTest(unittest.TestCase):
+class CreateURLTest(unittest.TestCase):
 
     def test_create_url_simple(self):
         url = utils.create_url('/foo/bar', 'test.host.com')
