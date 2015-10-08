@@ -125,7 +125,8 @@ class UrlParseTest(unittest.TestCase):
         host = 'stub'
         query = OrderedDict([('x', 1), ('y', 2)])
         http_case = self.make_test_case(host, params=query)
-        parsed_url = http_case._parse_url('http://example.com/foobar?alpha=beta')
+        parsed_url = http_case._parse_url(
+            'http://example.com/foobar?alpha=beta')
 
         self.assertEqual('http://example.com/foobar?alpha=beta&x=1&y=2',
                          parsed_url)
