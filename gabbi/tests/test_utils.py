@@ -86,7 +86,7 @@ class ExtractContentTypeTest(unittest.TestCase):
 
 class ColorizeTest(unittest.TestCase):
 
-    def test__colorize_missing_color(self):
+    def test_colorize_missing_color(self):
         """Make sure that choosing a non-existent color is safe."""
         message = utils._colorize('CERULEAN', 'hello')
         self.assertEqual('hello', message)
