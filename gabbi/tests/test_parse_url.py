@@ -16,6 +16,7 @@ These verbosely cover the _parse_url method to make sure it
 behaves.
 """
 
+from collections import OrderedDict
 import unittest
 import uuid
 
@@ -25,7 +26,7 @@ from gabbi import case
 class UrlParseTest(unittest.TestCase):
 
     @staticmethod
-    def make_test_case(host, port=8000, prefix=''):
+    def make_test_case(host, port=8000, prefix='', ssl=False, params=None):
         # Attributes used are port, prefix and host and they must
         # be set manually here, due to metaclass magics elsewhere.
         # test_data must have a base value.
@@ -34,6 +35,8 @@ class UrlParseTest(unittest.TestCase):
         http_case.host = host
         http_case.port = port
         http_case.prefix = prefix
+        http_case.test_data['ssl'] = ssl
+        http_case.test_data['query_parameters'] = params or {}
         return http_case
 
     def test_parse_url(self):
@@ -59,8 +62,8 @@ class UrlParseTest(unittest.TestCase):
 
     def test_with_ssl(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host)
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s:8000/foobar' % host, parsed_url)
 
@@ -80,8 +83,8 @@ class UrlParseTest(unittest.TestCase):
 
     def test_default_port_https(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host, port='443')
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, port='443', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s/foobar' % host, parsed_url)
 
@@ -94,7 +97,36 @@ class UrlParseTest(unittest.TestCase):
 
     def test_https_port_80_ssl(self):
         host = uuid.uuid4().hex
-        http_case = self.make_test_case(host, port='80')
-        parsed_url = http_case._parse_url('/foobar', ssl=True)
+        http_case = self.make_test_case(host, port='80', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('https://%s:80/foobar' % host, parsed_url)
+
+    def test_add_query_params(self):
+        host = uuid.uuid4().hex
+        # Use a sequence of tuples to ensure order.
+        query = OrderedDict([('x', 1), ('y', 2)])
+        http_case = self.make_test_case(host, params=query)
+        parsed_url = http_case._parse_url('/foobar')
+
+        self.assertEqual('http://%s:8000/foobar?x=1&y=2' % host, parsed_url)
+
+    def test_extend_query_params(self):
+        host = uuid.uuid4().hex
+        # Use a sequence of tuples to ensure order.
+        query = OrderedDict([('x', 1), ('y', 2)])
+        http_case = self.make_test_case(host, params=query)
+        parsed_url = http_case._parse_url('/foobar?alpha=beta')
+
+        self.assertEqual('http://%s:8000/foobar?alpha=beta&x=1&y=2'
+                         % host, parsed_url)
+
+    def test_extend_query_params_full_ulr(self):
+        host = 'stub'
+        query = OrderedDict([('x', 1), ('y', 2)])
+        http_case = self.make_test_case(host, params=query)
+        parsed_url = http_case._parse_url(
+            'http://example.com/foobar?alpha=beta')
+
+        self.assertEqual('http://example.com/foobar?alpha=beta&x=1&y=2',
+                         parsed_url)
