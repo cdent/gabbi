@@ -39,7 +39,7 @@ class DriverTest(unittest.TestCase):
         self.assertEqual('test_driver_sample_one',
                          the_one_test.__class__.__name__,
                          'test class name maps')
-        self.assertEqual('one',
+        self.assertEqual('test_driver_sample_one',
                          the_one_test.test_data['name'])
         self.assertEqual('/', the_one_test.test_data['url'])
 
