@@ -245,5 +245,5 @@ encoding is done of the resulting string value. If it is text, json, xml
 or javascript it will be encoded to UTF-8.
 
 
-.. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/gabbits_intercept
+.. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/tests/gabbits_intercept
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
