@@ -24,7 +24,7 @@ import sys
 from gabbi import driver
 from gabbi import fixture
 from gabbi import handlers
-from gabbi import simple_wsgi
+from gabbi.tests import simple_wsgi
 
 TESTS_DIR = 'gabbits_intercept'
 

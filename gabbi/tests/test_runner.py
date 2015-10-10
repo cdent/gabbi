@@ -23,7 +23,7 @@ from gabbi import driver
 from gabbi.fixture import InterceptFixture
 from gabbi import handlers
 from gabbi import runner
-from gabbi.simple_wsgi import SimpleWsgi
+from gabbi.tests.simple_wsgi import SimpleWsgi
 
 
 class RunnerTest(unittest.TestCase):
@@ -131,7 +131,7 @@ class RunnerTest(unittest.TestCase):
                 self.assertFailure(err)
 
         sys.argv.insert(3, "-r")
-        sys.argv.insert(4, "gabbi.test_intercept:TestResponseHandler")
+        sys.argv.insert(4, "gabbi.tests.test_intercept:TestResponseHandler")
 
         sys.stdin = StringIO("""
         tests:
