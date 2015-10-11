@@ -10,13 +10,13 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Test that the driver can build tests effectively.
-"""
+"""Test that the driver can build tests effectively."""
 
 import os
 import unittest
 
 from gabbi import driver
+
 
 TESTS_DIR = 'test_gabbits'
 
