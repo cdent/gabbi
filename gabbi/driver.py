@@ -264,8 +264,9 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         raise GabbiFormatError(
             'malformed test file, "tests" key required')
     except TypeError:
-        # Swallow this exception as displaying it does not shine a
-        # light on the path to fix it.
+        # `test_yaml` appears not to be a dictionary; we cannot infer
+        # any details or suggestions on how to fix it, thus discarding
+        # the original exception in favor of a generic error
         raise GabbiFormatError('malformed test file, invalid format')
 
     fixtures = test_yaml.get('fixtures', None)
