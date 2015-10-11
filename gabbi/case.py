@@ -50,7 +50,7 @@ REPLACERS = [
     'RESPONSE',
 ]
 
-# Empty test from which all others inherit
+# Basic test template determining both valid keys and default values
 BASE_TEST = {
     'name': '',
     'desc': '',
