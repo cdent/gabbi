@@ -38,6 +38,7 @@ from gabbi import __version__
 from gabbi import json_parser
 from gabbi import utils
 
+
 MAX_CHARS_OUTPUT = 2000
 
 REPLACERS = [
@@ -48,7 +49,6 @@ REPLACERS = [
     'HEADERS',
     'RESPONSE',
 ]
-
 
 # Empty test from which all others inherit
 BASE_TEST = {

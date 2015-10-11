@@ -39,6 +39,7 @@ from gabbi import handlers
 from gabbi import httpclient
 from gabbi import suite as gabbi_suite
 
+
 RESPONSE_HANDLERS = [
     handlers.HeadersResponseHandler,
     handlers.StringResponseHandler,
