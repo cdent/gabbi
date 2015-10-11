@@ -16,15 +16,14 @@
 For the sake of exploratory development.
 """
 
-
 import os
 import sys
-
 
 from gabbi import driver
 from gabbi import fixture
 from gabbi import handlers
 from gabbi.tests import simple_wsgi
+
 
 TESTS_DIR = 'gabbits_intercept'
 

@@ -17,6 +17,7 @@ import unittest
 
 from gabbi import driver
 
+
 TESTS_DIR = 'test_gabbits'
 
 
