@@ -257,8 +257,6 @@ def test_update(orig_dict, new_dict):
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept, prefix=''):
     """Generate a TestSuite from YAML-sourced data."""
-    file_suite = gabbi_suite.GabbiSuite()
-
     try:
         test_data = test_yaml['tests']
     except KeyError:
@@ -269,23 +267,22 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
         # the original exception in favor of a generic error
         raise GabbiFormatError('malformed test file, invalid format')
 
-    fixtures = test_yaml.get('fixtures', None)
-
-    # Set defaults from BASE_TEST then update those defaults
-    # with any defaults set in the YAML file.
-    base_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
-    defaults = _validate_defaults(test_yaml.get('defaults', {}))
-    test_update(base_test_data, defaults)
+    # Merge global with per-suite defaults
+    default_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
+    local_defaults = _validate_defaults(test_yaml.get('defaults', {}))
+    test_update(default_test_data, local_defaults)
 
     # Establish any fixture classes used in this file.
+    fixtures = test_yaml.get('fixtures', None)
     fixture_classes = []
     if fixtures and fixture_module:
         for fixture_class in fixtures:
             fixture_classes.append(getattr(fixture_module, fixture_class))
 
-    test_maker = TestMaker(test_base_name, base_test_data, test_directory,
+    test_maker = TestMaker(test_base_name, default_test_data, test_directory,
                            fixture_classes, loader, host, port, intercept,
                            prefix)
+    file_suite = gabbi_suite.GabbiSuite()
     prior_test = None
     for test_datum in test_data:
         this_test = test_maker.make_one_test(test_datum, prior_test)
@@ -296,7 +293,7 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
 
 
 def _validate_defaults(defaults):
-    """Ensure default test settings are acceptable
+    """Ensure default test settings are acceptable.
 
     Raises GabbiFormatError for invalid settings.
     """
