@@ -202,6 +202,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
+    # Exit immediately if we have no host to access, either via a real host
+    # or an intercept.
     if not (bool(host) ^ bool(intercept)):
         raise AssertionError('must specify exactly one of host or intercept')
 
@@ -219,8 +221,6 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     for handler in RESPONSE_HANDLERS + response_handlers:
         handler(case.HTTPTestCase)
 
-    # Return an empty suite if we have no host to access, either via
-    # a real host or an intercept
     for test_file in glob.iglob(yaml_file_glob):
         if intercept:
             host = str(uuid.uuid4())
