@@ -40,3 +40,10 @@ When you push your branch back to Github please never force push.
 If your pull request receives some comments and you need to make some
 changes, please do them as _an additional commit_ on the branch used for
 the pull request.
+
+Any code you submit should follow the rules of
+[pep8](https://www.python.org/dev/peps/pep-0008/). You can test that
+it does by running `tox -epep8` in your checkout. Note that when you
+run that the code will also be evaluated to be sure it follows some
+standards established in the OpenStack development community (mostly
+to do with import handling and line breaks).
