@@ -261,11 +261,8 @@ def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
     try:
         test_data = test_yaml['tests']
     except KeyError:
-        raise GabbiFormatError(
-            'malformed test file, "tests" key required')
+        raise GabbiFormatError('malformed test file, "tests" key required')
     except TypeError:
-        # Swallow this exception as displaying it does not shine a
-        # light on the path to fix it.
         raise GabbiFormatError('malformed test file, invalid format')
 
     fixtures = test_yaml.get('fixtures', None)
@@ -300,8 +297,7 @@ def _validate_defaults(defaults):
     Raises GabbiFormatError for invalid settings.
     """
     if any(_is_method_shortcut(key) for key in defaults):
-        raise GabbiFormatError(
-            '"METHOD: url" pairs not allowed in defaults')
+        raise GabbiFormatError('"METHOD: url" pairs not allowed in defaults')
     return defaults
 
 
