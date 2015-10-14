@@ -10,25 +10,24 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Handlers for processing the body of a response in various ways.
-
-A response handler is a class that adds functionality for making assertions
-about an HTTP response.
-
-A subclass may implement two methods: ``action`` and ``preprocess``.
-
-``preprocess`` takes one argument, the ``TestCase``. It is called exactly
-once for each test before looping across the assertions. It is used, rarely,
-to copy the ``test.output`` into a useful form (such as a parsed DOM).
-
-``action`` takes two or three arguments. If ``test_key_value`` is a list
-``action`` is called with the test case and a single list item. If
-``test_key_value`` is a dict then ``action`` is called with the test case
-and a key and value pair.
-"""
+"""Handlers for processing the body of a response in various ways."""
 
 
 class ResponseHandler(object):
+    """Add functionality for making assertions about an HTTP response.
+
+    A subclass may implement two methods: ``action`` and ``preprocess``.
+
+    ``preprocess`` takes one argument, the ``TestCase``. It is called exactly
+    once for each test before looping across the assertions. It is used,
+    rarely, to copy the ``test.output`` into a useful form (such as a parsed
+    DOM).
+
+    ``action`` takes two or three arguments. If ``test_key_value`` is a list
+    ``action`` is called with the test case and a single list item. If
+    ``test_key_value`` is a dict then ``action`` is called with the test case
+    and a key and value pair.
+    """
 
     test_key_suffix = ''
     test_key_value = []
@@ -61,6 +60,7 @@ class ResponseHandler(object):
         pass
 
     def _register(self, test_class):
+        """Register this handler on the provided test class."""
         test_class.base_test[self._key] = self.test_key_value
         if self not in test_class.response_handlers:
             test_class.response_handlers.append(self)
@@ -71,7 +71,7 @@ class ResponseHandler(object):
         return False
 
     def __ne__(self, other):
-        return (not self.__eq__(other))
+        return not self.__eq__(other)
 
 
 class StringResponseHandler(ResponseHandler):
@@ -91,7 +91,7 @@ class JSONResponseHandler(ResponseHandler):
     test_key_suffix = 'json_paths'
     test_key_value = {}
 
-    def action(self, test, path, value):
+    def action(self, test, path, value=None):
         """Test json_paths against json data."""
         # NOTE: This process has some advantages over other process that
         # might come along because the JSON data has already been
@@ -120,7 +120,7 @@ class HeadersResponseHandler(ResponseHandler):
     test_key_suffix = 'headers'
     test_key_value = {}
 
-    def action(self, test, header, value):
+    def action(self, test, header, value=None):
         header = header.lower()  # case-insensitive comparison
 
         response = test.response

@@ -10,6 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+"""Implementation of a command line runner of single gabbi files."""
 
 import argparse
 import sys
@@ -110,7 +111,7 @@ def run():
         port = None
 
     # Initialize the extensions for response handling.
-    for handler in (driver.RESPONSE_HANDLERS + custom_response_handlers):
+    for handler in driver.RESPONSE_HANDLERS + custom_response_handlers:
         handler(case.HTTPTestCase)
 
     data = yaml.safe_load(sys.stdin.read())

@@ -30,7 +30,7 @@ def create_url(base_url, host, port=None, prefix='', ssl=False):
     scheme = 'http'
     netloc = host
 
-    if (port and not _port_follows_standard(port, ssl)):
+    if port and not _port_follows_standard(port, ssl):
         netloc = '%s:%s' % (host, port)
 
     if ssl:

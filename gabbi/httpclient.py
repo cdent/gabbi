@@ -101,12 +101,14 @@ class VerboseHttp(httplib2.Http):
         return (response, content)
 
     def _print_headers(self, headers, prefix=''):
+        """Output request or response headers."""
         if self._show_headers:
             for key in headers:
                 if key not in self.HEADER_BLACKLIST:
                     self._print_header(key, headers[key], prefix=prefix)
 
     def _print_body(self, headers, content):
+        """Output body if not binary."""
         if self._show_body and utils.not_binary(
                 utils.extract_content_type(headers)[0]):
             self._verbose_output('')
@@ -114,6 +116,7 @@ class VerboseHttp(httplib2.Http):
                 utils.decode_response_content(headers, content))
 
     def _print_header(self, name, value, prefix='', stream=None):
+        """Output one single header."""
         header = self.colorize(self.COLORMAP['header'], "%s:" % name)
         self._verbose_output("%s %s" % (header, value), prefix=prefix,
                              stream=stream)

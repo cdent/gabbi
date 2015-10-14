@@ -283,6 +283,7 @@ class HTTPTestCase(unittest.TestCase):
 
     @staticmethod
     def _replacer_regex(key):
+        """Compose a regular expression for test template variables."""
         return r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
 
     def _response_replace(self, message):
@@ -438,6 +439,11 @@ class HTTPTestCase(unittest.TestCase):
         return query_string
 
     def assert_in_or_print_output(self, expected, iterable):
+        """Assert the iterable contains expected or print some output.
+
+        If the output is long, it is limited by either GABBI_MAX_CHARS_OUTPUT
+        in the environment or the MAX_CHARS_OUTPUT constant.
+        """
         if utils.not_binary(self.content_type):
             if expected in iterable:
                 return
@@ -448,7 +454,7 @@ class HTTPTestCase(unittest.TestCase):
             else:
                 full_response = self.output
 
-            max_chars = os.getenv('GABBIT_MAX_CHARS_OUTPUT', MAX_CHARS_OUTPUT)
+            max_chars = os.getenv('GABBI_MAX_CHARS_OUTPUT', MAX_CHARS_OUTPUT)
             response = full_response[0:max_chars]
             is_truncated = (len(response) != len(full_response))
 

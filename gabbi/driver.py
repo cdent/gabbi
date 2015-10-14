@@ -226,8 +226,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         if intercept:
             host = str(uuid.uuid4())
         test_yaml = load_yaml(test_file)
-        test_base_name = '%s_%s' % (test_loader_name, os.path.splitext(
-                                    os.path.basename(test_file))[0])
+        test_base_name = '%s_%s' % (
+            test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
         file_suite = test_suite_from_yaml(loader, test_base_name, test_yaml,
                                           path, host, port, fixture_module,
                                           intercept, prefix)
@@ -303,4 +303,8 @@ def _validate_defaults(defaults):
 
 
 def _is_method_shortcut(key):
+    """Is this test key indicating a request method.
+
+    It is a request method if it is all upper case.
+    """
     return key.isupper()
