@@ -17,8 +17,6 @@ response headers and body. When the test is run an HTTP request is
 made using httplib2. Assertions are made against the reponse.
 """
 
-from __future__ import print_function
-
 from collections import OrderedDict
 import copy
 import functools
