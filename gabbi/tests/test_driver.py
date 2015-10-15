@@ -60,7 +60,7 @@ class DriverTest(unittest.TestCase):
         test_yaml = {'name': 'house', 'url': '/'}
 
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('malformed test file, "tests" key required',
                          str(failure.exception))
@@ -68,7 +68,7 @@ class DriverTest(unittest.TestCase):
     def test_upper_dict_required(self):
         test_yaml = [{'name': 'house', 'url': '/'}]
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('malformed test file, invalid format',
                          str(failure.exception))
@@ -76,7 +76,7 @@ class DriverTest(unittest.TestCase):
     def test_inner_list_required(self):
         test_yaml = {'tests': {'name': 'house', 'url': '/'}}
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn('test chunk is not a dict at',
                       str(failure.exception))
@@ -85,7 +85,7 @@ class DriverTest(unittest.TestCase):
         test_yaml = {'tests': [{'url': '/'}]}
 
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('Test name missing in a test in foo.',
                          str(failure.exception))
@@ -94,7 +94,7 @@ class DriverTest(unittest.TestCase):
         test_yaml = {'tests': [{'name': 'missing url'}]}
 
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertEqual('Test url missing in test foo_missing_url.',
                          str(failure.exception))
@@ -107,7 +107,7 @@ class DriverTest(unittest.TestCase):
         }]}
 
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn("Invalid test keys used in test foo_simple:",
                       str(failure.exception))
@@ -115,7 +115,7 @@ class DriverTest(unittest.TestCase):
     def test_method_url_pair_format_error(self):
         test_yaml = {'defaults': {'GET': '/foo'}, 'tests': []}
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn('"METHOD: url" pairs not allowed in defaults',
                       str(failure.exception))
@@ -127,7 +127,7 @@ class DriverTest(unittest.TestCase):
             'name': 'duplicate methods',
         }]}
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn(
             'duplicate method/URL directive in "foo_duplicate_methods"',
@@ -145,7 +145,7 @@ class DriverTest(unittest.TestCase):
         }]}
 
         with self.assertRaises(driver.GabbiFormatError) as failure:
-            driver.test_suite_from_yaml(self.loader, 'foo', test_yaml, '.',
+            driver.test_suite_from_dict(self.loader, 'foo', test_yaml, '.',
                                         'localhost', 80, None, None)
         self.assertIn(
             "invalid key in test: 'response_html'",
