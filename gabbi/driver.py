@@ -35,7 +35,6 @@ import six
 import yaml
 
 from gabbi import case
-from gabbi.compat import test_suite_from_yaml  # noqa
 from gabbi import handlers
 from gabbi import httpclient
 from gabbi import suite as gabbi_suite
@@ -291,6 +290,20 @@ def test_suite_from_dict(loader, test_base_name, test_yaml, test_directory,
         prior_test = this_test
 
     return file_suite
+
+
+def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
+                         host, port, fixture_module, intercept, prefix=''):
+    """Legacy wrapper retained for backwards compatibility."""
+    import warnings
+
+    with warnings.catch_warnings():  # ensures warnings filter is restored
+        warnings.simplefilter('default', DeprecationWarning)
+        warnings.warn('test_suite_from_yaml has been renamed to '
+                      'test_suite_from_dict', DeprecationWarning, stacklevel=2)
+    return test_suite_from_dict(loader, test_base_name, test_yaml,
+                                test_directory, host, port, fixture_module,
+                                intercept, prefix)
 
 
 def _validate_defaults(defaults):
