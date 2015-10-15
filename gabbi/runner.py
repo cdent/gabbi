@@ -116,7 +116,7 @@ def run():
 
     data = yaml.safe_load(sys.stdin.read())
     loader = unittest.defaultTestLoader
-    suite = driver.test_suite_from_yaml(loader, 'input', data, '.',
+    suite = driver.test_suite_from_dict(loader, 'input', data, '.',
                                         host, port, None, None,
                                         prefix=prefix)
     result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)

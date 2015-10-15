@@ -35,6 +35,7 @@ import six
 import yaml
 
 from gabbi import case
+from gabbi.compat import test_suite_from_yaml  # noqa
 from gabbi import handlers
 from gabbi import httpclient
 from gabbi import suite as gabbi_suite
@@ -228,7 +229,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         test_yaml = load_yaml(test_file)
         test_base_name = '%s_%s' % (
             test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
-        file_suite = test_suite_from_yaml(loader, test_base_name, test_yaml,
+        file_suite = test_suite_from_dict(loader, test_base_name, test_yaml,
                                           path, host, port, fixture_module,
                                           intercept, prefix)
         top_suite.addTest(file_suite)
@@ -254,7 +255,7 @@ def test_update(orig_dict, new_dict):
             orig_dict[key] = val
 
 
-def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
+def test_suite_from_dict(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept, prefix=''):
     """Generate a TestSuite from YAML-sourced data."""
     try:
