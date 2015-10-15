@@ -62,11 +62,11 @@ class TestMaker(object):
     times to generate all the tests in the suite.
     """
 
-    def __init__(self, test_base_name, base_test_data, test_directory,
+    def __init__(self, test_base_name, test_defaults, test_directory,
                  fixture_classes, loader, host, port, intercept, prefix):
         self.test_base_name = test_base_name
-        self.base_test_data = base_test_data
-        self.base_test_key_set = set(base_test_data.keys())
+        self.test_defaults = test_defaults
+        self.default_keys = set(test_defaults.keys())
         self.test_directory = test_directory
         self.fixture_classes = fixture_classes
         self.host = host
@@ -75,25 +75,25 @@ class TestMaker(object):
         self.intercept = intercept
         self.prefix = prefix
 
-    def make_one_test(self, test_datum, prior_test):
+    def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
 
         The returned HTTPTestCase is added to the TestSuite currently
         being built (one per YAML file).
         """
-        test = copy.deepcopy(self.base_test_data)
+        test = copy.deepcopy(self.test_defaults)
         try:
-            test_update(test, test_datum)
+            test_update(test, test_dict)
         except KeyError as exc:
             raise GabbiFormatError('invalid key in test: %s' % exc)
         except AttributeError as exc:
-            if not isinstance(test_datum, dict):
+            if not isinstance(test_dict, dict):
                 raise GabbiFormatError(
-                    'test chunk is not a dict at "%s"' % test_datum)
+                    'test chunk is not a dict at "%s"' % test_dict)
             else:
                 # NOTE(cdent): Not clear this can happen but just in case.
                 raise GabbiFormatError(
-                    'malformed test chunk "%s": %s' % (test_datum, exc))
+                    'malformed test chunk "%s": %s' % (test_dict, exc))
 
         self._set_test_name(test)
         self._set_test_method_and_url(test)
@@ -165,12 +165,12 @@ class TestMaker(object):
 
         If there are any, raise a GabbiFormatError.
         """
-        test_key_set = set(test.keys())
-        if test_key_set != self.base_test_key_set:
+        test_keys = set(test.keys())
+        if test_keys != self.default_keys:
             raise GabbiFormatError(
                 'Invalid test keys used in test %s: %s'
                 % (test['name'],
-                   ', '.join(list(test_key_set - self.base_test_key_set))))
+                   ', '.join(list(test_keys - self.default_keys))))
 
 
 class TestBuilder(type):
@@ -225,10 +225,10 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     for test_file in glob.iglob(yaml_file_glob):
         if intercept:
             host = str(uuid.uuid4())
-        test_yaml = load_yaml(test_file)
+        suite_dict = load_yaml(test_file)
         test_base_name = '%s_%s' % (
             test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
-        file_suite = test_suite_from_dict(loader, test_base_name, test_yaml,
+        file_suite = test_suite_from_dict(loader, test_base_name, suite_dict,
                                           path, host, port, fixture_module,
                                           intercept, prefix)
         top_suite.addTest(file_suite)
@@ -254,38 +254,38 @@ def test_update(orig_dict, new_dict):
             orig_dict[key] = val
 
 
-def test_suite_from_dict(loader, test_base_name, test_yaml, test_directory,
+def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
                          host, port, fixture_module, intercept, prefix=''):
     """Generate a TestSuite from YAML-sourced data."""
     try:
-        test_data = test_yaml['tests']
+        test_data = suite_dict['tests']
     except KeyError:
         raise GabbiFormatError('malformed test file, "tests" key required')
     except TypeError:
-        # `test_yaml` appears not to be a dictionary; we cannot infer
+        # `suite_dict` appears not to be a dictionary; we cannot infer
         # any details or suggestions on how to fix it, thus discarding
         # the original exception in favor of a generic error
         raise GabbiFormatError('malformed test file, invalid format')
 
     # Merge global with per-suite defaults
-    default_test_data = copy.deepcopy(case.HTTPTestCase.base_test)
-    local_defaults = _validate_defaults(test_yaml.get('defaults', {}))
-    test_update(default_test_data, local_defaults)
+    default_test_dict = copy.deepcopy(case.HTTPTestCase.base_test)
+    local_defaults = _validate_defaults(suite_dict.get('defaults', {}))
+    test_update(default_test_dict, local_defaults)
 
     # Establish any fixture classes used in this file.
-    fixtures = test_yaml.get('fixtures', None)
+    fixtures = suite_dict.get('fixtures', None)
     fixture_classes = []
     if fixtures and fixture_module:
         for fixture_class in fixtures:
             fixture_classes.append(getattr(fixture_module, fixture_class))
 
-    test_maker = TestMaker(test_base_name, default_test_data, test_directory,
+    test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
                            prefix)
     file_suite = gabbi_suite.GabbiSuite()
     prior_test = None
-    for test_datum in test_data:
-        this_test = test_maker.make_one_test(test_datum, prior_test)
+    for test_dict in test_data:
+        this_test = test_maker.make_one_test(test_dict, prior_test)
         file_suite.addTest(this_test)
         prior_test = this_test
 
