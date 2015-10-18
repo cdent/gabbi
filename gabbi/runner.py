@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Implementation of a command line runner of single gabbi files."""
+"""Implementation of a command-line runner of single gabbi files."""
 
 import argparse
 import sys
@@ -91,11 +91,6 @@ def run():
     )
     args = parser.parse_args()
 
-    custom_response_handlers = []
-    for import_path in (args.response_handlers or []):
-        for handler in load_response_handlers(import_path):
-            custom_response_handlers.append(handler)
-
     split_url = urlparse.urlsplit(args.target)
     if split_url.scheme:
         target = split_url.netloc
@@ -110,7 +105,11 @@ def run():
         host = target
         port = None
 
-    # Initialize the extensions for response handling.
+    # Initialize response handlers.
+    custom_response_handlers = []
+    for import_path in (args.response_handlers or []):
+        for handler in load_response_handlers(import_path):
+            custom_response_handlers.append(handler)
     for handler in driver.RESPONSE_HANDLERS + custom_response_handlers:
         handler(case.HTTPTestCase)
 
