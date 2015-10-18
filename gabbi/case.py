@@ -158,15 +158,13 @@ class HTTPTestCase(unittest.TestCase):
 
     def _assert_response(self):
         """Compare the response with expected data."""
-
-        test = self.test_data
         response = self.response
 
         # Never accept a 500
         if response['status'] == '500':
             raise ServerError(self.output)
 
-        self._test_status(test['status'], response['status'])
+        self._test_status(self.test_data['status'], response['status'])
 
         for handler in self.response_handlers:
             handler(self)
