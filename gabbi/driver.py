@@ -207,21 +207,18 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     if not (bool(host) ^ bool(intercept)):
         raise AssertionError('must specify exactly one of host or intercept')
 
-    response_handlers = response_handlers or []
-    top_suite = suite.TestSuite()
-
     if test_loader_name is None:
         test_loader_name = inspect.stack()[1]
         test_loader_name = os.path.splitext(os.path.basename(
             test_loader_name[1]))[0]
 
-    yaml_file_glob = '%s/*.yaml' % path
-
-    # Initialize the extensions for response handling.
+    # Initialize response handlers.
+    response_handlers = response_handlers or []
     for handler in RESPONSE_HANDLERS + response_handlers:
         handler(case.HTTPTestCase)
 
-    for test_file in glob.iglob(yaml_file_glob):
+    top_suite = suite.TestSuite()
+    for test_file in glob.iglob('%s/*.yaml' % path):
         if intercept:
             host = str(uuid.uuid4())
         suite_dict = load_yaml(test_file)
