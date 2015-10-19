@@ -94,16 +94,16 @@ class TestMaker(object):
                 raise GabbiFormatError(
                     'malformed test chunk "%s": %s' % (test_dict, exc))
 
-        self._set_test_name(test)
-        self._set_test_method_and_url(test)
-        self._validate_keys(test)
+        test_name = self._set_test_name(test)
+        self._set_test_method_and_url(test, test_name)
+        self._validate_keys(test, test_name)
 
         http_class = httpclient.get_http(verbose=test['verbose'],
                                          caption=test['name'])
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
-        klass = TestBuilder(test['name'], (case.HTTPTestCase,),
+        klass = TestBuilder(test_name, (case.HTTPTestCase,),
                             {'test_data': test,
                              'test_directory': self.test_directory,
                              'fixtures': self.fixture_classes,
@@ -128,11 +128,11 @@ class TestMaker(object):
         if not test['name']:
             raise GabbiFormatError('Test name missing in a test in %s.'
                                    % self.test_base_name)
-        test['name'] = '%s_%s' % (self.test_base_name,
-                                  test['name'].lower().replace(' ', '_'))
+        return '%s_%s' % (self.test_base_name,
+                          test['name'].lower().replace(' ', '_'))
 
     @staticmethod
-    def _set_test_method_and_url(test):
+    def _set_test_method_and_url(test, test_name):
         """Extract the base URL and method for this test.
 
         If there is an upper case key in the test, that is used as the
@@ -147,7 +147,7 @@ class TestMaker(object):
                 if method_key:
                     raise GabbiFormatError(
                         'duplicate method/URL directive in "%s"' %
-                        test['name'])
+                        test_name)
 
                 test['method'] = key
                 test['url'] = val
@@ -157,9 +157,9 @@ class TestMaker(object):
 
         if not test['url']:
             raise GabbiFormatError('Test url missing in test %s.'
-                                   % test['name'])
+                                   % test_name)
 
-    def _validate_keys(self, test):
+    def _validate_keys(self, test, test_name):
         """Check for invalid keys.
 
         If there are any, raise a GabbiFormatError.
@@ -168,7 +168,7 @@ class TestMaker(object):
         if test_keys != self.default_keys:
             raise GabbiFormatError(
                 'Invalid test keys used in test %s: %s'
-                % (test['name'],
+                % (test_name,
                    ', '.join(list(test_keys - self.default_keys))))
 
 
