@@ -461,8 +461,3 @@ class HTTPTestCase(unittest.TestCase):
             self.fail(msg)
         else:
             self.assertIn(expected, iterable)
-
-
-class ServerError(Exception):
-    """A catchall ServerError."""
-    pass
