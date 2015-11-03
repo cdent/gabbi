@@ -24,7 +24,10 @@ Test Structure
 The top-level ``tests`` category contains an ordered sequence of test
 declarations, each describing the expected response to a given request:
 
-.. table:: metadata
+Metadata
+********
+
+.. table::
 
    ===========  =================================================  ============
    Key          Description                                        Notes
@@ -55,7 +58,10 @@ the respective test's ``name``, lowercased with spaces transformed to ``_``. In
 at least some test runners this will allow you to select and filter on test
 name.
 
-.. table:: request parameters
+Request Parameters
+******************
+
+.. table::
 
    ====================  ========================================  ============
    Key                   Description                               Notes
@@ -111,7 +117,10 @@ name.
                          :doc:`host` for details.
    ====================  ========================================  ============
 
-.. table:: response expectations
+Response Expectations
+*********************
+
+.. table::
 
    =======================  =====================================  ============
    Key                      Description                            Notes
