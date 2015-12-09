@@ -1,0 +1,30 @@
+#
+# Test that headers that should not be there are definitely not
+# there. These mostly test in a negative fashion.
+#
+
+tests:
+
+    - name: header not there basic
+      GET: /foobar
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foobar
+      response_forbidden_headers:
+          - no-there-one
+          - no-there-two
+
+    - name: header is there fail
+      xfail: True
+      GET: /foobar
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foobar
+      response_forbidden_headers:
+          - x-gabbi-url
+
+    - name: header is there fail case insensitive
+      xfail: True
+      GET: /foobar
+      response_headers:
+          x-gabbi-url: $SCHEME://$NETLOC/foobar
+      response_forbidden_headers:
+          - x-gaBBi-uRl

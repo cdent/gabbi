@@ -40,6 +40,7 @@ from gabbi import suite as gabbi_suite
 
 
 RESPONSE_HANDLERS = [
+    handlers.ForbiddenHeadersResponseHandler,
     handlers.HeadersResponseHandler,
     handlers.StringResponseHandler,
     handlers.JSONResponseHandler,
