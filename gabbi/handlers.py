@@ -110,6 +110,19 @@ class JSONResponseHandler(ResponseHandler):
                          % (path, expected, match))
 
 
+class ForbiddenHeadersResponseHandler(ResponseHandler):
+    """Test that listed headers are not in the response."""
+
+    test_key_suffix = 'forbidden_headers'
+    test_key_value = []
+
+    def action(self, test, forbidden, value=None):
+        # normalize forbidden header to lower case
+        forbidden = test.replace_template(forbidden).lower()
+        test.assertNotIn(forbidden, test.response,
+                         'Forbidden header %s found in response' % forbidden)
+
+
 class HeadersResponseHandler(ResponseHandler):
     """Compare expected headers with actual headers.
 

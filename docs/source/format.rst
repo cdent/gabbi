@@ -122,45 +122,48 @@ Response Expectations
 
 .. table::
 
-   =======================  =====================================  ============
-   Key                      Description                            Notes
-   =======================  =====================================  ============
-   ``status``               The expected response status code.     defaults to
-                            Multiple acceptable response codes     ``200``
-                            may be provided, separated by ``||``
-                            (e.g. ``302 || 301`` - note, however,
-                            that this indicates ambiguity, which
-                            is generally undesirable).
+   ==============================  =====================================  ============
+   Key                             Description                            Notes
+   ==============================  =====================================  ============
+   ``status``                      The expected response status code.     defaults to
+                                   Multiple acceptable response codes     ``200``
+                                   may be provided, separated by ``||``
+                                   (e.g. ``302 || 301`` - note, however,
+                                   that this indicates ambiguity, which
+                                   is generally undesirable).
 
-   ``response_headers``     A dictionary of key-value pairs
-                            representing expected response header
-                            names and values. If a header's value
-                            is wrapped in ``/.../``, it will be
-                            treated as a regular expression.
+   ``response_headers``            A dictionary of key-value pairs
+                                   representing expected response header
+                                   names and values. If a header's value
+                                   is wrapped in ``/.../``, it will be
+                                   treated as a regular expression.
 
-   ``response_strings``     A list of string fragments expected
-                            to be present in the response body.
+   ``response_forbidden_headers``  A list of headers which must `not`
+                                   be present.
 
-   ``response_json_paths``  A dictionary of JSONPath rules paired
-                            with expected matches. Using this
-                            rule requires that the content being
-                            sent from the server is JSON (i.e. a
-                            content type of ``application/json``
-                            or containing ``+json``)
+   ``response_strings``            A list of string fragments expected
+                                   to be present in the response body.
 
-   ``poll``                 A dictionary of two keys:
+   ``response_json_paths``         A dictionary of JSONPath rules paired
+                                   with expected matches. Using this
+                                   rule requires that the content being
+                                   sent from the server is JSON (i.e. a
+                                   content type of ``application/json``
+                                   or containing ``+json``)
 
-                            * ``count``: An integer stating the
-                              number of times to attempt this
-                              test before giving up.
-                            * ``delay``: A floating point number
-                              of seconds to delay between
-                              attemmpts.
+   ``poll``                        A dictionary of two keys:
 
-                            This makes it possible to poll for a
-                            resource created via an asynchronous
-                            request. Use with caution.
-   =======================  =====================================  ============
+                                   * ``count``: An integer stating the
+                                     number of times to attempt this
+                                     test before giving up.
+                                   * ``delay``: A floating point number
+                                     of seconds to delay between
+                                     attemmpts.
+
+                                   This makes it possible to poll for a
+                                   resource created via an asynchronous
+                                   request. Use with caution.
+   ==============================  =====================================  ============
 
 Note that many of these items allow substitutions (explained below).
 
@@ -225,6 +228,7 @@ All of these variables may be used in all of the following fields:
 * ``response_strings``
 * ``response_json_paths`` (on the value side of the key value pair)
 * ``response_headers`` (on the value side of the key value pair)
+* ``response_forbidden_headers``
 
 With these variables it ought to be possible to traverse an API without any
 explicit statements about the URLs being used. If you need a

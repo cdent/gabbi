@@ -93,6 +93,14 @@ tests:
       response_headers:
           content-type: /application/json/
 
+# If a header must not be present in a response at all that can be
+# expressed in a test as follows.
+
+    - name: test forbidden headers
+      url: /resource
+      response_forbidden_headers:
+          - x-special-header
+
 # All of the above requests have defaulted to a "GET" method. When
 # using "POST", "PUT" or "PATCH", the "data" key provides the
 # request body.
