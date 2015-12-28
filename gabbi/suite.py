@@ -19,6 +19,8 @@ are suite-level fixtures that operate as context managers.
 from unittest import case
 from unittest import suite
 
+from wsgi_intercept import interceptor
+
 from gabbi import fixture
 
 
@@ -63,8 +65,8 @@ class GabbiSuite(suite.TestSuite):
         try:
             with fixture.nest([fix() for fix in fixtures]):
                 if intercept:
-                    with fixture.InterceptFixture(host, port, intercept,
-                                                  prefix):
+                    with interceptor.Httplib2Interceptor(
+                            intercept, host, port, prefix):
                         result = super(GabbiSuite, self).run(result, debug)
                 else:
                     result = super(GabbiSuite, self).run(result, debug)

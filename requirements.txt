@@ -3,5 +3,5 @@ six
 PyYAML
 httplib2
 jsonpath-rw
-wsgi-intercept
+wsgi-intercept>=1.0.0
 colorama
