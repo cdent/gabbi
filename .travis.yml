@@ -1,5 +1,7 @@
 sudo: false
 language: python
+python:
+      - "3.5"
 install:
       - pip install tox 
 script:
@@ -9,12 +11,13 @@ env:
       - TOXENV=py32
       - TOXENV=py33
       - TOXENV=py34
+      - TOXENV=py35
       - TOXENV=pypy
       - TOXENV=pypy3
       - TOXENV=pep8
-      - TOXENV=py34-failskip
-      - TOXENV=py34-limit
-      - TOXENV=py34-prefix
+      - TOXENV=py35-failskip
+      - TOXENV=py35-limit
+      - TOXENV=py35-prefix
 
 notifications:
       irc: "chat.freenode.net#gabbi"
