@@ -1,5 +1,4 @@
 mock
-tox
 testrepository
 coverage
 hacking
