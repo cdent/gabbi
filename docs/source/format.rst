@@ -87,7 +87,7 @@ Request Parameters
                          full path (e.g. "/index") or a fully
                          qualified URL (i.e. including host and
                          scheme, e.g.
-                         "http://example.org/index") - see
+                         "http://example.org/index") — see
                          :doc:`host` for details.
 
    ``request_headers``   A dictionary of key-value pairs
@@ -105,7 +105,7 @@ Request Parameters
 
    ``data``              A representation to pass as the body of
                          a request. Note that ``content-type`` in
-                         ``request_headers`` should also be set -
+                         ``request_headers`` should also be set —
                          see `Data`_ for details.
 
    ``redirects``         If ``True``, redirects will               defaults to
@@ -113,7 +113,7 @@ Request Parameters
 
    ``ssl``               Determines whether the request uses SSL   defaults to
                          (i.e. HTTPS). Note that the ``url``'s     ``False``
-                         scheme takes precedence if present - see
+                         scheme takes precedence if present — see
                          :doc:`host` for details.
    ====================  ========================================  ============
 
@@ -128,7 +128,7 @@ Response Expectations
    ``status``                      The expected response status code.     defaults to
                                    Multiple acceptable response codes     ``200``
                                    may be provided, separated by ``||``
-                                   (e.g. ``302 || 301`` - note, however,
+                                   (e.g. ``302 || 301`` — note, however,
                                    that this indicates ambiguity, which
                                    is generally undesirable).
 
