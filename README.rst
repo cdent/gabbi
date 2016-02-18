@@ -11,7 +11,7 @@ Gabbi is a tool for running HTTP tests where requests and responses
 are represented in a declarative YAML-based form. See the docs_ for
 more details on features and formats.
 
-Gabbi is tested with Python 2.7, 3.4, 3.5 and pypy and pypy3.
+Gabbi is tested with Python 2.7, 3.4, 3.5 and pypy.
 
 Tests can be run using `unittest`_ style test runners or from the
 command line with a `gabbi-run`_ script.

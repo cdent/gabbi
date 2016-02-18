@@ -8,12 +8,10 @@ script:
       - tox
 env:
       - TOXENV=py27
-      - TOXENV=py32
       - TOXENV=py33
       - TOXENV=py34
       - TOXENV=py35
       - TOXENV=pypy
-      - TOXENV=pypy3
       - TOXENV=pep8
       - TOXENV=py35-failskip
       - TOXENV=py35-limit
