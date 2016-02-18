@@ -158,7 +158,7 @@ Response Expectations
                                      test before giving up.
                                    * ``delay``: A floating point number
                                      of seconds to delay between
-                                     attemmpts.
+                                     attempts.
 
                                    This makes it possible to poll for a
                                    resource created via an asynchronous
