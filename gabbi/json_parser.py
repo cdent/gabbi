@@ -15,10 +15,12 @@
 import functools
 
 import jsonpath_rw
-from jsonpath_rw_ext import parser, _iterable
+from jsonpath_rw_ext import _iterable
+from jsonpath_rw_ext import parser
 
 
 PARSER = None
+
 
 def custom_find(self, datum):
     """Return sorted value of This if list or dict."""
