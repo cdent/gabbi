@@ -12,52 +12,35 @@
 # under the License.
 """Extend jsonpath_rw to add a len command."""
 
+import functools
+
 import jsonpath_rw
+from jsonpath_rw_ext import parser, _iterable
 
 
 PARSER = None
 
+def custom_find(self, datum):
+    """Return sorted value of This if list or dict."""
+    if isinstance(datum.value, dict) and self.expressions:
+        return datum
 
-class Len(jsonpath_rw.JSONPath):
-    """The JSONPath referring to the len of the current object.
-
-    Concrete syntax is '`len`'.
-    """
-
-    def find(self, datum):
-        datum = jsonpath_rw.DatumInContext.wrap(datum)
-        try:
-            value = len(datum.value)
-        except TypeError:
-            return []
-        else:
-            return [jsonpath_rw.DatumInContext(value,
-                                               context=None,
-                                               path=Len())]
-
-    def __eq__(self, other):
-        return isinstance(other, Len)
-
-    def __str__(self):
-        return '`len`'
-
-    def __repr__(self):
-        return 'Len()'
+    if isinstance(datum.value, dict) or isinstance(datum.value, list):
+        key = (functools.cmp_to_key(self._compare)
+               if self.expressions else None)
+        return [jsonpath_rw.DatumInContext.wrap(
+            [value for value in sorted(datum.value, key=key)])]
+    return datum
 
 
-class GabbiJsonPathParser(jsonpath_rw.parser.JsonPathParser):
-    """Custom gabbi LALR-parser for JsonPath"""
-
-    def p_jsonpath_named_operator(self, p):
-        "jsonpath : NAMED_OPERATOR"
-        if p[1] == 'len':
-            p[0] = Len()
-        else:
-            super(GabbiJsonPathParser, self).p_jsonpath_named_operator(p)
+# Override jsonpath_pw_ext return from find so we have the right
+# data structure. Monkey patch because there are too many places to
+# change in the lexer and parser.
+_iterable.SortedThis.find = custom_find
 
 
 def parse(path):
     global PARSER
     if not PARSER:
-        PARSER = GabbiJsonPathParser()
+        PARSER = parser.ExtentedJsonPathParser()
     return PARSER.parse(path)

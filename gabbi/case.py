@@ -194,13 +194,16 @@ class HTTPTestCase(unittest.TestCase):
     def extract_json_path_value(data, path):
         """Extract the value at JSON Path path from the data.
 
-        The input data is a Python datastructre, not a JSON string.
+        The input data is a Python datastructure, not a JSON string.
         """
         path_expr = json_parser.parse(path)
         matches = [match.value for match in path_expr.find(data)]
-        try:
-            return matches[0]
-        except IndexError:
+        if matches:
+            if len(matches) > 1:
+                return matches
+            else:
+                return matches[0]
+        else:
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
 
