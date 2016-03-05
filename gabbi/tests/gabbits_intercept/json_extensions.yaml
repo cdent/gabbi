@@ -25,3 +25,36 @@ tests:
           $.beta: hello
           # the string at beta has five chars
           $.beta.`len`: 5
+
+    - name: test sort
+      url: /barfoo
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          objects:
+              - name: cow
+                value: moo
+              - name: cat
+                value: meow
+      response_json_paths:
+          $.objects[/name][0].value: meow
+          $.objects[/name][1].value: moo
+          $.objects[\name][1].value: meow
+          $.objects[\name][0].value: moo
+
+    - name: test filtered
+      url: /barfoo
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          objects:
+              - name: cow
+                value: moo
+              - name: cat
+                value: meow
+      response_json_paths:
+         $.objects[?name = "cow"].value: moo
+         $.objects[?name = "cat"].value: meow
+         $.objects[?value = "meow"].name: cat
