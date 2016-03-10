@@ -26,6 +26,7 @@ An entire directory of YAML files is a TestSuite of TestSuites.
 import copy
 import glob
 import inspect
+import io
 import os
 from unittest import suite
 import uuid
@@ -234,7 +235,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
 def load_yaml(yaml_file):
     """Read and parse any YAML file. Let exceptions flow where they may."""
-    with open(yaml_file) as source:
+    with io.open(yaml_file, encoding='utf-8') as source:
         return yaml.safe_load(source.read())
 
 
