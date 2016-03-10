@@ -42,6 +42,7 @@ tests:
           $.objects[/name][1].value: moo
           $.objects[\name][1].value: meow
           $.objects[\name][0].value: moo
+          $.objects[/name]..value: ['meow', 'moo']
 
     - name: test filtered
       url: /barfoo
