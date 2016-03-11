@@ -18,7 +18,7 @@ using `jsonpath_rw_ext`. It adds three useful functions:
 
 .. highlight:: json
 
-Here is a JSONPath example, demonstrating some of these features. Given
+Here is a JSONPath example demonstrating some of these features. Given
 JSON data as follows::
 
     {"pets": [
