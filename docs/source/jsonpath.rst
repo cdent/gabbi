@@ -18,10 +18,12 @@ JSONPath expressions are provided by `jsonpath_rw`_, with
 Here is a JSONPath example demonstrating some of these features. Given
 JSON data as follows::
 
-    {"pets": [
-        {"type": "cat", "sound": "meow"},
-        {"type": "dog", "sound": "woof"}
-    ]}
+    {
+        "pets": [
+            {"type": "cat", "sound": "meow"},
+            {"type": "dog", "sound": "woof"}
+        ]
+    }
 
 .. highlight:: yaml
 
