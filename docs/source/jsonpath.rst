@@ -16,29 +16,38 @@ using `jsonpath_rw_ext`. It adds three useful functions:
 #. Filter using ``[?name = "cow"]`` to select an item in the
    current datum.
 
-Here is a simple JSONPath example, including use of ``len``. Given JSON data
-as follows::
+.. highlight:: json
 
-    {
-        "alpha": ["one", "two"],
-        "beta": "hello"
-    }
+Here is a JSONPath example, demonstrating some of these features. Given
+JSON data as follows::
 
-it is possible to get information about the values and length as
-follows::
+    {"pets": [
+        {"type": "cat", "sound": "meow"},
+        {"type": "dog", "sound": "woof"}
+    ]}
+
+.. highlight:: yaml
+
+if the ordering of the list in ``pets`` is predictable and
+reliable it is relatively straightforward to test values::
 
     response_json_paths:
-        # the dict has two keys
-        $.`len`: 2
-        # The elements of the alpha list
-        $.alpha[0]: one
-        $.alpha.[1]: two
-        # the alpha list has two items
-        $.alpha.`len`: 2
-        # The string at beta is hello
-        $.beta: hello
-        # The string at beta has five chars
-        $.beta.`len`: 5
+        # length of list is two
+        $.pets.`len`: 2
+        # sound of second item in list is woof
+        $.pets[1].sound: woof
+
+If the ordering is *not* predictable additional effort is required::
+
+    response_json_paths:
+        # sort by type
+        $.pets[/type][0].sound: meow
+        # sort by type, reversed
+        $.pets[\type][0].sound: woof
+        # all the sounds
+        $.pets[/type]..sound: ['meow', 'woof']
+        # filter by type = dog
+        $.pets[?type = "dog"].sound: woof
 
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.

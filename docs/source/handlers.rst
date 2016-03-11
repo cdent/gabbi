@@ -1,6 +1,8 @@
 Response Handlers
 =================
 
+.. highlight:: yaml
+
 Response handlers determine how an HTTP response will be processed and checked
 against an expected result. For each entry starting with `response_`, an
 associated class is invoked with corresponding values. For example
@@ -14,6 +16,8 @@ these lines create an instance of ``StringResponseHandler``, passing the value
 ``["lorem ipsum", "dolor sit amet"]``. The response handler
 implementation interprets the response and the expected values, determining
 whether the test passes or fails.
+
+.. highlight:: python
 
 While the default handlers (as described in :doc:`format`) are sufficient for
 most cases, it is possible to register additional custom handlers by passing a
