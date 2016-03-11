@@ -165,7 +165,7 @@ Response Expectations
                                    request. Use with caution.
    ==============================  =====================================  ============
 
-Note that many of these items allow substitutions (explained below).
+Note that many of these items allow :ref:`substitutions <state-substitution>`.
 
 Default values for a file's ``tests`` may be provided via the top-level
 ``defaults`` category. These take precedence over the global defaults
@@ -193,6 +193,8 @@ Response Handlers
 created by test authors for specific use cases. See :doc:`handlers` for more
 information.
 
+
+.. _state-substitution:
 
 Substitution
 ------------
