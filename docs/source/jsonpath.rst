@@ -1,20 +1,17 @@
-
 JSONPath
 ========
 
-Gabbi makes extensive use of JSONPath to provide a tool for
-validating response bodies that are formatted as JSON and making
-reference to that JSON in subsequent queries. `jsonpath_rw`_ is used
-to process the JSONPath expressions.
+Gabbi supports JSONPath both for validating JSON response bodies and within
+:ref:`substitutions <state-substitution>`.
 
-To address common requirements when evaluting JSON responses,
-extensions have been made to the default implementation of JSONPath
-using `jsonpath_rw_ext`. It adds three useful functions:
+JSONPath expressions are provided by `jsonpath_rw`_, with
+`jsonpath_rw_ext`_ custom extensions to address common requirements:
 
-#. Return the length of the current datum using ``len``.
-#. Sort the current datum using ``sorted`` and ``[/name]``.
-#. Filter using ``[?name = "cow"]`` to select an item in the
-   current datum.
+#. Sorting via ``sorted`` and ``[/property]``.
+#. Filtering via ``[?property = value]``.
+#. Returning the respective length via ``len``.
+
+(These apply both to arrays and key-value pairs.)
 
 .. highlight:: json
 
@@ -28,7 +25,7 @@ JSON data as follows::
 
 .. highlight:: yaml
 
-if the ordering of the list in ``pets`` is predictable and
+If the ordering of the list in ``pets`` is predictable and
 reliable it is relatively straightforward to test values::
 
     response_json_paths:
