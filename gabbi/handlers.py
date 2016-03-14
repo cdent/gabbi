@@ -128,6 +128,8 @@ class HeadersResponseHandler(ResponseHandler):
 
     If a header value is wrapped in ``/`` it is treated as a raw
     regular expression.
+
+    Headers values are always treated as strings.
     """
 
     test_key_suffix = 'headers'
@@ -137,10 +139,10 @@ class HeadersResponseHandler(ResponseHandler):
         header = header.lower()  # case-insensitive comparison
 
         response = test.response
-        header_value = test.replace_template(value)
+        header_value = test.replace_template(str(value))
 
         try:
-            response_value = response[header]
+            response_value = str(response[header])
         except KeyError:
             raise AssertionError(
                 "'%s' header not present in response: %s" % (
@@ -153,6 +155,6 @@ class HeadersResponseHandler(ResponseHandler):
                 'Expect header %s to match /%s/, got %s' %
                 (header, header_value, response_value))
         else:
-            test.assertEqual(header_value, response[header],
+            test.assertEqual(header_value, response_value,
                              'Expect header %s with value %s, got %s' %
                              (header, header_value, response[header]))
