@@ -173,6 +173,17 @@ class HandlersTest(unittest.TestCase):
         self.assertIn("'location' header not present in response:",
                       str(failure.exception))
 
+    def test_resonse_headers_stringify(self):
+        handler = handlers.HeadersResponseHandler(self.test_class)
+        self.test.test_data = {'response_headers': {
+            'x-alpha-beta': 2.0,
+        }}
+        self.test.response = {'x-alpha-beta': '2.0'}
+        self._assert_handler(handler)
+
+        self.test.response = {'x-alpha-beta': 2.0}
+        self._assert_handler(handler)
+
     def _assert_handler(self, handler):
         # Instantiate our contained test class by naming its test
         # method and then run its tests to confirm.
