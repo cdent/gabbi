@@ -335,7 +335,7 @@ class HTTPTestCase(unittest.TestCase):
         for name in headers:
             headers[name] = self.replace_template(headers[name])
 
-        if test['data']:
+        if test['data'] is not '':
             body = self._test_data_to_string(
                 test['data'], headers.get('content-type', ''))
         else:
