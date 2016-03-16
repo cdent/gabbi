@@ -48,6 +48,22 @@ If the ordering is *not* predictable additional effort is required::
         # filter by type = dog
         $.pets[?type = "dog"].sound: woof
 
+If it is necessary to validate the entire JSON response use a
+JSONPath of ``$``::
+
+    response_json_paths:
+        $:
+            pets:
+                - type: cat
+                  sound: meow
+                - type: dog
+                  sound: woof
+
+This is not a technique that should be used frequently as it can
+lead to difficult to read tests and it also indicates that your
+gabbi tests are being used to test your serializers and data models,
+not just your API interactions.
+
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 

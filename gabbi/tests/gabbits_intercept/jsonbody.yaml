@@ -1,0 +1,38 @@
+# See if $ is the whole thing
+
+tests:
+
+    - name: test fully body
+      url: /foobar
+      method: POST
+      request_headers:
+          content-type: application/json
+      data:
+          alpha:
+              - one
+              - two
+          beta: hello
+      response_json_paths:
+          $:
+            alpha:
+               - one
+               - two
+            beta: hello
+
+    - name: test empty dict
+      url: /foobar
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: {}
+      response_json_paths:
+          $: {}
+
+    - name: test empty list
+      url: /foobar
+      method: POST
+      request_headers:
+          content-type: application/json
+      data: []
+      response_json_paths:
+          $: []
