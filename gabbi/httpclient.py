@@ -25,11 +25,12 @@ from gabbi import utils
 class Http(urllib3.PoolManager):
 
     def request(self, absolute_uri, method, body, headers, redirect):
-
-        retries = 1 if redirect else False
+        if redirect:
+            retry = urllib3.util.Retry(raise_on_redirect=False, redirect=5)
+        else:
+            retry = urllib3.util.Retry(total=False, redirect=False)
         response = super(Http, self).request(
-            method, absolute_uri, body=body, headers=headers,
-            redirect=redirect, retries=retries)
+            method, absolute_uri, body=body, headers=headers, retries=retry)
 
         # Transform response into something akin to httplib2
         # response object.
