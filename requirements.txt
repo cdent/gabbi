@@ -1,7 +1,7 @@
 pbr
 six
 PyYAML
-httplib2
+urllib3
 jsonpath-rw-ext>=1.0.0
-wsgi-intercept>=1.0.0
+wsgi-intercept>=1.2.0
 colorama
