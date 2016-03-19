@@ -64,7 +64,7 @@ class VerboseHttp(Http):
     """
 
     # A list of request and response headers to never display.
-    # Can include httplib2 response object attributes that are not
+    # Can include response object attributes that are not
     # technically headers.
     HEADER_BLACKLIST = [
         'status',
