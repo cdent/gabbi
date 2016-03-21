@@ -18,7 +18,7 @@ import unittest
 from uuid import uuid4
 
 from six import StringIO
-from wsgi_intercept.interceptor import Httplib2Interceptor
+from wsgi_intercept.interceptor import Urllib3Interceptor
 
 from gabbi import driver
 from gabbi import handlers
@@ -36,7 +36,7 @@ class RunnerTest(unittest.TestCase):
         host, port = (str(uuid4()), 8000)
         self.host = host
         self.port = port
-        self.server = lambda: Httplib2Interceptor(SimpleWsgi, host, port, '')
+        self.server = lambda: Urllib3Interceptor(SimpleWsgi, host, port, '')
 
         self._stdin = sys.stdin
 
@@ -73,7 +73,7 @@ class RunnerTest(unittest.TestCase):
                 self.assertSuccess(err)
 
     def test_target_url_parsing_standard_port(self):
-        self.server = lambda: Httplib2Interceptor(
+        self.server = lambda: Urllib3Interceptor(
             SimpleWsgi, self.host, 80, '')
         sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
 

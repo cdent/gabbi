@@ -14,7 +14,7 @@
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
-made using httplib2. Assertions are made against the reponse.
+made using urllib3. Assertions are made against the reponse.
 """
 
 from collections import OrderedDict
@@ -284,7 +284,7 @@ class HTTPTestCase(unittest.TestCase):
         return re.sub(self._replacer_regex('RESPONSE'),
                       self._json_replacer, message)
 
-    def _run_request(self, url, method, headers, body):
+    def _run_request(self, url, method, headers, body, redirect=False):
         """Run the http request and decode output.
 
         The call to make the request will catch a WSGIAppError from
@@ -293,14 +293,15 @@ class HTTPTestCase(unittest.TestCase):
         """
 
         if 'user-agent' not in (key.lower() for key in headers):
-            headers['user-agent'] = "gabbi/%s (Python httplib2)" % __version__
+            headers['user-agent'] = "gabbi/%s (Python urllib3)" % __version__
 
         try:
             response, content = self.http.request(
                 url,
                 method=method,
                 headers=headers,
-                body=body
+                body=body,
+                redirect=redirect
             )
         except wsgi_intercept.WSGIAppError as exc:
             # Extract and re-raise the wrapped exception.
@@ -341,18 +342,14 @@ class HTTPTestCase(unittest.TestCase):
         else:
             body = ''
 
-        # Reset follow_redirects with every go.
-        self.http.follow_redirects = False
-        if test['redirects']:
-            self.http.follow_redirects = True
-
         if test['poll']:
             count = test['poll'].get('count', 1)
             delay = test['poll'].get('delay', 1)
             failure = None
             while count:
                 try:
-                    self._run_request(full_url, method, headers, body)
+                    self._run_request(full_url, method, headers, body,
+                                      redirect=test['redirects'])
                     self._assert_response()
                     failure = None
                     break
@@ -365,7 +362,8 @@ class HTTPTestCase(unittest.TestCase):
             if failure:
                 raise failure
         else:
-            self._run_request(full_url, method, headers, body)
+            self._run_request(full_url, method, headers, body,
+                              redirect=test['redirects'])
             self._assert_response()
 
     def _scheme_replace(self, message):

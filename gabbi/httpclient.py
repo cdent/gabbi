@@ -17,12 +17,33 @@ from __future__ import print_function
 import os
 import sys
 
-import httplib2
+import urllib3
 
 from gabbi import utils
 
 
-class VerboseHttp(httplib2.Http):
+class Http(urllib3.PoolManager):
+
+    def request(self, absolute_uri, method, body, headers, redirect):
+        if redirect:
+            retry = urllib3.util.Retry(raise_on_redirect=False, redirect=5)
+        else:
+            retry = urllib3.util.Retry(total=False, redirect=False)
+        response = super(Http, self).request(
+            method, absolute_uri, body=body, headers=headers, retries=retry)
+
+        # Transform response into something akin to httplib2
+        # response object.
+        content = response.data
+        status = response.status
+        reason = response.reason
+        headers = response.headers
+        headers['status'] = str(status)
+        headers['reason'] = reason
+        return headers, content
+
+
+class VerboseHttp(Http):
     """A subclass of Http that verbosely reports on activity.
 
     If the output is a tty or ``GABBI_FORCE_COLOR`` is set in the
@@ -43,7 +64,7 @@ class VerboseHttp(httplib2.Http):
     """
 
     # A list of request and response headers to never display.
-    # Can include httplib2 response object attributes that are not
+    # Can include response object attributes that are not
     # technically headers.
     HEADER_BLACKLIST = [
         'status',
@@ -68,28 +89,25 @@ class VerboseHttp(httplib2.Http):
             self.colorize = utils.get_colorizer(self._stream)
         super(VerboseHttp, self).__init__(**kwargs)
 
-    def _request(self, conn, host, absolute_uri, request_uri, method, body,
-                 headers, redirections, cachekey):
+    def request(self, absolute_uri, method, body, headers, redirect):
         """Display request parameters before requesting."""
 
         self._verbose_output('#### %s ####' % self.caption,
                              color=self.COLORMAP['caption'])
-        self._verbose_output('%s %s' % (method, request_uri),
+        self._verbose_output('%s %s' % (method, absolute_uri),
                              prefix=self.REQUEST_PREFIX,
                              color=self.COLORMAP['request'])
-        self._print_header("Host", host, prefix=self.REQUEST_PREFIX)
 
         self._print_headers(headers, prefix=self.REQUEST_PREFIX)
         self._print_body(headers, body)
 
-        (response, content) = httplib2.Http._request(
-            self, conn, host, absolute_uri, request_uri, method, body,
-            headers, redirections, cachekey
-        )
+        response, content = super(VerboseHttp, self).request(
+            absolute_uri, method, body, headers, redirect)
 
         # Blank line for division
         self._verbose_output('')
-        self._verbose_output('%s %s' % (response['status'], response.reason),
+        self._verbose_output('%s %s' % (response['status'],
+                                        response['reason']),
                              prefix=self.RESPONSE_PREFIX,
                              color=self.COLORMAP['status'])
         self._print_headers(response, prefix=self.RESPONSE_PREFIX)
@@ -144,4 +162,4 @@ def get_http(verbose=False, caption=''):
             body = False
         return VerboseHttp(body=body, headers=headers, colorize=colorize,
                            stream=stream, caption=caption)
-    return httplib2.Http()
+    return Http()

@@ -65,7 +65,7 @@ class GabbiSuite(suite.TestSuite):
         try:
             with fixture.nest([fix() for fix in fixtures]):
                 if intercept:
-                    with interceptor.Httplib2Interceptor(
+                    with interceptor.Urllib3Interceptor(
                             intercept, host, port, prefix):
                         result = super(GabbiSuite, self).run(result, debug)
                 else:
