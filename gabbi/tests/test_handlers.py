@@ -37,7 +37,7 @@ class HandlersTest(unittest.TestCase):
     def test_response_strings(self):
         handler = handlers.StringResponseHandler(self.test_class)
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbeta\n'
         self._assert_handler(handler)
@@ -45,7 +45,7 @@ class HandlersTest(unittest.TestCase):
     def test_response_strings_fail(self):
         handler = handlers.StringResponseHandler(self.test_class)
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbta\n'
         with self.assertRaises(AssertionError):
@@ -54,7 +54,7 @@ class HandlersTest(unittest.TestCase):
     def test_response_strings_fail_big_output(self):
         handler = handlers.StringResponseHandler(self.test_class)
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbta\n' * 1000
         with self.assertRaises(AssertionError) as cm:
@@ -67,13 +67,13 @@ class HandlersTest(unittest.TestCase):
         handler = handlers.StringResponseHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_strings': ['foobar']}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cw',
                          'location': 'barn'},
                         {'name': 'chris',
                          'location': 'house'}] * 100
         }
-        self.test.output = json.dumps(self.test.json_data)
+        self.test.output = json.dumps(self.test.response_data)
         with self.assertRaises(AssertionError) as cm:
             self._assert_handler(handler)
 
@@ -89,7 +89,7 @@ class HandlersTest(unittest.TestCase):
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -104,7 +104,7 @@ class HandlersTest(unittest.TestCase):
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cw',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -119,7 +119,7 @@ class HandlersTest(unittest.TestCase):
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
