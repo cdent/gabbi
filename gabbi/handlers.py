@@ -12,6 +12,10 @@
 # under the License.
 """Handlers for processing the body of a response in various ways."""
 
+import json
+
+from gabbi import json_parser
+
 
 class ResponseHandler(object):
     """Add functionality for making assertions about an HTTP response.
@@ -86,7 +90,7 @@ class StringResponseHandler(ResponseHandler):
 
 
 class JSONResponseHandler(ResponseHandler):
-    """Test for matching json paths in the json_data."""
+    """Test for matching json paths in the response_data."""
 
     test_key_suffix = 'json_paths'
     test_key_value = {}
@@ -99,12 +103,13 @@ class JSONResponseHandler(ResponseHandler):
         # Other handlers that want access to data structures will need
         # to do their own processing.
         try:
-            match = test.extract_json_path_value(test.json_data, path)
+            match = JSONHandler.extract_json_path_value(
+                test.response_data, path)
         except AttributeError:
             raise AssertionError('unable to extract JSON from test results')
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
-                                 (path, test.json_data))
+                                 (path, test.response_data))
         expected = test.replace_template(value)
         test.assertEqual(expected, match, 'Unable to match %s as %s, got %s'
                          % (path, expected, match))
@@ -158,3 +163,76 @@ class HeadersResponseHandler(ResponseHandler):
             test.assertEqual(header_value, response_value,
                              'Expect header %s with value %s, got %s' %
                              (header, header_value, response[header]))
+
+
+class ContentHandler(object):
+
+    @staticmethod
+    def accepts(content_type):
+        """Return True if this handler can handler this type."""
+        return False
+
+    @staticmethod
+    def gen_replacer(test):
+        """Return a function which does RESPONSE replacing."""
+        def replacer_func(match):
+            return match.group('arg')
+        return replacer_func
+
+    @staticmethod
+    def dumps(data, pretty=False):
+        """Return structured data as a string.
+
+        If pretty is true, prettify.
+        """
+        return data
+
+    @staticmethod
+    def loads(data):
+        """Create structured (Python) data from a stream."""
+        return data
+
+
+class JSONHandler(ContentHandler):
+
+    @staticmethod
+    def accepts(content_type):
+        content_type = content_type.split(';', 1)[0].strip()
+        return (content_type.endswith('+json') or
+                content_type.startswith('application/json'))
+
+    @classmethod
+    def gen_replacer(cls, test):
+        def replacer_func(match):
+            path = match.group('arg')
+            return str(cls.extract_json_path_value(
+                test.prior.response_data, path))
+        return replacer_func
+
+    @staticmethod
+    def dumps(data, pretty=False):
+        if pretty:
+            return json.dumps(data, indent=2, separators=(',', ': '))
+        else:
+            return json.dumps(data)
+
+    @staticmethod
+    def loads(data):
+        return json.loads(data)
+
+    @staticmethod
+    def extract_json_path_value(data, path):
+        """Extract the value at JSON Path path from the data.
+
+        The input data is a Python datastructure, not a JSON string.
+        """
+        path_expr = json_parser.parse(path)
+        matches = [match.value for match in path_expr.find(data)]
+        if matches:
+            if len(matches) > 1:
+                return matches
+            else:
+                return matches[0]
+        else:
+            raise ValueError(
+                "JSONPath '%s' failed to match on data: '%s'" % (path, data))

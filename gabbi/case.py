@@ -20,7 +20,6 @@ made using urllib3. Assertions are made against the reponse.
 from collections import OrderedDict
 import copy
 import functools
-import json
 import os
 import re
 import sys
@@ -33,8 +32,12 @@ from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
-from gabbi import json_parser
+from gabbi import handlers
 from gabbi import utils
+
+CONTENT_HANDLERS = [
+    handlers.JSONHandler,
+]
 
 
 MAX_CHARS_OUTPUT = 2000
@@ -132,6 +135,14 @@ class HTTPTestCase(unittest.TestCase):
             self.prior.run()
         self._run_test()
 
+    @staticmethod
+    def get_content_handler(content_type):
+        """Determine the content handler for this media type."""
+        for handler in CONTENT_HANDLERS:
+            if handler.accepts(content_type):
+                return handler
+        return None
+
     def replace_template(self, message):
         """Replace magic strings in message."""
         if isinstance(message, dict):
@@ -190,23 +201,6 @@ class HTTPTestCase(unittest.TestCase):
         environ_name = match.group('arg')
         return os.environ[environ_name]
 
-    @staticmethod
-    def extract_json_path_value(data, path):
-        """Extract the value at JSON Path path from the data.
-
-        The input data is a Python datastructure, not a JSON string.
-        """
-        path_expr = json_parser.parse(path)
-        matches = [match.value for match in path_expr.find(data)]
-        if matches:
-            if len(matches) > 1:
-                return matches
-            else:
-                return matches[0]
-        else:
-            raise ValueError(
-                "JSONPath '%s' failed to match on data: '%s'" % (path, data))
-
     def _headers_replace(self, message):
         """Replace a header indicator in a message with that headers value from
         the prior request.
@@ -218,11 +212,6 @@ class HTTPTestCase(unittest.TestCase):
         """Replace a regex match with the value of a prior header."""
         header_key = match.group('arg')
         return self.prior.response[header_key.lower()]
-
-    def _json_replacer(self, match):
-        """Replace a regex match with the value of a JSON Path."""
-        path = match.group('arg')
-        return str(self.extract_json_path_value(self.prior.json_data, path))
 
     def _location_replace(self, message):
         """Replace $LOCATION in a message.
@@ -280,9 +269,18 @@ class HTTPTestCase(unittest.TestCase):
         return r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
 
     def _response_replace(self, message):
-        """Replace a JSON Path from the prior request with a value."""
+        """Replace a content from the prior request with a value."""
+        replacer_class = self.get_content_handler(
+            self.prior.response.get('content-type'))
+        if replacer_class:
+            replacer_func = replacer_class.gen_replacer(self)
+        else:
+            # If no handler can be found use the null replacer,
+            # which returns "foo" when "$RESPONSE['foo']".
+            # TODO(cdent): Is this right? What's better?
+            replacer_func = handlers.ContentHandler.gen_replace(self)
         return re.sub(self._replacer_regex('RESPONSE'),
-                      self._json_replacer, message)
+                      replacer_func, message)
 
     def _run_request(self, url, method, headers, body, redirect=False):
         """Run the http request and decode output.
@@ -316,12 +314,12 @@ class HTTPTestCase(unittest.TestCase):
         # Decode and store response
         decoded_output = utils.decode_response_content(response, content)
         self.content_type = response.get('content-type', '').lower()
-        if (decoded_output and
-                ('application/json' in self.content_type or
-                 '+json' in self.content_type)):
-            self.json_data = json.loads(decoded_output)
+        loader_class = self.get_content_handler(self.content_type)
+        if decoded_output and loader_class:
+            # save structured response data
+            self.response_data = loader_class.loads(decoded_output)
         else:
-            self.json_data = None
+            self.response_data = None
         self.output = decoded_output
 
     def _run_test(self):
@@ -387,7 +385,12 @@ class HTTPTestCase(unittest.TestCase):
                 else:
                     return info
         else:
-            data = json.dumps(data)
+            dumper_class = self.get_content_handler(content_type)
+            if dumper_class:
+                data = dumper_class.dumps(data)
+            else:
+                raise ValueError(
+                    'unable to process data to %s' % content_type)
         return self.replace_template(data)
 
     def _test_status(self, expected_status, observed_status):
@@ -439,9 +442,13 @@ class HTTPTestCase(unittest.TestCase):
             if expected in iterable:
                 return
 
-            if self.json_data:
-                full_response = json.dumps(self.json_data, indent=2,
-                                           separators=(',', ': '))
+            if self.response_data:
+                dumper_class = self.get_content_handler(self.content_type)
+                if dumper_class:
+                    full_response = dumper_class.dumps(self.response_data,
+                                                       pretty=True)
+                else:
+                    full_response = self.output
             else:
                 full_response = self.output
 
