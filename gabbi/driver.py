@@ -40,11 +40,11 @@ from gabbi import httpclient
 from gabbi import suite as gabbi_suite
 
 
-RESPONSE_HANDLERS = [
+HANDLERS = [
     handlers.ForbiddenHeadersResponseHandler,
     handlers.HeadersResponseHandler,
     handlers.StringResponseHandler,
-    handlers.JSONResponseHandler,
+    handlers.JSONHandler,
 ]
 
 
@@ -186,7 +186,8 @@ class TestBuilder(type):
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
-                response_handlers=None, prefix=''):
+                response_handlers=None, content_handlers=None,
+                prefix=''):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -198,8 +199,10 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param intercept: WSGI app factory for wsgi-intercept.
     :param test_loader_name: Base name for test classes. Rarely used.
     :param fixture_module: Python module containing fixture classes.
-    :param response_handers: ResponseHandler classes.
+    :param response_handlers: ResponseHandler classes.
     :type response_handlers: List of ResponseHandler classes.
+    :param content_handlers: ContentHandler classes.
+    :type content_handlers: List of ContentHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -214,9 +217,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         test_loader_name = os.path.splitext(os.path.basename(
             test_loader_name[1]))[0]
 
-    # Initialize response handlers.
+    # Initialize response and content handlers. This is effectively
+    # duplication of effort but not results. This allows for
+    # backwards compatibility for existing callers.
     response_handlers = response_handlers or []
-    for handler in RESPONSE_HANDLERS + response_handlers:
+    content_handlers = content_handlers or []
+    for handler in content_handlers + response_handlers + HANDLERS:
         handler(case.HTTPTestCase)
 
     top_suite = suite.TestSuite()

@@ -37,7 +37,6 @@ class ResponseHandler(object):
     test_key_value = []
 
     def __init__(self, test_class):
-        self._key = 'response_%s' % self.test_key_suffix
         self._register(test_class)
 
     def __call__(self, test):
@@ -65,9 +64,14 @@ class ResponseHandler(object):
 
     def _register(self, test_class):
         """Register this handler on the provided test class."""
-        test_class.base_test[self._key] = self.test_key_value
-        if self not in test_class.response_handlers:
-            test_class.response_handlers.append(self)
+        if self.test_key_suffix:
+            self._key = 'response_%s' % self.test_key_suffix
+            test_class.base_test[self._key] = self.test_key_value
+            if self not in test_class.response_handlers:
+                test_class.response_handlers.append(self)
+        if hasattr(self, 'accepts'):
+            if self not in test_class.content_handlers:
+                test_class.content_handlers.append(self)
 
     def __eq__(self, other):
         if isinstance(other, ResponseHandler):
@@ -87,32 +91,6 @@ class StringResponseHandler(ResponseHandler):
     def action(self, test, expected, value=None):
         expected = test.replace_template(expected)
         test.assert_in_or_print_output(expected, test.output)
-
-
-class JSONResponseHandler(ResponseHandler):
-    """Test for matching json paths in the response_data."""
-
-    test_key_suffix = 'json_paths'
-    test_key_value = {}
-
-    def action(self, test, path, value=None):
-        """Test json_paths against json data."""
-        # NOTE: This process has some advantages over other process that
-        # might come along because the JSON data has already been
-        # processed (to provided for the magic template replacing).
-        # Other handlers that want access to data structures will need
-        # to do their own processing.
-        try:
-            match = JSONHandler.extract_json_path_value(
-                test.response_data, path)
-        except AttributeError:
-            raise AssertionError('unable to extract JSON from test results')
-        except ValueError:
-            raise AssertionError('json path %s cannot match %s' %
-                                 (path, test.response_data))
-        expected = test.replace_template(value)
-        test.assertEqual(expected, match, 'Unable to match %s as %s, got %s'
-                         % (path, expected, match))
 
 
 class ForbiddenHeadersResponseHandler(ResponseHandler):
@@ -166,6 +144,7 @@ class HeadersResponseHandler(ResponseHandler):
 
 
 class ContentHandler(object):
+    """A mixin for ResponseHandlers that add content handling."""
 
     @staticmethod
     def accepts(content_type):
@@ -193,7 +172,10 @@ class ContentHandler(object):
         return data
 
 
-class JSONHandler(ContentHandler):
+class JSONHandler(ResponseHandler, ContentHandler):
+
+    test_key_suffix = 'json_paths'
+    test_key_value = {}
 
     @staticmethod
     def accepts(content_type):
@@ -236,3 +218,22 @@ class JSONHandler(ContentHandler):
         else:
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
+
+    def action(self, test, path, value=None):
+        """Test json_paths against json data."""
+        # NOTE: This process has some advantages over other process that
+        # might come along because the JSON data has already been
+        # processed (to provided for the magic template replacing).
+        # Other handlers that want access to data structures will need
+        # to do their own processing.
+        try:
+            match = self.extract_json_path_value(
+                test.response_data, path)
+        except AttributeError:
+            raise AssertionError('unable to extract JSON from test results')
+        except ValueError:
+            raise AssertionError('json path %s cannot match %s' %
+                                 (path, test.response_data))
+        expected = test.replace_template(value)
+        test.assertEqual(expected, match, 'Unable to match %s as %s, got %s'
+                         % (path, expected, match))

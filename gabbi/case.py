@@ -35,10 +35,6 @@ from gabbi import __version__
 from gabbi import handlers
 from gabbi import utils
 
-CONTENT_HANDLERS = [
-    handlers.JSONHandler,
-]
-
 
 MAX_CHARS_OUTPUT = 2000
 
@@ -103,6 +99,7 @@ class HTTPTestCase(unittest.TestCase):
     """
 
     response_handlers = []
+    content_handlers = []
     base_test = copy.copy(BASE_TEST)
 
     def setUp(self):
@@ -135,10 +132,9 @@ class HTTPTestCase(unittest.TestCase):
             self.prior.run()
         self._run_test()
 
-    @staticmethod
-    def get_content_handler(content_type):
+    def get_content_handler(self, content_type):
         """Determine the content handler for this media type."""
-        for handler in CONTENT_HANDLERS:
+        for handler in self.content_handlers:
             if handler.accepts(content_type):
                 return handler
         return None

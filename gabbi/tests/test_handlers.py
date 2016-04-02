@@ -83,7 +83,7 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = handlers.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -98,7 +98,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_fail_data(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = handlers.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -114,7 +114,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_fail_path(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = handlers.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
