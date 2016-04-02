@@ -105,7 +105,11 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
+<<<<<<< e762f6cc473aa62be6e371593f35b8dfeca51a0a
         handler = jsonhandler.JSONHandler()
+=======
+        handler = jsonhandler.JSONHandler(self.test_class)
+>>>>>>> Move the handlers into their own dir
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
