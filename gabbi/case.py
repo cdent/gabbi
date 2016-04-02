@@ -36,10 +36,6 @@ from gabbi import __version__
 from gabbi.handlers import base
 from gabbi import utils
 
-CONTENT_HANDLERS = [
-    handlers.JSONHandler,
-]
-
 
 MAX_CHARS_OUTPUT = 2000
 
