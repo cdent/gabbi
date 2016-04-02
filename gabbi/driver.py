@@ -36,6 +36,7 @@ import yaml
 
 from gabbi import case
 from gabbi import handlers
+from gabbi.handlers import jsonhandler
 from gabbi import httpclient
 from gabbi import suite as gabbi_suite
 
@@ -44,7 +45,7 @@ HANDLERS = [
     handlers.ForbiddenHeadersResponseHandler,
     handlers.HeadersResponseHandler,
     handlers.StringResponseHandler,
-    handlers.JSONHandler,
+    jsonhandler.JSONHandler,
 ]
 
 

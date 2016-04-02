@@ -19,6 +19,7 @@ import unittest
 from gabbi import case
 from gabbi import driver
 from gabbi import handlers
+from gabbi.handlers import jsonhandler
 
 
 class HandlersTest(unittest.TestCase):
@@ -83,7 +84,7 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
-        handler = handlers.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -98,7 +99,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_fail_data(self):
-        handler = handlers.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -114,7 +115,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_fail_path(self):
-        handler = handlers.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
