@@ -110,7 +110,7 @@ def run():
     for import_path in (args.response_handlers or []):
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
-    for handler in driver.RESPONSE_HANDLERS + custom_response_handlers:
+    for handler in custom_response_handlers + driver.HANDLERS:
         handler(case.HTTPTestCase)
 
     data = yaml.safe_load(sys.stdin.read())
