@@ -76,6 +76,12 @@ class SimpleWsgi(object):
                         query_data.update(body_data)
                     else:
                         query_data = body_data
+                if content_type_header == 'application/x-www-form-urlencoded':
+                    body_data = urlparse.parse_qs(body.decode('utf-8'))
+                    if query_data:
+                        query_data.update(body_data)
+                    else:
+                        query_data = body_data
             headers.append(('Location', full_request_url))
 
         if path_info == '/presenter':

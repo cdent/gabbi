@@ -1,0 +1,38 @@
+# Test the HTML content handler
+
+
+tests:
+
+- name: send form data
+  POST: /
+  request_headers:
+    content-type: application/x-www-form-urlencoded
+  data:
+    alpha: 1
+    beta: 2
+    livestock:
+      - cow
+      - horse
+  # form data becomes query data becomes json in response
+  response_json_paths:
+    $.alpha[0]: '1'
+    $.beta[0]: '2'
+    $.livestock.`sorted`: ['cow', 'horse']
+    
+- name: parse html
+  GET: /presenter
+  response_html:
+    h1: Hello World
+    title: Hello World
+    p: lorem ipsum dolor sit amet
+
+- name: response handle html
+  desc: replacers do not work on posted form data because of scoping and escaping
+  xfail: True
+  POST: /
+  request_headers:
+    content-type: application/x-www-form-urlencoded
+  data:
+    foobar: $RESPONSE['h1']
+  response_json_paths:
+    $.foobar[0]: Hello World

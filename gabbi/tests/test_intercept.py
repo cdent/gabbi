@@ -22,6 +22,7 @@ import sys
 from gabbi import driver
 from gabbi import fixture
 from gabbi import handlers
+from gabbi.tests import html_content_handler
 from gabbi.tests import simple_wsgi
 
 
@@ -71,4 +72,6 @@ def load_tests(loader, tests, pattern):
                               intercept=simple_wsgi.SimpleWsgi,
                               prefix=prefix,
                               fixture_module=sys.modules[__name__],
-                              response_handlers=[TestResponseHandler])
+                              response_handlers=[TestResponseHandler],
+                              content_handlers=[
+                                  html_content_handler.HTMLHandler])

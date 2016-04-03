@@ -93,7 +93,7 @@ class ConciseTestResult(TextTestResult):
         for test, err in errors:
             # err[0] is the type of exception
             # err[1] is the args of the exception
-            # err[3] is the traceback, not currently used
+            # err[2] is the traceback, not currently used
             self.stream.writeln('%s: %s' % (flavor, self.getDescription(test)))
             message = str(err[1])
             for line in message.splitlines():

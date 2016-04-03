@@ -15,6 +15,7 @@
 import os
 import unittest
 
+from gabbi import case
 from gabbi import driver
 
 
@@ -26,6 +27,10 @@ class DriverTest(unittest.TestCase):
     def setUp(self):
         super(DriverTest, self).setUp()
         self.loader = unittest.defaultTestLoader
+        # clean base_test response and content handlers
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.content_handlers = []
+        case.HTTPTestCase.base_test = case.BASE_TEST
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
 
     def test_driver_loads_two_tests(self):
