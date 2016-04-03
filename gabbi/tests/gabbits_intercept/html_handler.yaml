@@ -18,7 +18,7 @@ tests:
     $.alpha[0]: '1'
     $.beta[0]: '2'
     $.livestock.`sorted`: ['cow', 'horse']
-    
+
 - name: parse html
   GET: /presenter
   response_html:

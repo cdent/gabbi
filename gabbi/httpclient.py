@@ -22,6 +22,11 @@ import urllib3
 from gabbi import utils
 
 
+# Disable SSL warnings otherwise tests which process stderr will get
+# extra information.
+urllib3.disable_warnings()
+
+
 class Http(urllib3.PoolManager):
 
     def request(self, absolute_uri, method, body, headers, redirect):

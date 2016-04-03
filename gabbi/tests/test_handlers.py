@@ -32,13 +32,13 @@ class HandlersTest(unittest.TestCase):
 
     def setUp(self):
         super(HandlersTest, self).setUp()
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {}})
+
+    def tearDown(self):
+        case.HTTPTestCase.reset_handlers()
 
     def test_response_strings(self):
         handler = handlers.StringResponseHandler(self.test_class)
@@ -71,6 +71,8 @@ class HandlersTest(unittest.TestCase):
 
     def test_response_strings_fail_big_payload(self):
         handler = handlers.StringResponseHandler(self.test_class)
+        # Register the JSON handler so response_data is set.
+        jsonhandler.JSONHandler(self.test_class)
         self.test.content_type = "application/json"
         self.test.test_data = {'response_strings': ['foobar']}
         self.test.response_data = {
@@ -201,15 +203,15 @@ class TestHTMLContentHandler(unittest.TestCase):
 
     def setUp(self):
         super(TestHTMLContentHandler, self).setUp()
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {}})
         self.handler_class = html_content_handler.HTMLHandler
         self.handler = self.handler_class(self.test_class)
+
+    def tearDown(self):
+        case.HTTPTestCase.reset_handlers()
 
     def test_data(self):
         form_data = dict(name='foo', cat='thom', choices=['alpha', 'beta'])

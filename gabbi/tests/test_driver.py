@@ -26,12 +26,12 @@ class DriverTest(unittest.TestCase):
 
     def setUp(self):
         super(DriverTest, self).setUp()
+        case.HTTPTestCase.save_handlers()
         self.loader = unittest.defaultTestLoader
-        # clean base_test response and content handlers
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
+
+    def tearDown(self):
+        case.HTTPTestCase.reset_handlers()
 
     def test_driver_loads_two_tests(self):
         suite = driver.build_tests(self.test_dir, self.loader,

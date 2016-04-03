@@ -31,11 +31,7 @@ class RunnerTest(unittest.TestCase):
 
     def setUp(self):
         super(RunnerTest, self).setUp()
-
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
 
         # NB: random host ensures that we're not accidentally connecting to an
         #     actual server
@@ -60,6 +56,7 @@ class RunnerTest(unittest.TestCase):
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
+        case.HTTPTestCase.reset_handlers()
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
