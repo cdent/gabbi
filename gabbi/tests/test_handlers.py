@@ -20,6 +20,7 @@ from gabbi import case
 from gabbi.handlers import core
 from gabbi.handlers import jsonhandler
 from gabbi import suitemaker
+from gabbi.tests import html_content_handler
 
 
 class HandlersTest(unittest.TestCase):
@@ -31,6 +32,10 @@ class HandlersTest(unittest.TestCase):
 
     def setUp(self):
         super(HandlersTest, self).setUp()
+        # clear handlers before each test run
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.content_handlers = []
+        case.HTTPTestCase.base_test = case.BASE_TEST
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
                                            {'test_data': {},
@@ -105,11 +110,7 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
-<<<<<<< e762f6cc473aa62be6e371593f35b8dfeca51a0a
         handler = jsonhandler.JSONHandler()
-=======
-        handler = jsonhandler.JSONHandler(self.test_class)
->>>>>>> Move the handlers into their own dir
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -215,3 +216,32 @@ class HandlersTest(unittest.TestCase):
         # method and then run its tests to confirm.
         test = self.test('test_request')
         handler(test)
+
+
+class TestHTMLContentHandler(unittest.TestCase):
+
+    def setUp(self):
+        super(TestHTMLContentHandler, self).setUp()
+        # clear handlers before each test run
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.content_handlers = []
+        case.HTTPTestCase.base_test = case.BASE_TEST
+        self.test_class = case.HTTPTestCase
+        self.test = driver.TestBuilder('mytest', (self.test_class,),
+                                       {'test_data': {}})
+        self.handler_class = html_content_handler.HTMLHandler
+        self.handler = self.handler_class()
+
+    def test_data(self):
+        form_data = dict(name='foo', cat='thom', choices=['alpha', 'beta'])
+        form_string = self.handler_class.dumps(form_data)
+        self.assertIn('cat=thom', form_string)
+        self.assertIn('choices=alpha', form_string)
+        self.assertIn('choices=beta', form_string)
+        self.assertIn('name=foo', form_string)
+
+    def test_loads(self):
+        self.test.output = '<html><body><h1>Hi</h1></html>'
+        response_data = self.handler_class.loads(self.test.output)
+        node = response_data.cssselect('h1')
+        self.assertEqual('Hi', node[0].text)

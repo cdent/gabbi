@@ -1,4 +1,6 @@
 mock
+cssselect
+lxml
 testrepository
 coverage
 hacking
