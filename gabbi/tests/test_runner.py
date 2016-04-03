@@ -32,11 +32,7 @@ class RunnerTest(unittest.TestCase):
 
     def setUp(self):
         super(RunnerTest, self).setUp()
-
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
 
         # NB: random host ensures that we're not accidentally connecting to an
         #     actual server

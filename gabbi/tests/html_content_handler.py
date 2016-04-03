@@ -20,8 +20,7 @@ from gabbi import handlers
 
 
 def _parse_selector(selector):
-    """
-    extracts attribute name from selector, if any
+    """extracts attribute name from selector, if any
 
     attributes are appended with `@<name>` (e.g. `a@href`)
     """
@@ -52,38 +51,47 @@ class HTMLHandler(handlers.ResponseHandler, handlers.ContentHandler):
 
     def action(self, test, item, value):
         # TODO(FND): There's no template handling in this.
-        try: # count
+        try:  # count
             count = int(value)
-        except ValueError: # content
+        except ValueError:  # content
             count = None
 
         selector, attribute = _parse_selector(item)
         nodes = test.response_data.cssselect(selector)
         node_count = len(nodes)
         if count is not None:
-            test.assertEqual(node_count, count,
-                    "expected %d elements matching '%s', found %d" % (count,
-                            selector, node_count))
-            if attribute: # XXX: this is the same as using an attribute selector!?
+            test.assertEqual(
+                node_count, count,
+                "expected %d elements matching '%s', found %d" %
+                (count, selector, node_count))
+            # XXX: this is the same as using an attribute selector!?
+            if attribute:
                 for i, node in enumerate(nodes):
-                    test.assertTrue(attribute in node.attrib,
-                            "missing attribute '%s' on element #%d matching '%s'" %
-                                    (attribute, i + 1, selector))
+                    test.assertTrue(
+                        attribute in node.attrib,
+                        "missing attribute '%s' on element #%d matching '%s'" %
+                        (attribute, i + 1, selector))
         else:
-            test.assertNotEqual(node_count, 0, "no element matching '%s'" % selector)
-            test.assertEqual(node_count, 1,
-                    "'%s' content check must not target more than a single element" %
-                            selector)
+            test.assertNotEqual(
+                node_count, 0, "no element matching '%s'" % selector)
+            test.assertEqual(
+                node_count, 1,
+                "'%s' content check must not target more than a "
+                "single element" %
+                selector)
             node = nodes[0]
             if attribute:
                 actual = node.attrib[attribute]
-                test.assertEqual(actual, value,
-                        "unexpected value for attribute '%s' on element matching '%s'" %
-                                (attribute, selector))
+                test.assertEqual(
+                    actual, value,
+                    "unexpected value for attribute '%s' on element "
+                    "matching '%s'" %
+                    (attribute, selector))
             else:
                 actual = node.text.strip()
-                test.assertEqual(actual, value, 'Unable to match %s as %s, got %s'
-                         % (selector, actual, value))
+                test.assertEqual(
+                    actual, value, 'Unable to match %s as %s, got %s'
+                    % (selector, actual, value))
 
     @classmethod
     def gen_replacer(cls, test):
@@ -96,16 +104,18 @@ class HTMLHandler(handlers.ResponseHandler, handlers.ContentHandler):
             if node_count == 0:
                 raise ValueError("no matching elements for '%s'" % selector)
             elif node_count > 1:
-                raise ValueError("more than one matching element for '%s'" % selector)
+                raise ValueError(
+                    "more than one matching element for '%s'" % selector)
             node = nodes[0]
 
             if attribute:
                 try:
                     return node.attrib[attribute]
-                    # TODO: take `<base>` into account for relative URIs
+                    # TODO(FND): take `<base>` into account for relative URIs
                 except KeyError:
-                    raise ValueError("missing attribute '%s' on element matching '%s'" %
-                            (attribute, selector))
+                    raise ValueError(
+                        "missing attribute '%s' on element matching '%s'" %
+                        (attribute, selector))
             else:
                 return node.text
         return replace_func
@@ -115,7 +125,7 @@ class HTMLHandler(handlers.ResponseHandler, handlers.ContentHandler):
         """Turn dict into urlencoded form."""
         # TODO(FND): Because of the escaping that happens here, and
         # the way in which urlencode is overzealous, the $RESPONSE
-        # handling can't be done with the output from this. It could 
+        # handling can't be done with the output from this. It could
         # be possible to replicate what is done in gabbi.case to
         # process query strings, but we don't have access to the
         # methods here because we just have data, not the test

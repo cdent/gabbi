@@ -102,6 +102,27 @@ class HTTPTestCase(unittest.TestCase):
     """
 
     base_test = copy.copy(BASE_TEST)
+    saved_base_test = copy.copy(BASE_TEST)
+
+    @classmethod
+    def save_handlers(cls):
+        """In some testing situations these values need to be reset."""
+        cls.saved_response_handlers = cls.response_handlers
+        cls.saved_content_handlers = cls.content_handlers
+        cls.saved_base_test = copy.deepcopy(cls.base_test)
+        cls.reset_handlers(empty=True)
+
+    @classmethod
+    def reset_handlers(cls, empty=False):
+        """In some testing situations these values need to be reset."""
+        if empty:
+            cls.response_handlers = []
+            cls.content_handlers = []
+            cls.base_test = copy.deepcopy(BASE_TEST)
+        else:
+            cls.response_handlers = cls.saved_response_handlers
+            cls.content_handlers = cls.saved_content_handlers
+            cls.base_test = copy.deepcopy(cls.saved_base_test)
 
     def setUp(self):
         if not self.has_run:

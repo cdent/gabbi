@@ -32,10 +32,7 @@ class HandlersTest(unittest.TestCase):
 
     def setUp(self):
         super(HandlersTest, self).setUp()
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
                                            {'test_data': {},
@@ -56,6 +53,9 @@ class HandlersTest(unittest.TestCase):
         url = self.test('test_request').replace_template(
             self.test.test_data['url'])
         self.assertEqual('barnabas', url)
+
+    def tearDown(self):
+        case.HTTPTestCase.reset_handlers()
 
     def test_response_strings(self):
         handler = core.StringResponseHandler()
@@ -222,15 +222,15 @@ class TestHTMLContentHandler(unittest.TestCase):
 
     def setUp(self):
         super(TestHTMLContentHandler, self).setUp()
-        # clear handlers before each test run
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.content_handlers = []
-        case.HTTPTestCase.base_test = case.BASE_TEST
+        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {}})
         self.handler_class = html_content_handler.HTMLHandler
         self.handler = self.handler_class()
+
+    def tearDown(self):
+        case.HTTPTestCase.reset_handlers()
 
     def test_data(self):
         form_data = dict(name='foo', cat='thom', choices=['alpha', 'beta'])
