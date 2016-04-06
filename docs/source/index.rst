@@ -30,7 +30,7 @@ Initiative" or "Glorious And Basic Beta Investigator". These
 are not good enough so the search continues.
 
 Tests can be run using :ref:`unittest <test_loaders>` style test
-runners or from the command line with a :doc:`gabbi-run <runner>` script.
+runners or py.test or from the command line with a :doc:`gabbi-run <runner>` script.
 
 If you want to get straight to creating tests look at
 :doc:`example`, the test files in the `source distribution`_
