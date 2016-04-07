@@ -14,20 +14,23 @@ harness.
 Loader
 ------
 
-Test Loader
-~~~~~~~~~~~
+To run the tests they must be generated in some fashion and then
+run. This is accomplished by a test loader. Initially gabbi only
+supported those test harnesses that supported the ``load_tests``
+protocol in UnitTest. It now possible to also build and run tests
+with pytest_ with some limitations described below.
 
-To run those tests a test loader is required. That would look a
-bit like this:
+UnitTest Style Loader
+~~~~~~~~~~~~~~~~~~~~~
+
+To run the tests with a ``load_tests`` style loader a test file containing
+a ``load_tests`` method is required. That will look a bit like:
 
 .. literalinclude:: example.py
    :language: python
 
 For details on the arguments available when building tests see
 :meth:`~gabbi.driver.build_tests`.
-
-Run Test Loader
-~~~~~~~~~~~~~~~
 
 Once the test loader has been created, it needs to be run. There are *many*
 options. Which is appropriate depends very much on your environment. Here are
@@ -54,5 +57,27 @@ See the `source distribution`_ and `the tutorial repo`_ for more
 advanced options, including using ``testrepository`` and
 ``subunit``.
 
+pytest
+~~~~~~
+
+Since pytest does not support the ``load_tests`` system, a different
+way of generating tests is required. A test file must be created
+that calls :meth:`~gabbi.driver.py_test_generator` and yields the
+generated tests. That will look a bit like this:
+
+.. literalinclude:: pytest-example.py
+   :language: python
+
+This can then be run with the usual pytest commands. For example::
+
+   py.test -svx pytest-example.py
+
+.. warning:: When using the unittest runners, it is possible to select
+             just one test from a YAML file and cause it and all its
+             prior tests to run. This **does not** work when using
+             pytest. It will traverse the prior tests and then exit
+             after the first one has run. Fixing this is desirable.
+
 .. _source distribution: https://github.com/cdent/gabbi
 .. _the tutorial repo: https://github.com/cdent/gabbi-demo
+.. _pytest: http://pytest.org/

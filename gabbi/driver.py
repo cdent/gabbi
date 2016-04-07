@@ -28,6 +28,7 @@ import glob
 import inspect
 import io
 import os
+import unittest
 from unittest import suite
 import uuid
 
@@ -231,6 +232,30 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                                           intercept, prefix)
         top_suite.addTest(file_suite)
     return top_suite
+
+
+def py_test_generator(test_dir, host=None, port=8001, intercept=None,
+                      prefix=None, test_loader_name=None,
+                      fixture_module=None, response_handlers=None):
+    """Generate tests cases for py.test
+
+    This uses build_tests to create TestCases and then yields them in
+    a way that pytest can handle.
+    """
+    loader = unittest.TestLoader()
+    tests = build_tests(test_dir, loader, host=host, port=port,
+                        intercept=intercept,
+                        test_loader_name=test_loader_name,
+                        fixture_module=fixture_module,
+                        response_handlers=response_handlers,
+                        prefix=prefix)
+
+    for test in tests:
+        if hasattr(test, '_tests'):
+            for subtest in test._tests:
+                yield '%s' % subtest.__class__.__name__, subtest
+        else:
+            yield '%s' % test.__class__.__name__, test
 
 
 def load_yaml(yaml_file):

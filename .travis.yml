@@ -16,6 +16,8 @@ env:
       - TOXENV=py35-failskip
       - TOXENV=py35-limit
       - TOXENV=py35-prefix
+      - TOXENV=py27-pytest
+      - TOXENV=py35-pytest
 
 notifications:
       irc: "chat.freenode.net#gabbi"
