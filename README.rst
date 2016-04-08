@@ -14,8 +14,8 @@ more details on features and formats.
 Gabbi is tested with Python 2.7, 3.4, 3.5 and pypy.
 
 Tests can be run using `unittest`_ style test runners, `pytest`_ (with
-one limitation described in the docs) or from the command line with
-a `gabbi-run`_ script.
+one limitation described in the `loader docs`_) or from the command line
+with a `gabbi-run`_ script.
 
 There is a `gabbi-demo`_ repository which provides a tutorial via
 its commit history. The demo builds a simple API using gabbi to
@@ -25,6 +25,7 @@ facilitate test driven development.
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
 .. _unittest: https://gabbi.readthedocs.org/en/latest/example.html#loader
 .. _pytest: http://pytest.org/
+.. _loader docs: https://gabbi.readthedocs.org/en/latest/example.html#pytest 
 .. _gabbi-run: https://gabbi.readthedocs.org/en/latest/runner.html
 
 Purpose
