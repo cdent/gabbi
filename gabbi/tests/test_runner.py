@@ -20,7 +20,6 @@ from uuid import uuid4
 from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
 
-from gabbi import case
 from gabbi import driver
 from gabbi import handlers
 from gabbi import runner
@@ -31,7 +30,6 @@ class RunnerTest(unittest.TestCase):
 
     def setUp(self):
         super(RunnerTest, self).setUp()
-        case.HTTPTestCase.save_handlers()
 
         # NB: random host ensures that we're not accidentally connecting to an
         #     actual server
@@ -56,7 +54,6 @@ class RunnerTest(unittest.TestCase):
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
-        case.HTTPTestCase.reset_handlers()
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]

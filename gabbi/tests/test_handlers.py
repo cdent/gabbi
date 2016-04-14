@@ -32,16 +32,13 @@ class HandlersTest(unittest.TestCase):
 
     def setUp(self):
         super(HandlersTest, self).setUp()
-        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
-                                       {'test_data': {}})
-
-    def tearDown(self):
-        case.HTTPTestCase.reset_handlers()
+                                       {'test_data': {},
+                                        'content_handlers': []})
 
     def test_response_strings(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = handlers.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -49,7 +46,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_strings_fail(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = handlers.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -58,7 +55,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_strings_fail_big_output(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = handlers.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -70,9 +67,11 @@ class HandlersTest(unittest.TestCase):
         self.assertEqual(2036, len(msg))
 
     def test_response_strings_fail_big_payload(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        string_handler = handlers.StringResponseHandler()
         # Register the JSON handler so response_data is set.
-        jsonhandler.JSONHandler(self.test_class)
+        json_handler = jsonhandler.JSONHandler()
+        self.test.response_handlers = [string_handler, json_handler]
+        self.test.content_handlers = [json_handler]
         self.test.content_type = "application/json"
         self.test.test_data = {'response_strings': ['foobar']}
         self.test.response_data = {
@@ -83,7 +82,7 @@ class HandlersTest(unittest.TestCase):
         }
         self.test.output = json.dumps(self.test.response_data)
         with self.assertRaises(AssertionError) as cm:
-            self._assert_handler(handler)
+            self._assert_handler(string_handler)
 
         msg = str(cm.exception)
         self.assertEqual(2038, len(msg))
@@ -91,7 +90,7 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
-        handler = jsonhandler.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -106,7 +105,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_fail_data(self):
-        handler = jsonhandler.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
@@ -122,7 +121,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_fail_path(self):
-        handler = jsonhandler.JSONHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
@@ -137,7 +136,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_headers(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = handlers.HeadersResponseHandler()
         self.test.response = {'content-type': 'text/plain'}
 
         self.test.test_data = {'response_headers': {
@@ -151,7 +150,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_regex(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = handlers.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': '/text/plain/',
         }}
@@ -159,7 +158,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_fail_data(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = handlers.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': 'text/plain',
         }}
@@ -171,7 +170,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_response_headers_fail_header(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = handlers.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'location': '/somewhere',
         }}
@@ -182,7 +181,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_resonse_headers_stringify(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = handlers.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'x-alpha-beta': 2.0,
         }}
@@ -203,15 +202,11 @@ class TestHTMLContentHandler(unittest.TestCase):
 
     def setUp(self):
         super(TestHTMLContentHandler, self).setUp()
-        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {}})
         self.handler_class = html_content_handler.HTMLHandler
-        self.handler = self.handler_class(self.test_class)
-
-    def tearDown(self):
-        case.HTTPTestCase.reset_handlers()
+        self.handler = self.handler_class()
 
     def test_data(self):
         form_data = dict(name='foo', cat='thom', choices=['alpha', 'beta'])

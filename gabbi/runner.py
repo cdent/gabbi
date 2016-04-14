@@ -21,7 +21,6 @@ from importlib import import_module
 
 from six.moves.urllib import parse as urlparse
 
-from gabbi import case
 from gabbi import driver
 from gabbi.reporter import ConciseTestRunner
 
@@ -107,17 +106,19 @@ def run():
 
     # Initialize response handlers.
     custom_response_handlers = []
+    handler_objects = []
     for import_path in (args.response_handlers or []):
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
     for handler in custom_response_handlers + driver.HANDLERS:
-        handler(case.HTTPTestCase)
+        handler_objects.append(handler())
 
     data = yaml.safe_load(sys.stdin.read())
     loader = unittest.defaultTestLoader
     suite = driver.test_suite_from_dict(loader, 'input', data, '.',
                                         host, port, None, None,
-                                        prefix=prefix)
+                                        prefix=prefix,
+                                        handlers=handler_objects)
     result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
     sys.exit(not result.wasSuccessful())
 
