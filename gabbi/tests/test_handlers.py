@@ -32,7 +32,6 @@ class HandlersTest(unittest.TestCase):
 
     def setUp(self):
         super(HandlersTest, self).setUp()
-        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
                                            {'test_data': {},
@@ -222,7 +221,6 @@ class TestHTMLContentHandler(unittest.TestCase):
 
     def setUp(self):
         super(TestHTMLContentHandler, self).setUp()
-        case.HTTPTestCase.save_handlers()
         self.test_class = case.HTTPTestCase
         self.test = driver.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {}})

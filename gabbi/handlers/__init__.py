@@ -32,8 +32,8 @@ class ResponseHandler(object):
     test_key_suffix = ''
     test_key_value = []
 
-    def __init__(self, test_class):
-        self._register(test_class)
+    def __init__(self):
+        self._register()
 
     def __call__(self, test):
         if test.test_data[self._key]:
@@ -58,16 +58,16 @@ class ResponseHandler(object):
         """
         pass
 
-    def _register(self, test_class):
+    def _register(self):
         """Register this handler on the provided test class."""
+        self.response_handler = None
+        self.content_handler = None
         if self.test_key_suffix:
             self._key = 'response_%s' % self.test_key_suffix
-            test_class.base_test[self._key] = self.test_key_value
-            if self not in test_class.response_handlers:
-                test_class.response_handlers.append(self)
+            self.test_base = {self._key: self.test_key_value}
+            self.response_handler = self
         if hasattr(self, 'accepts'):
-            if self not in test_class.content_handlers:
-                test_class.content_handlers.append(self)
+            self.content_handler = self
 
     def __eq__(self, other):
         if isinstance(other, ResponseHandler):

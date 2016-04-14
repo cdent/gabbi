@@ -32,7 +32,6 @@ class RunnerTest(unittest.TestCase):
 
     def setUp(self):
         super(RunnerTest, self).setUp()
-        case.HTTPTestCase.save_handlers()
 
         # NB: random host ensures that we're not accidentally connecting to an
         #     actual server
