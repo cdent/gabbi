@@ -98,8 +98,6 @@ class HTTPTestCase(unittest.TestCase):
     tearDown are only run once.
     """
 
-    response_handlers = []
-    content_handlers = []
     base_test = copy.copy(BASE_TEST)
 
     def setUp(self):

@@ -67,7 +67,8 @@ class TestMaker(object):
     """
 
     def __init__(self, test_base_name, test_defaults, test_directory,
-                 fixture_classes, loader, host, port, intercept, prefix):
+                 fixture_classes, loader, host, port, intercept, prefix,
+                 response_handlers, content_handlers):
         self.test_base_name = test_base_name
         self.test_defaults = test_defaults
         self.default_keys = set(test_defaults.keys())
@@ -78,6 +79,8 @@ class TestMaker(object):
         self.loader = loader
         self.intercept = intercept
         self.prefix = prefix
+        self.content_handlers = content_handlers
+        self.response_handlers = response_handlers
 
     def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
@@ -115,6 +118,8 @@ class TestMaker(object):
                              'http': http_class,
                              'host': self.host,
                              'intercept': self.intercept,
+                             'content_handlers': self.content_handlers,
+                             'response_handlers': self.response_handlers,
                              'port': self.port,
                              'prefix': self.prefix,
                              'prior': prior_test})
@@ -225,8 +230,9 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     # backwards compatibility for existing callers.
     response_handlers = response_handlers or []
     content_handlers = content_handlers or []
+    handler_objects = []
     for handler in content_handlers + response_handlers + HANDLERS:
-        handler(case.HTTPTestCase)
+        handler_objects.append(handler())
 
     top_suite = suite.TestSuite()
     for test_file in glob.iglob('%s/*.yaml' % path):
@@ -237,7 +243,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
             test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
         file_suite = test_suite_from_dict(loader, test_base_name, suite_dict,
                                           path, host, port, fixture_module,
-                                          intercept, prefix)
+                                          intercept, prefix,
+                                          handlers=handler_objects)
         top_suite.addTest(file_suite)
     return top_suite
 
@@ -289,7 +296,8 @@ def test_update(orig_dict, new_dict):
 
 
 def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
-                         host, port, fixture_module, intercept, prefix=''):
+                         host, port, fixture_module, intercept, prefix='',
+                         handlers=None):
     """Generate a TestSuite from YAML-sourced data."""
     try:
         test_data = suite_dict['tests']
@@ -301,8 +309,19 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
         # the original exception in favor of a generic error
         raise GabbiFormatError('malformed test file, invalid format')
 
+    handlers = handlers or []
+    response_handlers = []
+    content_handlers = []
+
     # Merge global with per-suite defaults
     default_test_dict = copy.deepcopy(case.HTTPTestCase.base_test)
+    for handler in handlers:
+        default_test_dict.update(handler.test_base)
+        if handler.response_handler:
+            response_handlers.append(handler.response_handler)
+        if handler.content_handler:
+            content_handlers.append(handler.content_handler)
+
     local_defaults = _validate_defaults(suite_dict.get('defaults', {}))
     test_update(default_test_dict, local_defaults)
 
@@ -315,7 +334,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix)
+                           prefix, response_handlers, content_handlers)
     file_suite = gabbi_suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:
