@@ -1,6 +1,7 @@
 pbr
 pytest
 six
+pytest
 PyYAML
 urllib3>=1.11.0
 jsonpath-rw-ext>=1.0.0
