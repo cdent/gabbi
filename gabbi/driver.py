@@ -38,6 +38,7 @@ import yaml
 from gabbi import case
 from gabbi import handlers
 from gabbi import httpclient
+from gabbi import reporter
 from gabbi import suite as gabbi_suite
 
 
@@ -243,6 +244,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
     a way that pytest can handle.
     """
     loader = unittest.TestLoader()
+    result = reporter.PyTestResult()
     tests = build_tests(test_dir, loader, host=host, port=port,
                         intercept=intercept,
                         test_loader_name=test_loader_name,
@@ -252,10 +254,12 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
 
     for test in tests:
         if hasattr(test, '_tests'):
-            for subtest in test._tests:
-                yield '%s' % subtest.__class__.__name__, subtest
-        else:
-            yield '%s' % test.__class__.__name__, test
+            # Establish fixtures as if they were tests.
+            yield 'start_%s' % test._tests[0].__class__.__name__, \
+                test.start, result
+            for subtest in test:
+                yield '%s' % subtest.__class__.__name__, subtest, result
+            yield 'stop_%s' % test._tests[0].__class__.__name__, test.stop
 
 
 def load_yaml(yaml_file):
