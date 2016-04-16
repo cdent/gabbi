@@ -72,14 +72,6 @@ This can then be run with the usual pytest commands. For example::
 
    py.test -svx pytest-example.py
 
-.. warning:: When using the unittest runners, it is possible to select
-             just one test from a YAML file and cause it and all its
-             prior tests to run, in order, starting with the first
-             one in the file and ending with the selected test. This
-             **does not** work when using pytest. The list of prior tests
-             will be traversed to find the first one, but only that first
-             test will be run.
-
 .. _source distribution: https://github.com/cdent/gabbi
 .. _the tutorial repo: https://github.com/cdent/gabbi-demo
 .. _pytest: http://pytest.org/
