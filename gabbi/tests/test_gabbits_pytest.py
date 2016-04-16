@@ -28,6 +28,7 @@ TESTS_DIR = 'gabbits_intercept'
 
 def test_from_build():
 
+    os.environ['GABBI_TEST_URL'] = 'takingnames'
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     test_generator = driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
