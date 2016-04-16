@@ -39,7 +39,7 @@ class GabbiSuite(suite.TestSuite):
     tests in this suite will be skipped.
     """
 
-    def run(self, result, debug=False, pytest=False):
+    def run(self, result, debug=False):
         """Override TestSuite run to start suite-level fixtures.
 
         To avoid exception confusion, use a null Fixture when there
