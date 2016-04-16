@@ -1,5 +1,4 @@
 mock
-pytest
 testrepository
 coverage
 hacking
