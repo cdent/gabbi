@@ -31,7 +31,7 @@ docs:
 	cd docs ; $(MAKE) html
 
 test:
-	tox
+	tox --skip-missing-interpreters
 
 dist: test
 	python setup.py sdist
