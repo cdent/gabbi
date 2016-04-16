@@ -24,7 +24,7 @@ facilitate test driven development.
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
 .. _unittest: https://gabbi.readthedocs.org/en/latest/example.html#loader
 .. _pytest: http://pytest.org/
-.. _loader docs: https://gabbi.readthedocs.org/en/latest/example.html#pytest 
+.. _loader docs: https://gabbi.readthedocs.org/en/latest/example.html#pytest
 .. _gabbi-run: https://gabbi.readthedocs.org/en/latest/runner.html
 
 Purpose

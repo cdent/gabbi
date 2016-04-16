@@ -6,7 +6,7 @@ optionally use one or more fixtures to provide the necessary
 environment for tests to run.
 
 Fixtures are implemented as nested context managers. Subclasses
-of :class:`~gabbi.fixture.GabbiFixture` must implement 
+of :class:`~gabbi.fixture.GabbiFixture` must implement
 ``start_fixture`` and ``stop_fixture`` methods for creating and
 destroying, respectively, any resources managed by the fixture.
 While the subclass may choose to implement ``__init__`` it is
