@@ -78,20 +78,26 @@ class ResponseHandler(object):
         return not self.__eq__(other)
 
 
-class ContentHandler(object):
-    """A mixin for ResponseHandlers that adds content handling."""
+class ContentHandler(ResponseHandler):
+    """A subclass of ResponseHandlers that adds content handling."""
 
     @staticmethod
     def accepts(content_type):
         """Return True if this handler can handler this type."""
         return False
 
-    @staticmethod
-    def gen_replacer(test):
+    @classmethod
+    def gen_replacer(cls, test):
         """Return a function which does RESPONSE replacing."""
         def replacer_func(match):
-            return match.group('arg')
+            path = match.group('arg')
+            return cls.replacer(test.prior.response_data, path)
         return replacer_func
+
+    @classmethod
+    def replacer(cls, response_data, path):
+        """Return the string the is replacing RESPONSE."""
+        return path
 
     @staticmethod
     def dumps(data, pretty=False):

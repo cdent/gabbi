@@ -18,8 +18,7 @@ from gabbi import handlers
 from gabbi import json_parser
 
 
-class JSONHandler(handlers.ResponseHandler,
-                  handlers.ContentHandler):
+class JSONHandler(handlers.ContentHandler):
 
     test_key_suffix = 'json_paths'
     test_key_value = {}
@@ -31,12 +30,8 @@ class JSONHandler(handlers.ResponseHandler,
                 content_type.startswith('application/json'))
 
     @classmethod
-    def gen_replacer(cls, test):
-        def replacer_func(match):
-            path = match.group('arg')
-            return str(cls.extract_json_path_value(
-                test.prior.response_data, path))
-        return replacer_func
+    def replacer(cls, response_data, match):
+        return str(cls.extract_json_path_value(response_data, match))
 
     @staticmethod
     def dumps(data, pretty=False):
