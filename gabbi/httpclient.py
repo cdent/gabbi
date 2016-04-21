@@ -68,6 +68,7 @@ class VerboseHttp(Http):
     # technically headers.
     HEADER_BLACKLIST = [
         'status',
+        'reason',
     ]
 
     REQUEST_PREFIX = '>'
