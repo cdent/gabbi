@@ -1,15 +1,22 @@
 .. image:: https://travis-ci.org/cdent/gabbi.svg?branch=master
     :target: https://travis-ci.org/cdent/gabbi
 .. image:: https://readthedocs.org/projects/gabbi/badge/?version=latest
-    :target: https://gabbi.readthedocs.org/en/latest/
+    :target: https://gabbi.readthedocs.io/en/latest/
     :alt: Documentation Status
 
 Gabbi
 =====
 
 Gabbi is a tool for running HTTP tests where requests and responses
-are represented in a declarative YAML-based form. See the docs_ for
-more details on features and formats.
+are represented in a declarative YAML-based form. The simplest test
+looks like this::
+
+    tests:
+    - name: A test
+      GET: /api/resources/id
+
+See the docs_ for more details on the many features and formats for
+setting request headers and bodies and evaluating responses.
 
 Gabbi is tested with Python 2.7, 3.4, 3.5 and pypy.
 
@@ -20,12 +27,12 @@ There is a `gabbi-demo`_ repository which provides a tutorial via
 its commit history. The demo builds a simple API using gabbi to
 facilitate test driven development.
 
-.. _docs: https://gabbi.readthedocs.org/
+.. _docs: https://gabbi.readthedocs.io/
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
-.. _unittest: https://gabbi.readthedocs.org/en/latest/example.html#loader
+.. _unittest: https://gabbi.readthedocs.io/en/latest/example.html#loader
 .. _pytest: http://pytest.org/
-.. _loader docs: https://gabbi.readthedocs.org/en/latest/example.html#pytest
-.. _gabbi-run: https://gabbi.readthedocs.org/en/latest/runner.html
+.. _loader docs: https://gabbi.readthedocs.io/en/latest/example.html#pytest
+.. _gabbi-run: https://gabbi.readthedocs.io/en/latest/runner.html
 
 Purpose
 -------
