@@ -1,0 +1,40 @@
+
+tests:
+- name: get a url the first time
+  GET: /3ADE1BBB
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB
+
+- name: get that same url again
+  GET: $LAST_URL
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB
+
+- name: get it a third time
+  GET: $LAST_URL
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB
+
+- name: add some query params
+  GET: $LAST_URL
+  query_parameters:
+      key1: value1
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
+
+- name: now last url has those query params
+  desc: IS THIS WHAT WE WANT?
+  GET: $LAST_URL
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
+
+- name: change parameters
+  xfail: True
+  desc: Because of the (desirable) way query_parameters works, this extends
+  GET: $LAST_URL
+  query_parameters:
+      key1: value2
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
+  # What we actually get is
+  #   x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1&key1=value2

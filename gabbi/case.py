@@ -44,6 +44,7 @@ REPLACERS = [
     'NETLOC',
     'ENVIRON',
     'LOCATION',
+    'LAST_URL',
     'HEADERS',
     'RESPONSE',
 ]
@@ -224,6 +225,13 @@ class HTTPTestCase(unittest.TestCase):
         path = match.group('arg')
         return str(self.extract_json_path_value(self.prior.json_data, path))
 
+    def _last_url_replace(self, message):
+        """Replace $LAST_URL in a message.
+
+        With the URL used in the prior request.
+        """
+        return message.replace('$LAST_URL', self.prior.url)
+
     def _location_replace(self, message):
         """Replace $LOCATION in a message.
 
@@ -312,6 +320,7 @@ class HTTPTestCase(unittest.TestCase):
         self.response = response
         if 'location' in response:
             self.location = response['location']
+        self.url = url
 
         # Decode and store response
         decoded_output = utils.decode_response_content(response, content)

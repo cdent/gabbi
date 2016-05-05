@@ -211,6 +211,9 @@ processed in the order given.
   string value of the environment variable is ``"True"`` or
   ``"False"`` then the resulting value will be the corresponding
   boolean, not a string.
+* ``$LAST_URL``: The URL used to make the prior request. Note that
+  this is the full URL including scheme and host and includes any
+  ``query_parameters`` that may have been used.
 * ``$LOCATION``: The location header returned in the prior response.
 * ``$HEADERS['<header>']``: The value of any header from the
   prior response.
