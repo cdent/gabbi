@@ -22,19 +22,14 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
 
-- name: now last url has those query params
-  desc: IS THIS WHAT WE WANT?
+- name: now last url does not have those query params
   GET: $LAST_URL
   response_headers:
-      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB
 
-- name: change parameters
-  xfail: True
-  desc: Because of the (desirable) way query_parameters works, this extends
+- name: last with adjusted parameters
   GET: $LAST_URL
   query_parameters:
       key1: value2
   response_headers:
-      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1
-  # What we actually get is
-  #   x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value1&key1=value2
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value2

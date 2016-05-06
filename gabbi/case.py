@@ -320,7 +320,6 @@ class HTTPTestCase(unittest.TestCase):
         self.response = response
         if 'location' in response:
             self.location = response['location']
-        self.url = url
 
         # Decode and store response
         decoded_output = utils.decode_response_content(response, content)
@@ -338,6 +337,8 @@ class HTTPTestCase(unittest.TestCase):
         test = self.test_data
 
         base_url = self.replace_template(test['url'])
+        # Save the URL after replacers but before query_parameters
+        self.url = base_url
         full_url = self._parse_url(base_url)
 
         method = test['method'].upper()
