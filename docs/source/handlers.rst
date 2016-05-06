@@ -48,6 +48,11 @@ of :class:`~gabbi.handlers.ContentHandler` to
                        intercept=simple_wsgi.SimpleWsgi,
                        content_handlers=[MyContentHandler])
 
+If pytest is being used::
+
+    driver.py_test_generator(test_dir, intercept=simple_wsgi.SimpleWsgi,
+                             content_handlers=[MyContenHandler])
+
 .. warning:: When there are multiple handlers listed that accept the
              same content-type, the one that is earliest in the list
              will be used.

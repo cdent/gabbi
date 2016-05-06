@@ -251,7 +251,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
-                      fixture_module=None, response_handlers=None):
+                      fixture_module=None, response_handlers=None,
+                      content_handlers=None):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -264,6 +265,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         test_loader_name=test_loader_name,
                         fixture_module=fixture_module,
                         response_handlers=response_handlers,
+                        content_handlers=content_handlers,
                         prefix=prefix)
 
     for test in tests:
