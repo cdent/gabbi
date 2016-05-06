@@ -36,6 +36,22 @@ class HandlersTest(unittest.TestCase):
                                        {'test_data': {},
                                         'content_handlers': []})
 
+    def test_empty_response_handler(self):
+        self.test.test_data = {'url': '$RESPONSE["barnabas"]'}
+        self.test.response = {'content-type': 'unmatchable'}
+        self.test.response_data = ''
+        self.test.prior = self.test
+
+        url = self.test('test_request').replace_template(
+            self.test.test_data['url'])
+        self.assertEqual('barnabas', url)
+
+        self.test.response_data = None
+        self.test.content_handlers = [jsonhandler.JSONHandler()]
+        url = self.test('test_request').replace_template(
+            self.test.test_data['url'])
+        self.assertEqual('barnabas', url)
+
     def test_response_strings(self):
         handler = handlers.StringResponseHandler()
         self.test.content_type = "text/plain"

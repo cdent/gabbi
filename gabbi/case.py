@@ -284,8 +284,7 @@ class HTTPTestCase(unittest.TestCase):
         else:
             # If no handler can be found use the null replacer,
             # which returns "foo" when "$RESPONSE['foo']".
-            # TODO(cdent): Is this right? What's better?
-            replacer_func = handlers.ContentHandler.gen_replace(self)
+            replacer_func = handlers.ContentHandler.gen_replacer(self)
         return re.sub(self._replacer_regex('RESPONSE'),
                       replacer_func, message)
 
