@@ -80,3 +80,6 @@ Testing can be limited to individual modules by specifying them
 after the tox invocation::
 
     tox -epep8,py27,py34 -- test_driver test_handlers
+
+If you wish to avoid running tests that connect to internet hosts,
+set ``GABBI_SKIP_NETWORK`` to ``True``.
