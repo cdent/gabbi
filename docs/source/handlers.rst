@@ -9,9 +9,10 @@ and response. A content handler operates as follows:
 * Structured YAML data provided via the ``data`` attribute is
   converted to a string or bytes sequence and used as request body.
 * The response body (a string or sequence of bytes) is transformed
-  and made available via the ``response_data`` attribute.
-* The ``response_data`` is used when evaluating the response body.
-* The ``response_data`` is used in ``$RESPONSE[]`` substitutions.
+  into a content-type dependent structure and stored in an internal
+  attribute named ``response_data`` that is:
+  * used when evaluating the response body
+  * used in ``$RESPONSE[]`` :ref:`substitutions <state-substitution>`
 
 By default, gabbi provides content handlers for JSON. In that
 content handler the ``data`` test key is converted from structured
