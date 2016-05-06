@@ -15,14 +15,27 @@
 
 
 import os
+import sys
+from unittest import case
 
 from gabbi import driver
+from gabbi import fixture
 
 
 TESTS_DIR = 'gabbits_live'
 
 
+class LiveSkipFixture(fixture.GabbiFixture):
+    """Skip a test file when we don't want to use the internet."""
+
+    def start_fixture(self):
+        if os.environ.get('GABBI_SKIP_NETWORK', 'False').lower() == 'true':
+            raise case.SkipTest('live tests skipped')
+
+
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    return driver.build_tests(test_dir, loader, host='google.com', port=443)
+    return driver.build_tests(test_dir, loader, host='google.com',
+                              fixture_module=sys.modules[__name__],
+                              port=443)

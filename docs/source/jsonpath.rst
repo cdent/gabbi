@@ -67,5 +67,5 @@ not just your API interactions.
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 
-.. _jsonpath_rw: http://jsonpath-rw.readthedocs.org/en/latest/
-.. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.org/en/latest/
+.. _jsonpath_rw: http://jsonpath-rw.readthedocs.io/en/latest/
+.. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.io/en/latest/

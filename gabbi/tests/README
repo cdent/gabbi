@@ -1,0 +1,5 @@
+Some of the tests in this collection will attempt to connect to
+google over the internet to validate some behaviors using real
+socket connections. If this is not desirable (for example behind
+firewalls or in packaging situations) set GABBI_SKIP_NETWORK to
+true in the environment running the tests.
