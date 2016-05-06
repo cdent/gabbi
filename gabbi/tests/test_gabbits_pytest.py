@@ -20,6 +20,7 @@ without duplication.
 import os
 
 from gabbi import driver
+from gabbi.tests import html_content_handler
 from gabbi.tests import simple_wsgi
 from gabbi.tests import test_intercept
 
@@ -33,7 +34,8 @@ def test_from_build():
     test_generator = driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
         fixture_module=test_intercept,
-        response_handlers=[test_intercept.TestResponseHandler])
+        response_handlers=[test_intercept.TestResponseHandler],
+        content_handlers=[html_content_handler.HTMLHandler])
 
     # TODO(cdent): Where is our Python3!
     # yield from test_generator
