@@ -11,6 +11,7 @@ and response. A content handler operates as follows:
 * The response body (a string or sequence of bytes) is transformed
   into a content-type dependent structure and stored in an internal
   attribute named ``response_data`` that is:
+
   * used when evaluating the response body
   * used in ``$RESPONSE[]`` :ref:`substitutions <state-substitution>`
 
