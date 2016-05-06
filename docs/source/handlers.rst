@@ -1,38 +1,76 @@
-Response Handlers
-=================
 
-.. highlight:: yaml
+Content Handlers
+================
 
-Response handlers determine how an HTTP response will be processed and checked
-against an expected result. For each entry starting with `response_`, an
-associated class is invoked with corresponding values. For example
-if the following lines are in a test::
+Content handlers are responsible for preparing request data and
+evaluating response data based on the content-type of the request
+and response. A content handler operates as follows:
 
-    response_strings:
-        - "lorem ipsum"
-        - "dolor sit amet"
+* Structured YAML data provided via the ``data`` attribute is
+  converted to a string or bytes sequence and used as request body.
+* The response body (a string or sequence of bytes) is transformed
+  and made available via the ``response_data`` attribute.
+* The ``response_data`` is used when evaluating the response body.
+* The ``response_data`` is used in ``$RESPONSE[]`` substitutions.
 
-these lines create an instance of ``StringResponseHandler``, passing the value
-``["lorem ipsum", "dolor sit amet"]``. The response handler
-implementation interprets the response and the expected values, determining
-whether the test passes or fails.
+By default, gabbi provides content handlers for JSON. In that
+content handler the ``data`` test key is converted from structured
+YAML into a JSON string. Response bodies are converted from a JSON
+string into a data structure in ``response_data`` that is used when
+evaluating ``response_json_paths`` entries in a test or doing
+JSONPath-based ``$RESPONSE[]`` substitutions.
+
+Further content handlers can be added as extensions. Test authors
+may need these extensions for their own suites, or enterprising
+developers may wish to create and distribute extensions for others
+to use.
+
+.. note:: One extension that is likely to be useful is a content handler
+          that turns ``data`` into url-encoded form data suitable
+          for POST and turns an HTML response into a DOM object.
+
+Extensions
+----------
+
+Content handlers are an evolution of the response handler concept in
+version 1.x of gabbi. To preserve backwards compatibility with
+existing response handlers, old style response handlers are still
+allowed, but new handlers should implement the content handler
+interface (described below).
 
 .. highlight:: python
 
-While the default handlers (as described in :doc:`format`) are sufficient for
-most cases, it is possible to register additional custom handlers by passing a
-subclass of :class:`~gabbi.handlers.ResponseHandler` to
+Registering additional custom handlers is done by passing a subclass
+of :class:`~gabbi.handlers.ContentHandler` to
 :meth:`~gabbi.driver.build_tests`::
 
     driver.build_tests(test_dir, loader, host=None,
                        intercept=simple_wsgi.SimpleWsgi,
-                       response_handlers=[MyResponseHandler])
+                       content_handlers=[MyContentHandler])
+
+.. warning:: When there are multiple handlers listed that accept the
+             same content-type, the one that is earliest in the list
+             will be used.
 
 With ``gabbi-run``, custom handlers can be loaded via the
 ``--response-handler`` option -- see
 :meth:`~gabbi.runner.load_response_handlers` for details.
 
-A subclass needs to define at least three things:
+.. note:: The use of the ``--response-handler`` argument is done to
+          preserve backwards compatibility and avoid excessive arguments.
+          Both types of handler may be passed to the argument.
+
+Implementation Details
+~~~~~~~~~~~~~~~~~~~~~~
+
+Creating a content handler requires subclassing
+:class:`~gabbi.handlers.ContentHandler` and implementing several methods.
+These methods are described below, but inspecting
+:class:`~gabbi.handlers.jsonhandler.JSONHandler` will be instructive in
+highlighting required arguments and techniques.
+
+To provide a ``response_<something>`` response-body evaluator a subclass
+must define:
 
 * ``test_key_suffix``: This, along with the prefix ``response_``, forms
   the key used in the test structure. It is a class level string.
@@ -49,12 +87,32 @@ A subclass needs to define at least three things:
   * ``value``: ``None`` if ``test_key_value`` is a list, otherwise the
     value half of the key/value pair at this entry.
 
-Optionally a subclass may also define a ``preprocess`` method which is
-called once before the loop that calls ``action`` is run.
-``preprocess`` is passed the current test instance which may be
-modified in place if required. One possible reason to do this would
-be to process the ``test.output`` into another form (e.g. a parsed
-DOM) only once rather than per test assertion. Since ``ResponseHandler``
-classes will run in an unpredictable order it is best to add new
-attributes on the test instance instead of changing the value of
-existing attributes.
+To translate request or response bodies to or from structured data a
+subclass must define an ``accepts`` method. This should return
+``True`` if this class is willing to translate the provided
+content-type. During request processing it is given the value of the
+content-type header that will be sent in the request. During
+response processing it is given the value of the content-type header of
+the response. This makes it possible to handle different request and
+response bodies in the same handler, if desired. For example a
+handler might accept ``application/x-www-form-urlencoded`` and
+``text/html``.
+
+If ``accepts`` is defined two additional static methods should be defined:
+
+* ``dumps``: Turn structured Python data from the ``data`` key in a
+  test into a string or byte stream.
+* ``loads``: Turn a string or byte stream in a response into a Python data
+  structure. Gabbi will put this data on the ``response_data``
+  attribute on the test, where it can be used in the evaluations
+  described above (in the  ``action`` method) or in ``$RESPONSE`` handling.
+  An example usage here would be to turn HTML into a DOM.
+
+Finally if a ``replacer`` class method is defined, then when a
+``$RESPONSE`` substitution is encountered, ``replacer`` will be
+passed the ``response_data`` of the prior test and the argument within the
+``$RESPONSE``.
+
+Please see the `JSONHandler source`_ for additional detail.
+
+.. _JSONHandler source: https://github.com/cdent/gabbi/blob/master/gabbi/handlers/jsonhandler.py

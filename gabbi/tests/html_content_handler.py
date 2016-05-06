@@ -30,7 +30,7 @@ def _parse_selector(selector):
     return selector, attribute
 
 
-class HTMLHandler(handlers.ResponseHandler, handlers.ContentHandler):
+class HTMLHandler(handlers.ContentHandler):
 
     test_key_suffix = 'html'
     test_key_value = {}

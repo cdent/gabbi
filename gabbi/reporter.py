@@ -13,8 +13,11 @@
 # under the License.
 """TestRunner and TestResult for gabbi-run."""
 
+from unittest import TestResult
 from unittest import TextTestResult
 from unittest import TextTestRunner
+
+import pytest
 
 from gabbi import utils
 
@@ -98,6 +101,21 @@ class ConciseTestResult(TextTestResult):
             message = str(err[1])
             for line in message.splitlines():
                 self.stream.writeln('\t%s' % line)
+
+
+class PyTestResult(TestResult):
+
+    def addFailure(self, test, err):
+        raise err[1]
+
+    def addError(self, test, err):
+        raise err[1]
+
+    def addSkip(self, test, reason):
+        pytest.skip(reason)
+
+    def addExpectedFailure(self, test, err):
+        pytest.xfail('%s' % err[1])
 
 
 class ConciseTestRunner(TextTestRunner):
