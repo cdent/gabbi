@@ -19,6 +19,16 @@ from gabbi import json_parser
 
 
 class JSONHandler(handlers.ContentHandler):
+    """A ContentHandler for JSON
+
+    * Structured test ``data`` is turned into JSON when request
+      content-type is JSON.
+    * Response bodies that are JSON strings are made into Python
+      data on the test ``response_data`` attribute when the response
+      content-type is JSON.
+    * A ``response_json_paths`` response handler is added.
+    * JSONPaths in $RESPONSE substitutions are supported.
+    """
 
     test_key_suffix = 'json_paths'
     test_key_value = {}
