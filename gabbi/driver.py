@@ -208,7 +208,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     # Exit immediately if we have no host to access, either via a real host
     # or an intercept.
-    if not (bool(host) ^ bool(intercept)):
+    if not bool(host) ^ bool(intercept):
         raise AssertionError('must specify exactly one of host or intercept')
 
     if test_loader_name is None:
