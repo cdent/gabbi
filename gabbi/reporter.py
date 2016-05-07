@@ -104,6 +104,13 @@ class ConciseTestResult(TextTestResult):
 
 
 class PyTestResult(TestResult):
+    """Wrap a test result to allow it to work with pytest.
+
+    The main behaviors here are:
+
+    * to turn what had been exceptions back into exceptions
+    * use pytest's skip and xfail methods
+    """
 
     def addFailure(self, test, err):
         raise err[1]

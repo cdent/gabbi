@@ -13,13 +13,12 @@
 """Implementation of a command-line runner of single gabbi files."""
 
 import argparse
+from importlib import import_module
 import sys
 import unittest
-import yaml
-
-from importlib import import_module
 
 from six.moves.urllib import parse as urlparse
+import yaml
 
 from gabbi import driver
 from gabbi.reporter import ConciseTestRunner
@@ -107,7 +106,7 @@ def run():
     # Initialize response handlers.
     custom_response_handlers = []
     handler_objects = []
-    for import_path in (args.response_handlers or []):
+    for import_path in args.response_handlers or []:
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
     for handler in custom_response_handlers + driver.HANDLERS:

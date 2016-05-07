@@ -19,6 +19,7 @@ PARSER = None
 
 
 def parse(path):
+    """Parse a JSONPath expression use the global parser."""
     global PARSER
     if not PARSER:
         PARSER = parser.ExtentedJsonPathParser()

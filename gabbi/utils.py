@@ -14,15 +14,16 @@
 
 import os
 
-import colorama
-from six.moves.urllib import parse as urlparse
-
 
 try:  # Python 3
     ConnectionRefused = ConnectionRefusedError
 except NameError:  # Python 2
     import socket
     ConnectionRefused = socket.error
+
+
+import colorama
+from six.moves.urllib import parse as urlparse
 
 
 def create_url(base_url, host, port=None, prefix='', ssl=False):

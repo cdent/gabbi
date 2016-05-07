@@ -28,6 +28,11 @@ urllib3.disable_warnings()
 
 
 class Http(urllib3.PoolManager):
+    """A subclass of the urllib3.PoolManager to munge the data.
+
+    This transforms the response to look more like what httplib2
+    provided when it was used as the httpclient.
+    """
 
     def request(self, absolute_uri, method, body, headers, redirect):
         if redirect:
