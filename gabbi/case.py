@@ -30,6 +30,7 @@ from unittest import case
 
 import six
 from six.moves.urllib import parse as urlparse
+from six.moves import http_cookies
 import wsgi_intercept
 
 from gabbi import __version__
@@ -44,6 +45,7 @@ REPLACERS = [
     'NETLOC',
     'ENVIRON',
     'LOCATION',
+    'COOKIE',
     'LAST_URL',
     'HEADERS',
     'RESPONSE',
@@ -207,6 +209,17 @@ class HTTPTestCase(unittest.TestCase):
         else:
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
+
+    def _cookie_replace(self, message):
+        """Replace $COOKIE in a message.
+
+        With cookie data from set-cookie in the prior request.
+        """
+        response_cookies = self.prior.response['set-cookie']
+        cookies = http_cookies.SimpleCookie()
+        cookies.load(response_cookies)
+        cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
+        return message.replace('$COOKIE', cookie_string)
 
     def _headers_replace(self, message):
         """Replace a header indicator in a message with that headers value from

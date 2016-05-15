@@ -105,6 +105,8 @@ class SimpleWsgi(object):
                 else:
                     CURRENT_POLL = 0
             # fall through if we've ended the loop
+        elif path_info == '/cookie':
+            headers.append(('Set-Cookie', 'session=1234; domain=.example.com'))
 
         start_response('200 OK', headers)
 
