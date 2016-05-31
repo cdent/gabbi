@@ -211,6 +211,9 @@ processed in the order given.
   string value of the environment variable is ``"True"`` or
   ``"False"`` then the resulting value will be the corresponding
   boolean, not a string.
+* ``$COOKIE``: All the cookies set by any ``Set-Cookie`` headers in
+  the prior response, including only the cookie key and value pairs
+  and no metadata (e.g. ``expires`` or ``domain``).
 * ``$LAST_URL``: The URL defined in the prior request, after
   substitutions have been made.
 * ``$LOCATION``: The location header returned in the prior response.
