@@ -29,8 +29,8 @@ import unittest
 from unittest import case
 
 import six
-from six.moves.urllib import parse as urlparse
 from six.moves import http_cookies
+from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
