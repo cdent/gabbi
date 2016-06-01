@@ -1,0 +1,19 @@
+
+tests:
+- name: get a cookie
+  GET: /cookie
+  response_headers:
+      set-cookie: session=1234; domain=.example.com
+
+- name: use that cookie in a URL
+  desc: to get it somewhere we can test it and confirm domain is dropped
+  GET: /foobar?$COOKIE
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/foobar?session=1234
+
+- name: confirm no cookies causes error
+  desc: "this will cause data unavailable: set-cookie"
+  xfail: true
+  GET: /foobar?$COOKIE
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/foobar
