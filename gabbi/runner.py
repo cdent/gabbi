@@ -97,7 +97,7 @@ def run():
     # Initialize response handlers.
     initialize_handlers(args.response_handlers)
 
-    data = utils.load_yaml()
+    data = utils.load_yaml(handle=sys.stdin)
     loader = unittest.defaultTestLoader
     suite = driver.test_suite_from_dict(loader, 'input', data, '.',
                                         host, port, None, None,

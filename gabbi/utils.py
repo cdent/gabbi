@@ -114,7 +114,7 @@ def load_yaml(handle=None, yaml_file=None):
         with io.open(yaml_file, encoding='utf-8') as source:
             return yaml.safe_load(source.read())
 
-    handle = handle or sys.stdin
+    # This will intentionally raise AttributeError if handle is none.
     return yaml.safe_load(handle.read())
 
 
