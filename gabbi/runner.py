@@ -108,10 +108,10 @@ def run():
 
 def process_target_args(target, prefix):
     """Turn the argparse args into a host, port and prefix."""
-    split_url = urlparse.urlsplit(target)
+    split_url = urlparse.urlparse(target)
+
     if split_url.scheme:
-        target = split_url.netloc
-        prefix = split_url.path
+        return split_url.hostname, split_url.port, split_url.path
     else:
         target = target
         prefix = prefix

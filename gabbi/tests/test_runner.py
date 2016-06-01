@@ -226,14 +226,22 @@ class RunnerHostArgParse(unittest.TestCase):
         host, port, prefix = runner.process_target_args(
             url_or_host, provided_prefix)
 
-        self.assertEqual(expected_host, host)
+        # normalize hosts, they are case insensitive
+        self.assertEqual(expected_host.lower(), host.lower())
+        # port can be a string or int depending on the inputs
         self.assertEqual(expected_port, port)
         self.assertEqual(expected_prefix, prefix)
 
-    def test_plain_url(self):
+    def test_plain_url_no_port(self):
+        self._test_hostport('http://foobar.com/news',
+                            'foobar.com',
+                            expected_port=None,
+                            expected_prefix='/news')
+
+    def test_plain_url_with_port(self):
         self._test_hostport('http://foobar.com:80/news',
                             'foobar.com',
-                            expected_port='80',
+                            expected_port=80,
                             expected_prefix='/news')
 
     def test_simple_hostport(self):
@@ -252,14 +260,14 @@ class RunnerHostArgParse(unittest.TestCase):
         self._test_hostport(
             'http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:999/news',
             'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210',
-            expected_port='999',
+            expected_port=999,
             expected_prefix='/news')
 
     def test_ipv6_url_localhost(self):
         self._test_hostport(
             'http://[::1]:999/news',
             '::1',
-            expected_port='999',
+            expected_port=999,
             expected_prefix='/news')
 
     def test_ipv6_host_localhost(self):
