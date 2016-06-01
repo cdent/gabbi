@@ -13,6 +13,7 @@
 """Test that the CLI works as expected
 """
 
+import mock
 import sys
 import unittest
 from uuid import uuid4
@@ -216,6 +217,72 @@ class RunnerTest(unittest.TestCase):
         sys.stderr.flush()
         sys.stderr.seek(0)
         self._stderr.write(sys.stderr.read())
+
+
+class RunnerHostArgParse(unittest.TestCase):
+
+    @mock.patch('sys.exit')
+    @mock.patch('sys.stdin')
+    @mock.patch('gabbi.driver.test_suite_from_dict')
+    @mock.patch('yaml.safe_load', return_value={})
+    def _test_hostport(self, url_or_host, expected_host,
+                       portmock_yaml, mock_test_suite, mock_read, mock_exit,
+                       provided_prefix=None, expected_port=None,
+                       expected_prefix=None,):
+        sys.argv = ['gabbi-run', url_or_host]
+        if provided_prefix:
+            sys.argv.append(provided_prefix)
+        runner.run()
+
+        mock_test_suite.assert_called_with(
+            unittest.defaultTestLoader, 'input', {}, '.', expected_host,
+            expected_port, None, None, prefix=expected_prefix
+        )
+
+    def test_plain_url(self):
+        self._test_hostport('http://foobar.com:80/news',
+                            'foobar.com',
+                            expected_port='80',
+                            expected_prefix='/news')
+
+    def test_simple_hostport(self):
+        self._test_hostport('foobar.com:999',
+                            'foobar.com',
+                            expected_port='999')
+
+    def test_simple_hostport_with_prefix(self):
+        self._test_hostport('foobar.com:999',
+                            'foobar.com',
+                            provided_prefix='/news',
+                            expected_port='999',
+                            expected_prefix='/news')
+
+    def test_ipv6_url_long(self):
+        self._test_hostport(
+            'http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:999/news',
+            'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210',
+            expected_port='999',
+            expected_prefix='/news')
+
+    def test_ipv6_url_localhost(self):
+        self._test_hostport(
+            'http://[::1]:999/news',
+            '::1',
+            expected_port='999',
+            expected_prefix='/news')
+
+    def test_ipv6_host_localhost(self):
+        # If a user wants to use the hostport form, then they need
+        # to hack it with the brackets.
+        self._test_hostport(
+            '[::1]',
+            '::1')
+
+    def test_ipv6_hostport_localhost(self):
+        self._test_hostport(
+            '[::1]:999',
+            '::1',
+            expected_port='999')
 
 
 class HTMLResponseHandler(handlers.ResponseHandler):

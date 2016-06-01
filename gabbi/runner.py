@@ -67,7 +67,9 @@ def run():
         'target',
         nargs='?', default='stub',
         help='A fully qualified URL (with optional path as prefix) '
-             'to the primary target or a host and port, : separated'
+             'to the primary target or a host and port, : separated. '
+             'If using an IPV6 address for the host in either form, '
+             'wrap it in \'[\' and \']\'.'
     )
     parser.add_argument(
         'prefix',
@@ -98,11 +100,14 @@ def run():
         target = args.target
         prefix = args.prefix
 
-    if ':' in target:
-        host, port = target.split(':')
+    if ':' in target and '[' not in target:
+        host, port = target.rsplit(':', 1)
+    elif ']:' in target:
+        host, port = target.rsplit(':', 1)
     else:
         host = target
         port = None
+    host = host.replace('[', '').replace(']', '')
 
     # Initialize response handlers.
     custom_response_handlers = []
