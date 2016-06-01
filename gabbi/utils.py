@@ -29,10 +29,17 @@ from six.moves.urllib import parse as urlparse
 def create_url(base_url, host, port=None, prefix='', ssl=False):
     """Given pieces of a path-based url, return a fully qualified url."""
     scheme = 'http'
-    netloc = host
+
+    # A host with : in it at this stage is assumed to be an IPv6
+    # address of some kind (they come in many forms). Port should
+    # already have been stripped off.
+    if ':' in host and not (host.startswith('[') and host.endswith(']')):
+        host = '[%s]' % host
 
     if port and not _port_follows_standard(port, ssl):
         netloc = '%s:%s' % (host, port)
+    else:
+        netloc = host
 
     if ssl:
         scheme = 'https'

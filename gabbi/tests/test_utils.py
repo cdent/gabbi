@@ -132,3 +132,29 @@ class CreateURLTest(unittest.TestCase):
         url = utils.create_url('/foo/bar?x=1&y=2', 'test.host.com', ssl=True,
                                port=80)
         self.assertEqual('https://test.host.com:80/foo/bar?x=1&y=2', url)
+
+    def test_create_url_ipv6_ssl(self):
+        url = utils.create_url('/foo/bar?x=1&y=2', '::1', ssl=True)
+        self.assertEqual('https://[::1]/foo/bar?x=1&y=2', url)
+
+    def test_create_url_ipv6_ssl_weird_port(self):
+        url = utils.create_url('/foo/bar?x=1&y=2', '::1', ssl=True, port=80)
+        self.assertEqual('https://[::1]:80/foo/bar?x=1&y=2', url)
+
+    def test_create_url_ipv6_full(self):
+        url = utils.create_url('/foo/bar?x=1&y=2',
+                               '2607:f8b0:4000:801::200e', port=8080)
+        self.assertEqual(
+            'http://[2607:f8b0:4000:801::200e]:8080/foo/bar?x=1&y=2', url)
+
+    def test_create_url_ipv6_already_bracket(self):
+        url = utils.create_url(
+            '/foo/bar?x=1&y=2', '[2607:f8b0:4000:801::200e]', port=999)
+        self.assertEqual(
+            'http://[2607:f8b0:4000:801::200e]:999/foo/bar?x=1&y=2', url)
+
+    def test_create_url_no_double_colon(self):
+        url = utils.create_url(
+            '/foo', 'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210', port=999)
+        self.assertEqual(
+            'http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:999/foo', url)
