@@ -13,7 +13,6 @@
 """Test that the CLI works as expected
 """
 
-import mock
 import sys
 import unittest
 from uuid import uuid4
@@ -221,23 +220,15 @@ class RunnerTest(unittest.TestCase):
 
 class RunnerHostArgParse(unittest.TestCase):
 
-    @mock.patch('sys.exit')
-    @mock.patch('sys.stdin')
-    @mock.patch('gabbi.driver.test_suite_from_dict')
-    @mock.patch('yaml.safe_load', return_value={})
     def _test_hostport(self, url_or_host, expected_host,
-                       portmock_yaml, mock_test_suite, mock_read, mock_exit,
                        provided_prefix=None, expected_port=None,
                        expected_prefix=None,):
-        sys.argv = ['gabbi-run', url_or_host]
-        if provided_prefix:
-            sys.argv.append(provided_prefix)
-        runner.run()
+        host, port, prefix = runner.process_target_args(
+            url_or_host, provided_prefix)
 
-        mock_test_suite.assert_called_with(
-            unittest.defaultTestLoader, 'input', {}, '.', expected_host,
-            expected_port, None, None, prefix=expected_prefix
-        )
+        self.assertEqual(expected_host, host)
+        self.assertEqual(expected_port, port)
+        self.assertEqual(expected_prefix, prefix)
 
     def test_plain_url(self):
         self._test_hostport('http://foobar.com:80/news',

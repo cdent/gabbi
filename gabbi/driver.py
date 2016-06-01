@@ -26,20 +26,19 @@ An entire directory of YAML files is a TestSuite of TestSuites.
 import copy
 import glob
 import inspect
-import io
 import os
 import unittest
 from unittest import suite
 import uuid
 
 import six
-import yaml
 
 from gabbi import case
 from gabbi import handlers
 from gabbi import httpclient
 from gabbi import reporter
 from gabbi import suite as gabbi_suite
+from gabbi import utils
 
 
 RESPONSE_HANDLERS = [
@@ -225,7 +224,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     for test_file in glob.iglob('%s/*.yaml' % path):
         if intercept:
             host = str(uuid.uuid4())
-        suite_dict = load_yaml(test_file)
+        suite_dict = utils.load_yaml(yaml_file=test_file)
         test_base_name = '%s_%s' % (
             test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
         file_suite = test_suite_from_dict(loader, test_base_name, suite_dict,
@@ -260,12 +259,6 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
             for subtest in test:
                 yield '%s' % subtest.__class__.__name__, subtest, result
             yield 'stop_%s' % test._tests[0].__class__.__name__, test.stop
-
-
-def load_yaml(yaml_file):
-    """Read and parse any YAML file. Let exceptions flow where they may."""
-    with io.open(yaml_file, encoding='utf-8') as source:
-        return yaml.safe_load(source.read())
 
 
 def test_update(orig_dict, new_dict):

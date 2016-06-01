@@ -12,7 +12,11 @@
 # under the License.
 """Utility functions grab bag."""
 
+import io
 import os
+import sys
+
+import yaml
 
 
 try:  # Python 3
@@ -97,6 +101,21 @@ def get_colorizer(stream):
         return _colorize
     else:
         return lambda x, y: y
+
+
+def load_yaml(handle=None, yaml_file=None):
+    """Read and parse any YAML file or filehandle.
+
+    Let exceptions flow where they may.
+
+    If no file or handle is provided, read from STDIN.
+    """
+    if yaml_file:
+        with io.open(yaml_file, encoding='utf-8') as source:
+            return yaml.safe_load(source.read())
+
+    handle = handle or sys.stdin
+    return yaml.safe_load(handle.read())
 
 
 def not_binary(content_type):

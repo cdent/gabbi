@@ -18,11 +18,11 @@ import sys
 import unittest
 
 from six.moves.urllib import parse as urlparse
-import yaml
 
 from gabbi import case
 from gabbi import driver
 from gabbi.reporter import ConciseTestRunner
+from gabbi import utils
 
 
 def run():
@@ -90,15 +90,31 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
-    args = parser.parse_args()
 
-    split_url = urlparse.urlsplit(args.target)
+    args = parser.parse_args()
+    host, port, prefix = process_target_args(args.target, args.prefix)
+
+    # Initialize response handlers.
+    initialize_handlers(args.response_handlers)
+
+    data = utils.load_yaml()
+    loader = unittest.defaultTestLoader
+    suite = driver.test_suite_from_dict(loader, 'input', data, '.',
+                                        host, port, None, None,
+                                        prefix=prefix)
+    result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
+    sys.exit(not result.wasSuccessful())
+
+
+def process_target_args(target, prefix):
+    """Turn the argparse args into a host, port and prefix."""
+    split_url = urlparse.urlsplit(target)
     if split_url.scheme:
         target = split_url.netloc
         prefix = split_url.path
     else:
-        target = args.target
-        prefix = args.prefix
+        target = target
+        prefix = prefix
 
     if ':' in target and '[' not in target:
         host, port = target.rsplit(':', 1)
@@ -109,21 +125,16 @@ def run():
         port = None
     host = host.replace('[', '').replace(']', '')
 
-    # Initialize response handlers.
+    return host, port, prefix
+
+
+def initialize_handlers(handlers):
     custom_response_handlers = []
-    for import_path in args.response_handlers or []:
+    for import_path in handlers or []:
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
     for handler in driver.RESPONSE_HANDLERS + custom_response_handlers:
         handler(case.HTTPTestCase)
-
-    data = yaml.safe_load(sys.stdin.read())
-    loader = unittest.defaultTestLoader
-    suite = driver.test_suite_from_dict(loader, 'input', data, '.',
-                                        host, port, None, None,
-                                        prefix=prefix)
-    result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
-    sys.exit(not result.wasSuccessful())
 
 
 def load_response_handlers(import_path):
