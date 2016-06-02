@@ -56,6 +56,21 @@ class DriverTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             driver.build_tests(self.test_dir, self.loader)
 
+    def test_build_require_ssl(self):
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost',
+                                   require_ssl=True)
+        first_test = suite._tests[0]._tests[0]
+        full_url = first_test._parse_url(first_test.test_data['url'])
+        self.assertEqual('https://localhost:8001/', full_url)
+
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost',
+                                   require_ssl=False)
+        first_test = suite._tests[0]._tests[0]
+        full_url = first_test._parse_url(first_test.test_data['url'])
+        self.assertEqual('http://localhost:8001/', full_url)
+
     def test_tests_key_required(self):
         test_yaml = {'name': 'house', 'url': '/'}
 

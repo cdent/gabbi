@@ -92,10 +92,13 @@ def run():
     )
     args = parser.parse_args()
 
+    force_ssl = False
     split_url = urlparse.urlsplit(args.target)
     if split_url.scheme:
         target = split_url.netloc
         prefix = split_url.path
+        if split_url.scheme == 'https':
+            force_ssl = True
     else:
         target = args.target
         prefix = args.prefix
@@ -118,6 +121,13 @@ def run():
         handler(case.HTTPTestCase)
 
     data = yaml.safe_load(sys.stdin.read())
+    # Only override the default if we are forcing a change, there may
+    # already be a default.
+    if force_ssl:
+        if 'defaults' in data:
+            data['defaults']['ssl'] = True
+        else:
+            data['defaults'] = {'ssl': True}
     loader = unittest.defaultTestLoader
     suite = driver.test_suite_from_dict(loader, 'input', data, '.',
                                         host, port, None, None,

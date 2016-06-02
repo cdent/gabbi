@@ -188,7 +188,7 @@ class TestBuilder(type):
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
-                response_handlers=None, prefix=''):
+                response_handlers=None, prefix='', require_ssl=False):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -203,6 +203,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param response_handers: ResponseHandler classes.
     :type response_handlers: List of ResponseHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
+    :param require_ssl: If ``True``, make all tests default to using SSL.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
@@ -228,6 +229,13 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         suite_dict = load_yaml(test_file)
         test_base_name = '%s_%s' % (
             test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
+
+        if require_ssl:
+            if 'defaults' in suite_dict:
+                suite_dict['defaults']['ssl'] = True
+            else:
+                suite_dict['defaults'] = {'ssl': True}
+
         file_suite = test_suite_from_dict(loader, test_base_name, suite_dict,
                                           path, host, port, fixture_module,
                                           intercept, prefix)
@@ -237,7 +245,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
-                      fixture_module=None, response_handlers=None):
+                      fixture_module=None, response_handlers=None,
+                      require_ssl=False):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -250,7 +259,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         test_loader_name=test_loader_name,
                         fixture_module=fixture_module,
                         response_handlers=response_handlers,
-                        prefix=prefix)
+                        prefix=prefix, require_ssl=require_ssl)
 
     for test in tests:
         if hasattr(test, '_tests'):
