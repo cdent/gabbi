@@ -228,15 +228,18 @@ class RunnerHostArgParse(unittest.TestCase):
     def _test_hostport(self, url_or_host, expected_host,
                        portmock_yaml, mock_test_suite, mock_read, mock_exit,
                        provided_prefix=None, expected_port=None,
-                       expected_prefix=None,):
+                       expected_prefix=None, expected_data=None):
         sys.argv = ['gabbi-run', url_or_host]
         if provided_prefix:
             sys.argv.append(provided_prefix)
         runner.run()
 
+        expected_data = expected_data or {}
+
         mock_test_suite.assert_called_with(
-            unittest.defaultTestLoader, 'input', {}, '.', expected_host,
-            expected_port, None, None, prefix=expected_prefix
+            unittest.defaultTestLoader, 'input', expected_data,
+            '.', expected_host, expected_port, None, None,
+            prefix=expected_prefix
         )
 
     def test_plain_url(self):
@@ -244,6 +247,12 @@ class RunnerHostArgParse(unittest.TestCase):
                             'foobar.com',
                             expected_port='80',
                             expected_prefix='/news')
+
+    def test_ssl_url(self):
+        self._test_hostport('https://foobar.com/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_data={'defaults': {'ssl': True}})
 
     def test_simple_hostport(self):
         self._test_hostport('foobar.com:999',
