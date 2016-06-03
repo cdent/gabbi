@@ -13,6 +13,7 @@
 """Test that the CLI works as expected
 """
 
+import copy
 import mock
 import sys
 import unittest
@@ -21,7 +22,8 @@ from uuid import uuid4
 from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
 
-from gabbi import driver
+from gabbi import case
+from gabbi import exception
 from gabbi import handlers
 from gabbi import runner
 from gabbi.tests.simple_wsgi import SimpleWsgi
@@ -55,6 +57,9 @@ class RunnerTest(unittest.TestCase):
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
+        # Cleanup the custom response_handler
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
@@ -74,6 +79,11 @@ class RunnerTest(unittest.TestCase):
                 self.assertSuccess(err)
 
     def test_target_url_parsing_standard_port(self):
+        # NOTE(cdent): For reasons unclear this regularly fails in
+        # py.test and sometimes fails with testr. So there is
+        # some state that is not being properly cleard somewhere.
+        # Within SimpleWsgi, the environ thinks url_scheme is
+        # 'https'.
         self.server = lambda: Urllib3Interceptor(
             SimpleWsgi, self.host, 80, '')
         sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
@@ -99,7 +109,7 @@ class RunnerTest(unittest.TestCase):
           GET: /
           response_html: ...
         """)
-        with self.assertRaises(driver.GabbiFormatError):
+        with self.assertRaises(exception.GabbiFormatError):
             runner.run()
 
         sys.argv.insert(1, "--response-handler")
@@ -169,7 +179,7 @@ class RunnerTest(unittest.TestCase):
 
     def test_exit_code(self):
         sys.stdin = StringIO()
-        with self.assertRaises(driver.GabbiFormatError):
+        with self.assertRaises(exception.GabbiFormatError):
             runner.run()
 
         sys.stdin = StringIO("""
@@ -223,7 +233,7 @@ class RunnerHostArgParse(unittest.TestCase):
 
     @mock.patch('sys.exit')
     @mock.patch('sys.stdin')
-    @mock.patch('gabbi.driver.test_suite_from_dict')
+    @mock.patch('gabbi.suitemaker.test_suite_from_dict')
     @mock.patch('yaml.safe_load', return_value={})
     def _test_hostport(self, url_or_host, expected_host,
                        portmock_yaml, mock_test_suite, mock_read, mock_exit,
