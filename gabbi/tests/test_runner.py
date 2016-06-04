@@ -39,7 +39,8 @@ class RunnerTest(unittest.TestCase):
         host, port = (str(uuid4()), 8000)
         self.host = host
         self.port = port
-        self.server = lambda: Urllib3Interceptor(SimpleWsgi, host, port, '')
+        self.server = lambda: Urllib3Interceptor(
+            SimpleWsgi, host=host, port=port)
 
         self._stdin = sys.stdin
 
@@ -85,7 +86,7 @@ class RunnerTest(unittest.TestCase):
         # Within SimpleWsgi, the environ thinks url_scheme is
         # 'https'.
         self.server = lambda: Urllib3Interceptor(
-            SimpleWsgi, self.host, 80, '')
+            SimpleWsgi, host=self.host, port=80)
         sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
 
         sys.stdin = StringIO("""
