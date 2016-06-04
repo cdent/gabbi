@@ -17,6 +17,7 @@ behaves.
 """
 
 from collections import OrderedDict
+import copy
 import unittest
 import uuid
 
@@ -31,7 +32,7 @@ class UrlParseTest(unittest.TestCase):
         # be set manually here, due to metaclass magics elsewhere.
         # test_data must have a base value.
         http_case = case.HTTPTestCase('test_request')
-        http_case.test_data = case.BASE_TEST
+        http_case.test_data = copy.copy(case.BASE_TEST)
         http_case.host = host
         http_case.port = port
         http_case.prefix = prefix
