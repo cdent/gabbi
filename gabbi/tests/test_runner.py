@@ -14,7 +14,6 @@
 """
 
 import copy
-import mock
 import sys
 import unittest
 from uuid import uuid4
@@ -232,38 +231,50 @@ class RunnerTest(unittest.TestCase):
 
 class RunnerHostArgParse(unittest.TestCase):
 
-    @mock.patch('sys.exit')
-    @mock.patch('sys.stdin')
-    @mock.patch('gabbi.suitemaker.test_suite_from_dict')
-    @mock.patch('yaml.safe_load', return_value={})
     def _test_hostport(self, url_or_host, expected_host,
-                       portmock_yaml, mock_test_suite, mock_read, mock_exit,
                        provided_prefix=None, expected_port=None,
-                       expected_prefix=None, expected_data=None):
-        sys.argv = ['gabbi-run', url_or_host]
-        if provided_prefix:
-            sys.argv.append(provided_prefix)
-        runner.run()
+                       expected_prefix=None, expected_ssl=False):
+        host, port, prefix, ssl = runner.process_target_args(
+            url_or_host, provided_prefix)
 
-        expected_data = expected_data or {}
+        # normalize hosts, they are case insensitive
+        self.assertEqual(expected_host.lower(), host.lower())
+        # port can be a string or int depending on the inputs
+        self.assertEqual(expected_port, port)
+        self.assertEqual(expected_prefix, prefix)
+        self.assertEqual(expected_ssl, ssl)
 
-        mock_test_suite.assert_called_with(
-            unittest.defaultTestLoader, 'input', expected_data,
-            '.', expected_host, expected_port, None, None,
-            prefix=expected_prefix
-        )
+    def test_plain_url_no_port(self):
+        self._test_hostport('http://foobar.com/news',
+                            'foobar.com',
+                            expected_port=None,
+                            expected_prefix='/news')
 
-    def test_plain_url(self):
+    def test_plain_url_with_port(self):
         self._test_hostport('http://foobar.com:80/news',
                             'foobar.com',
-                            expected_port='80',
+                            expected_port=80,
                             expected_prefix='/news')
 
     def test_ssl_url(self):
         self._test_hostport('https://foobar.com/news',
                             'foobar.com',
                             expected_prefix='/news',
-                            expected_data={'defaults': {'ssl': True}})
+                            expected_ssl=True)
+
+    def test_ssl_port80_url(self):
+        self._test_hostport('https://foobar.com:80/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=80,
+                            expected_ssl=True)
+
+    def test_ssl_port_url(self):
+        self._test_hostport('https://foobar.com:999/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=999,
+                            expected_ssl=True)
 
     def test_simple_hostport(self):
         self._test_hostport('foobar.com:999',
@@ -281,14 +292,14 @@ class RunnerHostArgParse(unittest.TestCase):
         self._test_hostport(
             'http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:999/news',
             'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210',
-            expected_port='999',
+            expected_port=999,
             expected_prefix='/news')
 
     def test_ipv6_url_localhost(self):
         self._test_hostport(
             'http://[::1]:999/news',
             '::1',
-            expected_port='999',
+            expected_port=999,
             expected_prefix='/news')
 
     def test_ipv6_host_localhost(self):

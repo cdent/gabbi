@@ -18,12 +18,12 @@ import sys
 import unittest
 
 from six.moves.urllib import parse as urlparse
-import yaml
 
 from gabbi import case
 from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
 from gabbi import suitemaker
+from gabbi import utils
 
 
 def run():
@@ -91,39 +91,15 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
+
     args = parser.parse_args()
-
-    force_ssl = False
-    split_url = urlparse.urlsplit(args.target)
-    if split_url.scheme:
-        target = split_url.netloc
-        prefix = split_url.path
-        if split_url.scheme == 'https':
-            force_ssl = True
-    else:
-        target = args.target
-        prefix = args.prefix
-
-    if ':' in target and '[' not in target:
-        host, port = target.rsplit(':', 1)
-    elif ']:' in target:
-        host, port = target.rsplit(':', 1)
-    else:
-        host = target
-        port = None
-    host = host.replace('[', '').replace(']', '')
+    host, port, prefix, force_ssl = process_target_args(
+        args.target, args.prefix)
 
     # Initialize response handlers.
-    custom_response_handlers = []
-    for import_path in args.response_handlers or []:
-        for handler in load_response_handlers(import_path):
-            custom_response_handlers.append(handler)
-    for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
-        handler(case.HTTPTestCase)
+    initialize_handlers(args.response_handlers)
 
-    data = yaml.safe_load(sys.stdin.read())
-    # Only override the default if we are forcing a change, there may
-    # already be a default.
+    data = utils.load_yaml(handle=sys.stdin)
     if force_ssl:
         if 'defaults' in data:
             data['defaults']['ssl'] = True
@@ -135,6 +111,40 @@ def run():
     result = ConciseTestRunner(
         verbosity=2, failfast=args.failfast).run(test_suite)
     sys.exit(not result.wasSuccessful())
+
+
+def process_target_args(target, prefix):
+    """Turn the argparse args into a host, port and prefix."""
+    force_ssl = False
+    split_url = urlparse.urlparse(target)
+
+    if split_url.scheme:
+        if split_url.scheme == 'https':
+            force_ssl = True
+        return split_url.hostname, split_url.port, split_url.path, force_ssl
+    else:
+        target = target
+        prefix = prefix
+
+    if ':' in target and '[' not in target:
+        host, port = target.rsplit(':', 1)
+    elif ']:' in target:
+        host, port = target.rsplit(':', 1)
+    else:
+        host = target
+        port = None
+    host = host.replace('[', '').replace(']', '')
+
+    return host, port, prefix, force_ssl
+
+
+def initialize_handlers(response_handlers):
+    custom_response_handlers = []
+    for import_path in response_handlers or []:
+        for handler in load_response_handlers(import_path):
+            custom_response_handlers.append(handler)
+    for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
+        handler(case.HTTPTestCase)
 
 
 def load_response_handlers(import_path):
