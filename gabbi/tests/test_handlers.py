@@ -17,8 +17,8 @@ import json
 import unittest
 
 from gabbi import case
-from gabbi import driver
 from gabbi import handlers
+from gabbi import suitemaker
 
 
 class HandlersTest(unittest.TestCase):
@@ -31,8 +31,8 @@ class HandlersTest(unittest.TestCase):
     def setUp(self):
         super(HandlersTest, self).setUp()
         self.test_class = case.HTTPTestCase
-        self.test = driver.TestBuilder('mytest', (self.test_class,),
-                                       {'test_data': {}})
+        self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
+                                           {'test_data': {}})
 
     def test_response_strings(self):
         handler = handlers.StringResponseHandler(self.test_class)

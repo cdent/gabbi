@@ -16,8 +16,7 @@ This suite has two features: the contained tests are ordered and there
 are suite-level fixtures that operate as context managers.
 """
 
-from unittest import case
-from unittest import suite
+import unittest
 
 from wsgi_intercept import interceptor
 
@@ -29,7 +28,7 @@ def noop(*args):
     pass
 
 
-class GabbiSuite(suite.TestSuite):
+class GabbiSuite(unittest.TestSuite):
     """A TestSuite with fixtures.
 
     The suite wraps the tests with a set of nested context managers that
@@ -56,7 +55,7 @@ class GabbiSuite(suite.TestSuite):
                         result = super(GabbiSuite, self).run(result, debug)
                 else:
                     result = super(GabbiSuite, self).run(result, debug)
-        except case.SkipTest as exc:
+        except unittest.SkipTest as exc:
             for test in self._tests:
                 result.addSkip(test, str(exc))
 
@@ -72,7 +71,7 @@ class GabbiSuite(suite.TestSuite):
                 fix_object = fix()
                 fix_object.__enter__()
                 self.used_fixtures.append(fix_object)
-        except case.SkipTest as exc:
+        except unittest.SkipTest as exc:
             # Disable the already collected tests that we now wish
             # to skip.
             for test in self:

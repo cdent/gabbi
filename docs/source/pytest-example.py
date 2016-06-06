@@ -20,6 +20,8 @@ TESTS_DIR = 'gabbits'
 
 def test_gabbits():
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
+    # Pass "require_ssl=True" as an argument to force all tests
+    # to use SSL in requests.
     test_generator = driver.py_test_generator(
         test_dir, intercept=wsgiapp.app,
         fixture_module=fixtures)

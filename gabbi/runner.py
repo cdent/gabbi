@@ -20,9 +20,10 @@ import unittest
 from six.moves.urllib import parse as urlparse
 
 from gabbi import case
-from gabbi import driver
+from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
 from gabbi import utils
+from gabbi import suitemaker
 
 
 def run():
@@ -92,26 +93,35 @@ def run():
     )
 
     args = parser.parse_args()
-    host, port, prefix = process_target_args(args.target, args.prefix)
+    host, port, prefix, force_ssl = process_target_args(
+        args.target, args.prefix)
 
     # Initialize response handlers.
     initialize_handlers(args.response_handlers)
 
     data = utils.load_yaml(handle=sys.stdin)
+    if force_ssl:
+        if 'defaults' in data:
+            data['defaults']['ssl'] = True
+        else:
+            data['defaults'] = {'ssl': True}
     loader = unittest.defaultTestLoader
-    suite = driver.test_suite_from_dict(loader, 'input', data, '.',
-                                        host, port, None, None,
-                                        prefix=prefix)
-    result = ConciseTestRunner(verbosity=2, failfast=args.failfast).run(suite)
+    test_suite = suitemaker.test_suite_from_dict(
+        loader, 'input', data, '.', host, port, None, None, prefix=prefix)
+    result = ConciseTestRunner(
+        verbosity=2, failfast=args.failfast).run(test_suite)
     sys.exit(not result.wasSuccessful())
 
 
 def process_target_args(target, prefix):
     """Turn the argparse args into a host, port and prefix."""
+    force_ssl = False
     split_url = urlparse.urlparse(target)
 
     if split_url.scheme:
-        return split_url.hostname, split_url.port, split_url.path
+        if split_url.scheme == 'https':
+            force_ssl = True
+        return split_url.hostname, split_url.port, split_url.path, force_ssl
     else:
         target = target
         prefix = prefix
@@ -125,7 +135,7 @@ def process_target_args(target, prefix):
         port = None
     host = host.replace('[', '').replace(']', '')
 
-    return host, port, prefix
+    return host, port, prefix, force_ssl
 
 
 def initialize_handlers(handlers):
@@ -133,7 +143,7 @@ def initialize_handlers(handlers):
     for import_path in handlers or []:
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
-    for handler in driver.RESPONSE_HANDLERS + custom_response_handlers:
+    for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
         handler(case.HTTPTestCase)
 
 
