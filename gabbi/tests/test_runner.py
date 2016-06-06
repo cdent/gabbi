@@ -233,8 +233,8 @@ class RunnerHostArgParse(unittest.TestCase):
 
     def _test_hostport(self, url_or_host, expected_host,
                        provided_prefix=None, expected_port=None,
-                       expected_prefix=None,):
-        host, port, prefix = runner.process_target_args(
+                       expected_prefix=None, expected_ssl=False):
+        host, port, prefix, ssl = runner.process_target_args(
             url_or_host, provided_prefix)
 
         # normalize hosts, they are case insensitive
@@ -242,6 +242,7 @@ class RunnerHostArgParse(unittest.TestCase):
         # port can be a string or int depending on the inputs
         self.assertEqual(expected_port, port)
         self.assertEqual(expected_prefix, prefix)
+        self.assertEqual(expected_ssl, ssl)
 
     def test_plain_url_no_port(self):
         self._test_hostport('http://foobar.com/news',
@@ -259,7 +260,21 @@ class RunnerHostArgParse(unittest.TestCase):
         self._test_hostport('https://foobar.com/news',
                             'foobar.com',
                             expected_prefix='/news',
-                            expected_data={'defaults': {'ssl': True}})
+                            expected_ssl=True)
+
+    def test_ssl_port80_url(self):
+        self._test_hostport('https://foobar.com:80/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=80,
+                            expected_ssl=True)
+
+    def test_ssl_port_url(self):
+        self._test_hostport('https://foobar.com:999/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=999,
+                            expected_ssl=True)
 
     def test_simple_hostport(self):
         self._test_hostport('foobar.com:999',

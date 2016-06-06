@@ -22,8 +22,8 @@ from six.moves.urllib import parse as urlparse
 from gabbi import case
 from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
-from gabbi import utils
 from gabbi import suitemaker
+from gabbi import utils
 
 
 def run():
@@ -138,9 +138,9 @@ def process_target_args(target, prefix):
     return host, port, prefix, force_ssl
 
 
-def initialize_handlers(handlers):
+def initialize_handlers(response_handlers):
     custom_response_handlers = []
-    for import_path in handlers or []:
+    for import_path in response_handlers or []:
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
     for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
