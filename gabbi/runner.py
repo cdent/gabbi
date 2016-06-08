@@ -19,7 +19,6 @@ import unittest
 
 from six.moves.urllib import parse as urlparse
 
-from gabbi import case
 from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
 from gabbi import suitemaker
@@ -97,7 +96,7 @@ def run():
         args.target, args.prefix)
 
     # Initialize response handlers.
-    initialize_handlers(args.response_handlers)
+    handler_objects = initialize_handlers(args.response_handlers)
 
     data = utils.load_yaml(handle=sys.stdin)
     if force_ssl:
@@ -107,7 +106,8 @@ def run():
             data['defaults'] = {'ssl': True}
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
-        loader, 'input', data, '.', host, port, None, None, prefix=prefix)
+        loader, 'input', data, '.', host, port, None, None, prefix=prefix,
+        handlers=handler_objects)
     result = ConciseTestRunner(
         verbosity=2, failfast=args.failfast).run(test_suite)
     sys.exit(not result.wasSuccessful())
@@ -140,11 +140,13 @@ def process_target_args(target, prefix):
 
 def initialize_handlers(response_handlers):
     custom_response_handlers = []
+    handler_objects = []
     for import_path in response_handlers or []:
         for handler in load_response_handlers(import_path):
             custom_response_handlers.append(handler)
     for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
-        handler(case.HTTPTestCase)
+        handler_objects.append(handler())
+    return handler_objects
 
 
 def load_response_handlers(import_path):

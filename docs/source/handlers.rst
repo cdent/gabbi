@@ -35,7 +35,7 @@ Extensions
 ----------
 
 Content handlers are an evolution of the response handler concept in
-version 1.x of gabbi. To preserve backwards compatibility with
+earlier versions gabbi. To preserve backwards compatibility with
 existing response handlers, old style response handlers are still
 allowed, but new handlers should implement the content handler
 interface (described below).
@@ -43,7 +43,7 @@ interface (described below).
 .. highlight:: python
 
 Registering additional custom handlers is done by passing a subclass
-of :class:`~gabbi.handlers.ContentHandler` to
+of :class:`~gabbi.handlers.base.ContentHandler` to
 :meth:`~gabbi.driver.build_tests`::
 
     driver.build_tests(test_dir, loader, host=None,
@@ -71,7 +71,7 @@ Implementation Details
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Creating a content handler requires subclassing
-:class:`~gabbi.handlers.ContentHandler` and implementing several methods.
+:class:`~gabbi.handlers.base.ContentHandler` and implementing several methods.
 These methods are described below, but inspecting
 :class:`~gabbi.handlers.jsonhandler.JSONHandler` will be instructive in
 highlighting required arguments and techniques.

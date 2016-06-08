@@ -11,14 +11,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from gabbi import handlers
+from gabbi.handlers import base
 
 
 def gabbi_response_handlers():
     return [CustomResponseHandler]
 
 
-class CustomResponseHandler(handlers.ResponseHandler):
+class CustomResponseHandler(base.ResponseHandler):
 
     test_key_suffix = 'custom'
     test_key_value = []

@@ -36,7 +36,8 @@ class TestMaker(object):
     """
 
     def __init__(self, test_base_name, test_defaults, test_directory,
-                 fixture_classes, loader, host, port, intercept, prefix):
+                 fixture_classes, loader, host, port, intercept, prefix,
+                 response_handlers, content_handlers):
         self.test_base_name = test_base_name
         self.test_defaults = test_defaults
         self.default_keys = set(test_defaults.keys())
@@ -47,6 +48,8 @@ class TestMaker(object):
         self.loader = loader
         self.intercept = intercept
         self.prefix = prefix
+        self.content_handlers = content_handlers
+        self.response_handlers = response_handlers
 
     def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
@@ -84,6 +87,8 @@ class TestMaker(object):
                              'http': http_class,
                              'host': self.host,
                              'intercept': self.intercept,
+                             'content_handlers': self.content_handlers,
+                             'response_handlers': self.response_handlers,
                              'port': self.port,
                              'prefix': self.prefix,
                              'prior': prior_test})
@@ -205,7 +210,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix, response_handlers, content_hahndlers)
+                           prefix, response_handlers, content_handlers)
     file_suite = suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:

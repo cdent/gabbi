@@ -17,7 +17,7 @@ import json
 import unittest
 
 from gabbi import case
-from gabbi import handlers
+from gabbi.handlers import core
 from gabbi.handlers import jsonhandler
 from gabbi import suitemaker
 
@@ -33,8 +33,8 @@ class HandlersTest(unittest.TestCase):
         super(HandlersTest, self).setUp()
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
-                                       {'test_data': {},
-                                        'content_handlers': []})
+                                           {'test_data': {},
+                                           'content_handlers': []})
 
     def test_empty_response_handler(self):
         self.test.test_data = {'url': '$RESPONSE["barnabas"]'}
@@ -53,7 +53,7 @@ class HandlersTest(unittest.TestCase):
         self.assertEqual('barnabas', url)
 
     def test_response_strings(self):
-        handler = handlers.StringResponseHandler()
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -61,7 +61,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_strings_fail(self):
-        handler = handlers.StringResponseHandler()
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -70,7 +70,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_strings_fail_big_output(self):
-        handler = handlers.StringResponseHandler()
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
         self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
@@ -82,7 +82,7 @@ class HandlersTest(unittest.TestCase):
         self.assertEqual(2036, len(msg))
 
     def test_response_strings_fail_big_payload(self):
-        string_handler = handlers.StringResponseHandler()
+        string_handler = core.StringResponseHandler()
         # Register the JSON handler so response_data is set.
         json_handler = jsonhandler.JSONHandler()
         self.test.response_handlers = [string_handler, json_handler]
@@ -151,7 +151,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_headers(self):
-        handler = handlers.HeadersResponseHandler()
+        handler = core.HeadersResponseHandler()
         self.test.response = {'content-type': 'text/plain'}
 
         self.test.test_data = {'response_headers': {
@@ -165,7 +165,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_regex(self):
-        handler = handlers.HeadersResponseHandler()
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': '/text/plain/',
         }}
@@ -173,7 +173,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_fail_data(self):
-        handler = handlers.HeadersResponseHandler()
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': 'text/plain',
         }}
@@ -185,7 +185,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_response_headers_fail_header(self):
-        handler = handlers.HeadersResponseHandler()
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'location': '/somewhere',
         }}
@@ -196,7 +196,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_resonse_headers_stringify(self):
-        handler = handlers.HeadersResponseHandler()
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'x-alpha-beta': 2.0,
         }}

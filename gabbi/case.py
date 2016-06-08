@@ -33,7 +33,7 @@ from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
-from gabbi import handlers
+from gabbi.handlers import base
 from gabbi import utils
 
 
@@ -198,23 +198,6 @@ class HTTPTestCase(unittest.TestCase):
         environ_name = match.group('arg')
         return os.environ[environ_name]
 
-    @staticmethod
-    def extract_json_path_value(data, path):
-        """Extract the value at JSON Path path from the data.
-
-        The input data is a Python datastructure, not a JSON string.
-        """
-        path_expr = json_parser.parse(path)
-        matches = [match.value for match in path_expr.find(data)]
-        if matches:
-            if len(matches) > 1:
-                return matches
-            else:
-                return matches[0]
-        else:
-            raise ValueError(
-                "JSONPath '%s' failed to match on data: '%s'" % (path, data))
-
     def _cookie_replace(self, message):
         """Replace $COOKIE in a message.
 
@@ -237,11 +220,6 @@ class HTTPTestCase(unittest.TestCase):
         """Replace a regex match with the value of a prior header."""
         header_key = match.group('arg')
         return self.prior.response[header_key.lower()]
-
-    def _json_replacer(self, match):
-        """Replace a regex match with the value of a JSON Path."""
-        path = match.group('arg')
-        return str(self.extract_json_path_value(self.prior.json_data, path))
 
     def _last_url_replace(self, message):
         """Replace $LAST_URL in a message.
@@ -314,7 +292,7 @@ class HTTPTestCase(unittest.TestCase):
         else:
             # If no handler can be found use the null replacer,
             # which returns "foo" when "$RESPONSE['foo']".
-            replacer_func = handlers.ContentHandler.gen_replacer(self)
+            replacer_func = base.ContentHandler.gen_replacer(self)
         return re.sub(self._replacer_regex('RESPONSE'),
                       replacer_func, message)
 

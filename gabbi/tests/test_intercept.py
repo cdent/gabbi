@@ -21,7 +21,7 @@ import sys
 
 from gabbi import driver
 from gabbi import fixture
-from gabbi import handlers
+from gabbi.handlers import base
 from gabbi.tests import simple_wsgi
 
 
@@ -38,7 +38,7 @@ class TestFixtureTwo(fixture.GabbiFixture):
     pass
 
 
-class TestResponseHandler(handlers.ResponseHandler):
+class TestResponseHandler(base.ResponseHandler):
     """A sample response handler just to test."""
 
     test_key_suffix = 'test'

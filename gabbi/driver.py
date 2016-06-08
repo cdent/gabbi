@@ -30,7 +30,6 @@ import unittest
 from unittest import suite
 import uuid
 
-from gabbi import case
 from gabbi import handlers
 from gabbi import reporter
 from gabbi import suitemaker

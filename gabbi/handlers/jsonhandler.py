@@ -14,11 +14,11 @@
 
 import json
 
-from gabbi import handlers
+from gabbi.handlers import base
 from gabbi import json_parser
 
 
-class JSONHandler(handlers.ContentHandler):
+class JSONHandler(base.ContentHandler):
     """A ContentHandler for JSON
 
     * Structured test ``data`` is turned into JSON when request

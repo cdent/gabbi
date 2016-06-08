@@ -33,6 +33,30 @@ gabbi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`handlers.base` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gabbi.handlers.base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`handlers.core` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gabbi.handlers.core
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`handlers.jsonhandler` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gabbi.handlers.jsonhandler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`suite` Module
 -------------------
 
