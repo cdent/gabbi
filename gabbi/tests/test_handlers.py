@@ -17,9 +17,9 @@ import json
 import unittest
 
 from gabbi import case
-from gabbi import driver
 from gabbi import handlers
 from gabbi.handlers import jsonhandler
+from gabbi import suitemaker
 
 
 class HandlersTest(unittest.TestCase):
@@ -32,7 +32,7 @@ class HandlersTest(unittest.TestCase):
     def setUp(self):
         super(HandlersTest, self).setUp()
         self.test_class = case.HTTPTestCase
-        self.test = driver.TestBuilder('mytest', (self.test_class,),
+        self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
                                        {'test_data': {},
                                         'content_handlers': []})
 

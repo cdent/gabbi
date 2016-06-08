@@ -13,6 +13,7 @@
 """Test that the CLI works as expected
 """
 
+import copy
 import sys
 import unittest
 from uuid import uuid4
@@ -20,7 +21,8 @@ from uuid import uuid4
 from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
 
-from gabbi import driver
+from gabbi import case
+from gabbi import exception
 from gabbi import handlers
 from gabbi import runner
 from gabbi.tests.simple_wsgi import SimpleWsgi
@@ -36,7 +38,8 @@ class RunnerTest(unittest.TestCase):
         host, port = (str(uuid4()), 8000)
         self.host = host
         self.port = port
-        self.server = lambda: Urllib3Interceptor(SimpleWsgi, host, port, '')
+        self.server = lambda: Urllib3Interceptor(
+            SimpleWsgi, host=host, port=port)
 
         self._stdin = sys.stdin
 
@@ -54,6 +57,9 @@ class RunnerTest(unittest.TestCase):
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
+        # Cleanup the custom response_handler
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
@@ -73,8 +79,13 @@ class RunnerTest(unittest.TestCase):
                 self.assertSuccess(err)
 
     def test_target_url_parsing_standard_port(self):
+        # NOTE(cdent): For reasons unclear this regularly fails in
+        # py.test and sometimes fails with testr. So there is
+        # some state that is not being properly cleard somewhere.
+        # Within SimpleWsgi, the environ thinks url_scheme is
+        # 'https'.
         self.server = lambda: Urllib3Interceptor(
-            SimpleWsgi, self.host, 80, '')
+            SimpleWsgi, host=self.host, port=80)
         sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
 
         sys.stdin = StringIO("""
@@ -98,7 +109,7 @@ class RunnerTest(unittest.TestCase):
           GET: /
           response_html: ...
         """)
-        with self.assertRaises(driver.GabbiFormatError):
+        with self.assertRaises(exception.GabbiFormatError):
             runner.run()
 
         sys.argv.insert(1, "--response-handler")
@@ -168,7 +179,7 @@ class RunnerTest(unittest.TestCase):
 
     def test_exit_code(self):
         sys.stdin = StringIO()
-        with self.assertRaises(driver.GabbiFormatError):
+        with self.assertRaises(exception.GabbiFormatError):
             runner.run()
 
         sys.stdin = StringIO("""
@@ -216,6 +227,93 @@ class RunnerTest(unittest.TestCase):
         sys.stderr.flush()
         sys.stderr.seek(0)
         self._stderr.write(sys.stderr.read())
+
+
+class RunnerHostArgParse(unittest.TestCase):
+
+    def _test_hostport(self, url_or_host, expected_host,
+                       provided_prefix=None, expected_port=None,
+                       expected_prefix=None, expected_ssl=False):
+        host, port, prefix, ssl = runner.process_target_args(
+            url_or_host, provided_prefix)
+
+        # normalize hosts, they are case insensitive
+        self.assertEqual(expected_host.lower(), host.lower())
+        # port can be a string or int depending on the inputs
+        self.assertEqual(expected_port, port)
+        self.assertEqual(expected_prefix, prefix)
+        self.assertEqual(expected_ssl, ssl)
+
+    def test_plain_url_no_port(self):
+        self._test_hostport('http://foobar.com/news',
+                            'foobar.com',
+                            expected_port=None,
+                            expected_prefix='/news')
+
+    def test_plain_url_with_port(self):
+        self._test_hostport('http://foobar.com:80/news',
+                            'foobar.com',
+                            expected_port=80,
+                            expected_prefix='/news')
+
+    def test_ssl_url(self):
+        self._test_hostport('https://foobar.com/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_ssl=True)
+
+    def test_ssl_port80_url(self):
+        self._test_hostport('https://foobar.com:80/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=80,
+                            expected_ssl=True)
+
+    def test_ssl_port_url(self):
+        self._test_hostport('https://foobar.com:999/news',
+                            'foobar.com',
+                            expected_prefix='/news',
+                            expected_port=999,
+                            expected_ssl=True)
+
+    def test_simple_hostport(self):
+        self._test_hostport('foobar.com:999',
+                            'foobar.com',
+                            expected_port='999')
+
+    def test_simple_hostport_with_prefix(self):
+        self._test_hostport('foobar.com:999',
+                            'foobar.com',
+                            provided_prefix='/news',
+                            expected_port='999',
+                            expected_prefix='/news')
+
+    def test_ipv6_url_long(self):
+        self._test_hostport(
+            'http://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:999/news',
+            'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210',
+            expected_port=999,
+            expected_prefix='/news')
+
+    def test_ipv6_url_localhost(self):
+        self._test_hostport(
+            'http://[::1]:999/news',
+            '::1',
+            expected_port=999,
+            expected_prefix='/news')
+
+    def test_ipv6_host_localhost(self):
+        # If a user wants to use the hostport form, then they need
+        # to hack it with the brackets.
+        self._test_hostport(
+            '[::1]',
+            '::1')
+
+    def test_ipv6_hostport_localhost(self):
+        self._test_hostport(
+            '[::1]:999',
+            '::1',
+            expected_port='999')
 
 
 class HTMLResponseHandler(handlers.ResponseHandler):

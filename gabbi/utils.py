@@ -12,7 +12,10 @@
 # under the License.
 """Utility functions grab bag."""
 
+import io
 import os
+
+import yaml
 
 
 try:  # Python 3
@@ -29,10 +32,17 @@ from six.moves.urllib import parse as urlparse
 def create_url(base_url, host, port=None, prefix='', ssl=False):
     """Given pieces of a path-based url, return a fully qualified url."""
     scheme = 'http'
-    netloc = host
+
+    # A host with : in it at this stage is assumed to be an IPv6
+    # address of some kind (they come in many forms). Port should
+    # already have been stripped off.
+    if ':' in host and not (host.startswith('[') and host.endswith(']')):
+        host = '[%s]' % host
 
     if port and not _port_follows_standard(port, ssl):
         netloc = '%s:%s' % (host, port)
+    else:
+        netloc = host
 
     if ssl:
         scheme = 'https'
@@ -90,6 +100,21 @@ def get_colorizer(stream):
         return _colorize
     else:
         return lambda x, y: y
+
+
+def load_yaml(handle=None, yaml_file=None):
+    """Read and parse any YAML file or filehandle.
+
+    Let exceptions flow where they may.
+
+    If no file or handle is provided, read from STDIN.
+    """
+    if yaml_file:
+        with io.open(yaml_file, encoding='utf-8') as source:
+            return yaml.safe_load(source.read())
+
+    # This will intentionally raise AttributeError if handle is None.
+    return yaml.safe_load(handle.read())
 
 
 def not_binary(content_type):

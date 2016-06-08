@@ -28,6 +28,7 @@ import unittest
 from unittest import case
 
 import six
+from six.moves import http_cookies
 from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
@@ -43,6 +44,7 @@ REPLACERS = [
     'NETLOC',
     'ENVIRON',
     'LOCATION',
+    'COOKIE',
     'LAST_URL',
     'HEADERS',
     'RESPONSE',
@@ -195,6 +197,34 @@ class HTTPTestCase(unittest.TestCase):
         """
         environ_name = match.group('arg')
         return os.environ[environ_name]
+
+    @staticmethod
+    def extract_json_path_value(data, path):
+        """Extract the value at JSON Path path from the data.
+
+        The input data is a Python datastructure, not a JSON string.
+        """
+        path_expr = json_parser.parse(path)
+        matches = [match.value for match in path_expr.find(data)]
+        if matches:
+            if len(matches) > 1:
+                return matches
+            else:
+                return matches[0]
+        else:
+            raise ValueError(
+                "JSONPath '%s' failed to match on data: '%s'" % (path, data))
+
+    def _cookie_replace(self, message):
+        """Replace $COOKIE in a message.
+
+        With cookie data from set-cookie in the prior request.
+        """
+        response_cookies = self.prior.response['set-cookie']
+        cookies = http_cookies.SimpleCookie()
+        cookies.load(response_cookies)
+        cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
+        return message.replace('$COOKIE', cookie_string)
 
     def _headers_replace(self, message):
         """Replace a header indicator in a message with that headers value from

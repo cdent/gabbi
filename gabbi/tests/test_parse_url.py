@@ -17,6 +17,7 @@ behaves.
 """
 
 from collections import OrderedDict
+import copy
 import unittest
 import uuid
 
@@ -31,7 +32,7 @@ class UrlParseTest(unittest.TestCase):
         # be set manually here, due to metaclass magics elsewhere.
         # test_data must have a base value.
         http_case = case.HTTPTestCase('test_request')
-        http_case.test_data = case.BASE_TEST
+        http_case.test_data = copy.copy(case.BASE_TEST)
         http_case.host = host
         http_case.port = port
         http_case.prefix = prefix
@@ -40,21 +41,21 @@ class UrlParseTest(unittest.TestCase):
         return http_case
 
     def test_parse_url(self):
-        host = uuid.uuid4()
+        host = uuid.uuid4().hex
         http_case = self.make_test_case(host)
         parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('http://%s:8000/foobar' % host, parsed_url)
 
     def test_parse_prefix(self):
-        host = uuid.uuid4()
+        host = uuid.uuid4().hex
         http_case = self.make_test_case(host, prefix='/noise')
         parsed_url = http_case._parse_url('/foobar')
 
         self.assertEqual('http://%s:8000/noise/foobar' % host, parsed_url)
 
     def test_parse_full(self):
-        host = uuid.uuid4()
+        host = uuid.uuid4().hex
         http_case = self.make_test_case(host)
         parsed_url = http_case._parse_url('http://example.com/house')
 
@@ -102,6 +103,37 @@ class UrlParseTest(unittest.TestCase):
 
         self.assertEqual('https://%s:80/foobar' % host, parsed_url)
 
+    def test_ipv6_url(self):
+        host = '::1'
+        http_case = self.make_test_case(host, port='80', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
+
+        self.assertEqual('https://[%s]:80/foobar' % host, parsed_url)
+
+    def test_ipv6_full_url(self):
+        host = '::1'
+        http_case = self.make_test_case(host, port='80', ssl=True)
+        parsed_url = http_case._parse_url(
+            'http://[2001:4860:4860::8888]/foobar')
+
+        self.assertEqual('http://[2001:4860:4860::8888]/foobar', parsed_url)
+
+    def test_ipv6_no_double_colon_wacky_ssl(self):
+        host = 'FEDC:BA98:7654:3210:FEDC:BA98:7654:3210'
+        http_case = self.make_test_case(host, port='80', ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
+
+        self.assertEqual(
+            'https://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80/foobar',
+            parsed_url)
+
+        http_case = self.make_test_case(host, ssl=True)
+        parsed_url = http_case._parse_url('/foobar')
+
+        self.assertEqual(
+            'https://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:8000/foobar',
+            parsed_url)
+
     def test_add_query_params(self):
         host = uuid.uuid4().hex
         # Use a sequence of tuples to ensure order.
@@ -121,7 +153,7 @@ class UrlParseTest(unittest.TestCase):
         self.assertEqual('http://%s:8000/foobar?alpha=beta&x=1&y=2'
                          % host, parsed_url)
 
-    def test_extend_query_params_full_ulr(self):
+    def test_extend_query_params_full_url(self):
         host = 'stub'
         query = OrderedDict([('x', 1), ('y', 2)])
         http_case = self.make_test_case(host, params=query)

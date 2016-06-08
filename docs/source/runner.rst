@@ -32,5 +32,11 @@ or in the target URL::
 The value of prefix will be prepended to the path portion of URLs that
 are not fully qualified.
 
+Anywhere host is used, if it is a raw IPV6 address it should be
+wrapped in ``[`` and ``]``.
+
+If ``https`` is used in the target, then the tests in the provided
+YAML will default to ``ssl: True``.
+
 If a ``-x`` or ``--failfast`` argument is provided then ``gabbi-run`` will
 exit after the first test failure.

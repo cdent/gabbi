@@ -172,3 +172,14 @@ class HeadersResponseHandler(ResponseHandler):
             test.assertEqual(header_value, response_value,
                              'Expect header %s with value %s, got %s' %
                              (header, header_value, response[header]))
+
+
+# A list of these handlers for easy traversal.
+# TODO(cdent): We could automate this, but meh.
+# When the content-handler changes are done this can be cleaned up.
+RESPONSE_HANDLERS = [
+    ForbiddenHeadersResponseHandler,
+    HeadersResponseHandler,
+    StringResponseHandler,
+    JSONResponseHandler,
+]

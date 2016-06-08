@@ -10,6 +10,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""See gabbi.driver and gabbbi.case."""
+"""Gabbi specific exceptions."""
 
-__version__ = '1.21.0'
+
+class GabbiFormatError(ValueError):
+    """An exception to encapsulate poorly formed test data."""
+    pass
