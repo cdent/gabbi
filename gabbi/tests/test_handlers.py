@@ -13,6 +13,7 @@
 """Test response handlers.
 """
 
+import copy
 import json
 import unittest
 
@@ -54,7 +55,9 @@ class HandlersTest(unittest.TestCase):
         self.assertEqual('barnabas', url)
 
     def tearDown(self):
-        case.HTTPTestCase.reset_handlers()
+        self.test_class.response_handlers = []
+        self.test_class.content_handlers = []
+        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_response_strings(self):
         handler = core.StringResponseHandler()
@@ -222,13 +225,15 @@ class TestHTMLContentHandler(unittest.TestCase):
     def setUp(self):
         super(TestHTMLContentHandler, self).setUp()
         self.test_class = case.HTTPTestCase
-        self.test = driver.TestBuilder('mytest', (self.test_class,),
-                                       {'test_data': {}})
+        self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
+                                           {'test_data': {}})
         self.handler_class = html_content_handler.HTMLHandler
         self.handler = self.handler_class()
 
     def tearDown(self):
-        case.HTTPTestCase.reset_handlers()
+        self.test_class.response_handlers = []
+        self.test_class.content_handlers = []
+        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_data(self):
         form_data = dict(name='foo', cat='thom', choices=['alpha', 'beta'])

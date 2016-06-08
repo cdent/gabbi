@@ -16,7 +16,7 @@ from lxml import html
 
 from six.moves.urllib import parse as urlparse
 
-from gabbi import handlers
+from gabbi.handlers import base
 
 
 def _parse_selector(selector):
@@ -30,7 +30,7 @@ def _parse_selector(selector):
     return selector, attribute
 
 
-class HTMLHandler(handlers.ResponseHandler, handlers.ContentHandler):
+class HTMLHandler(base.ContentHandler):
 
     test_key_suffix = 'html'
     test_key_value = {}
