@@ -103,6 +103,11 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
     This uses build_tests to create TestCases and then yields them in
     a way that pytest can handle.
     """
+
+    import pytest
+    pluginmanager = pytest.config.pluginmanager
+    pluginmanager.import_plugin('gabbi.pytester')
+
     loader = unittest.TestLoader()
     result = reporter.PyTestResult()
     tests = build_tests(test_dir, loader, host=host, port=port,
@@ -114,7 +119,8 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
 
     for test in tests:
         if hasattr(test, '_tests'):
-            # Establish fixtures as if they were tests.
+            # Establish fixtures as if they were tests. These will
+            # be cleaned up by the pytester plugin.
             yield 'start_%s' % test._tests[0].__class__.__name__, \
                 test.start, result
             for subtest in test:
