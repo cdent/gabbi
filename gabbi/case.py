@@ -27,6 +27,7 @@ import sys
 import time
 import unittest
 from unittest import case
+from unittest import result
 
 import six
 from six.moves import http_cookies
@@ -132,7 +133,9 @@ class HTTPTestCase(unittest.TestCase):
             self.skipTest(self.test_data['skip'])
 
         if self.prior and not self.prior.has_run:
-            self.prior.run()
+            # Use a different result so we don't count this test
+            # in the results.
+            self.prior.run(result.TestResult())
         self._run_test()
 
     def replace_template(self, message):
