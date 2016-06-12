@@ -35,6 +35,7 @@ from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
+from gabbi import exception
 from gabbi import json_parser
 from gabbi import utils
 
@@ -360,7 +361,11 @@ class HTTPTestCase(unittest.TestCase):
         method = test['method'].upper()
         headers = test['request_headers']
         for name in headers:
-            headers[name] = self.replace_template(headers[name])
+            try:
+                headers[name] = self.replace_template(headers[name])
+            except TypeError as exc:
+                raise exception.GabbiFormatError(
+                    'malformed headers in test %s: %s' % (test['name'], exc))
 
         if test['data'] is not '':
             body = self._test_data_to_string(
