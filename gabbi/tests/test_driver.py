@@ -70,3 +70,20 @@ class DriverTest(unittest.TestCase):
         first_test = suite._tests[0]._tests[0]
         full_url = first_test._parse_url(first_test.test_data['url'])
         self.assertEqual('http://localhost:8001/', full_url)
+
+    def test_build_url_target(self):
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost', port='999',
+                                   url='https://example.com:1024/theend')
+        first_test = suite._tests[0]._tests[0]
+        full_url = first_test._parse_url(first_test.test_data['url'])
+        self.assertEqual('https://example.com:1024/theend/', full_url)
+
+    def test_build_url_target_forced_ssl(self):
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost', port='999',
+                                   url='http://example.com:1024/theend',
+                                   require_ssl=True)
+        first_test = suite._tests[0]._tests[0]
+        full_url = first_test._parse_url(first_test.test_data['url'])
+        self.assertEqual('https://example.com:1024/theend/', full_url)
