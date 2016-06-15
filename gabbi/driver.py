@@ -52,7 +52,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param intercept: WSGI app factory for wsgi-intercept.
     :param test_loader_name: Base name for test classes. Rarely used.
     :param fixture_module: Python module containing fixture classes.
-    :param response_handers: ResponseHandler classes.
+    :param response_handers: :class:`~gabbi.handlers.ResponseHandler` classes.
     :type response_handlers: List of ResponseHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
     :param url: A full URL to test against. Replaces host, port and prefix.

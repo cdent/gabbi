@@ -12,9 +12,9 @@
 # under the License.
 """The code that creates a suite of tests.
 
-The key piece of code ``test_suite_from_dict``. It produces a
-``gabbi.suite.GabbiSuite`` containing one or more
-``gabbi.case.HTTPTestCase``.
+The key piece of code is :meth:`test_suite_from_dict`. It produces a
+:class:`gabbi.suite.GabbiSuite` containing one or more
+:class:`gabbi.case.HTTPTestCase`.
 """
 
 import copy
@@ -167,7 +167,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
     :param defaults: An optional dictionary of default values to be used
                      in each test.
     :param tests: A list of individual tests, themselves each being a
-                  dictionary. TODO: link to the case.BASE_TEST.
+                  dictionary. See :data:`gabbi.case.BASE_TEST`.
     """
     try:
         test_data = suite_dict['tests']
