@@ -24,6 +24,8 @@ Test Structure
 The top-level ``tests`` category contains an ordered sequence of test
 declarations, each describing the expected response to a given request:
 
+.. _metadata:
+
 Metadata
 ********
 
@@ -57,6 +59,8 @@ Note: When tests are generated dynamically, the ``TestCase`` name will include
 the respective test's ``name``, lowercased with spaces transformed to ``_``. In
 at least some test runners this will allow you to select and filter on test
 name.
+
+.. _request-parameters:
 
 Request Parameters
 ******************
@@ -116,6 +120,8 @@ Request Parameters
                          scheme takes precedence if present — see
                          :doc:`host` for details.
    ====================  ========================================  ============
+
+.. _response-expectations:
 
 Response Expectations
 *********************
