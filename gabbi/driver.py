@@ -29,8 +29,10 @@ import os
 import unittest
 from unittest import suite
 import uuid
+import warnings
 
 from gabbi import case
+from gabbi import exception
 from gabbi import handlers
 from gabbi import reporter
 from gabbi import suitemaker
@@ -83,6 +85,10 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
     top_suite = suite.TestSuite()
     for test_file in glob.iglob('%s/*.yaml' % path):
+        if '_' in os.path.basename(test_file):
+            warnings.warn(exception.GabbiSyntaxWarning(
+                "'_' in test filename %s. This can break suite grouping."
+                % test_file))
         if intercept:
             host = str(uuid.uuid4())
         suite_dict = utils.load_yaml(yaml_file=test_file)
@@ -134,7 +140,6 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
                          host, port, fixture_module, intercept, prefix=''):
     """Legacy wrapper retained for backwards compatibility."""
-    import warnings
 
     with warnings.catch_warnings():  # ensures warnings filter is restored
         warnings.simplefilter('default', DeprecationWarning)

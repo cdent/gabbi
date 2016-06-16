@@ -16,3 +16,8 @@
 class GabbiFormatError(ValueError):
     """An exception to encapsulate poorly formed test data."""
     pass
+
+
+class GabbiSyntaxWarning(SyntaxWarning):
+    """A warning about syntax that is not desirable."""
+    pass
