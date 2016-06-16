@@ -8,6 +8,7 @@
    :hidden:
 
    format
+   loader
    example
    jsonpath
    host
