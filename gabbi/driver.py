@@ -39,7 +39,7 @@ from gabbi import utils
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
                 response_handlers=None, content_handlers=None,
-                prefix='', require_ssl=False):
+                prefix='', require_ssl=False, url=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -51,11 +51,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param intercept: WSGI app factory for wsgi-intercept.
     :param test_loader_name: Base name for test classes. Rarely used.
     :param fixture_module: Python module containing fixture classes.
-    :param response_handlers: ResponseHandler classes.
+    :param response_handers: :class:`~gabbi.handlers.ResponseHandler` classes.
     :type response_handlers: List of ResponseHandler classes.
     :param content_handlers: ContentHandler classes.
     :type content_handlers: List of ContentHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
+    :param url: A full URL to test against. Replaces host, port and prefix.
     :param require_ssl: If ``True``, make all tests default to using SSL.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -64,6 +65,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     # or an intercept.
     if not bool(host) ^ bool(intercept):
         raise AssertionError('must specify exactly one of host or intercept')
+
+    # If url is being used, reset host, port and prefix.
+    if url:
+        host, port, prefix, force_ssl = utils.host_info_from_target(url)
+        if force_ssl and not require_ssl:
+            require_ssl = force_ssl
 
     if test_loader_name is None:
         test_loader_name = inspect.stack()[1]
@@ -104,7 +111,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
                       fixture_module=None, response_handlers=None,
-                      content_handlers=None, require_ssl=False):
+                      content_handlers=None, require_ssl=False, url=None):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -118,7 +125,8 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         fixture_module=fixture_module,
                         response_handlers=response_handlers,
                         content_handlers=content_handlers,
-                        prefix=prefix, require_ssl=require_ssl)
+                        prefix=prefix, require_ssl=require_ssl,
+                        url=url)
 
     for test in tests:
         if hasattr(test, '_tests'):

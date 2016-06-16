@@ -7,6 +7,8 @@
 Gabbi
 =====
 
+`Release Notes`_
+
 Gabbi is a tool for running HTTP tests where requests and responses
 are represented in a declarative YAML-based form. The simplest test
 looks like this::
@@ -27,6 +29,7 @@ There is a `gabbi-demo`_ repository which provides a tutorial via
 its commit history. The demo builds a simple API using gabbi to
 facilitate test driven development.
 
+.. _Release Notes: https://gabbi.readthedocs.io/en/latest/release.html
 .. _docs: https://gabbi.readthedocs.io/
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
 .. _unittest: https://gabbi.readthedocs.io/en/latest/example.html#loader

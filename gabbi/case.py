@@ -26,6 +26,7 @@ import sys
 import time
 import unittest
 from unittest import case
+from unittest import result
 
 import six
 from six.moves import http_cookies
@@ -33,6 +34,7 @@ from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
+from gabbi import exception
 from gabbi.handlers import base
 from gabbi import utils
 
@@ -130,7 +132,9 @@ class HTTPTestCase(unittest.TestCase):
             self.skipTest(self.test_data['skip'])
 
         if self.prior and not self.prior.has_run:
-            self.prior.run()
+            # Use a different result so we don't count this test
+            # in the results.
+            self.prior.run(result.TestResult())
         self._run_test()
 
     def get_content_handler(self, content_type):
@@ -348,7 +352,11 @@ class HTTPTestCase(unittest.TestCase):
         method = test['method'].upper()
         headers = test['request_headers']
         for name in headers:
-            headers[name] = self.replace_template(headers[name])
+            try:
+                headers[name] = self.replace_template(headers[name])
+            except TypeError as exc:
+                raise exception.GabbiFormatError(
+                    'malformed headers in test %s: %s' % (test['name'], exc))
 
         if test['data'] is not '':
             body = self._test_data_to_string(

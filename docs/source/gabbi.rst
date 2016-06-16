@@ -1,5 +1,5 @@
 gabbi Package
-=================
+=============
 
 :mod:`case` Module
 ------------------
@@ -13,6 +13,14 @@ gabbi Package
 --------------------
 
 .. automodule:: gabbi.driver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`suitemaker` Module
+------------------------
+
+.. automodule:: gabbi.suitemaker
     :members:
     :undoc-members:
     :show-inheritance:
@@ -73,6 +81,14 @@ gabbi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`reporter` Module
+----------------------
+
+.. automodule:: gabbi.reporter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`utils` Module
 -------------------
 
@@ -81,10 +97,26 @@ gabbi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`exception` Module
+-----------------------
+
+.. automodule:: gabbi.exception
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`httpclient` Module
 ------------------------
 
 .. automodule:: gabbi.httpclient
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`json_parser` Module
+-------------------------
+
+.. automodule:: gabbi.json_parser
     :members:
     :undoc-members:
     :show-inheritance:

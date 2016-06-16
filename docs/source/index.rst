@@ -14,6 +14,7 @@
    fixtures
    handlers
    runner
+   release
    gabbi
 
 Gabbi

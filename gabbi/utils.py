@@ -126,6 +126,31 @@ def not_binary(content_type):
             content_type.startswith('application/json'))
 
 
+def host_info_from_target(target, prefix=None):
+    """Turn url or host:port and target into test destination."""
+    force_ssl = False
+    split_url = urlparse.urlparse(target)
+
+    if split_url.scheme:
+        if split_url.scheme == 'https':
+            force_ssl = True
+        return split_url.hostname, split_url.port, split_url.path, force_ssl
+    else:
+        target = target
+        prefix = prefix
+
+    if ':' in target and '[' not in target:
+        host, port = target.rsplit(':', 1)
+    elif ']:' in target:
+        host, port = target.rsplit(':', 1)
+    else:
+        host = target
+        port = None
+    host = host.replace('[', '').replace(']', '')
+
+    return host, port, prefix, force_ssl
+
+
 def _colorize(color, message):
     """Add a color to the message."""
     try:
