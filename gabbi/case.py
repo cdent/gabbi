@@ -369,7 +369,8 @@ class HTTPTestCase(unittest.TestCase):
 
         if test['data'] is not '':
             body = self._test_data_to_string(
-                test['data'], headers.get('content-type', ''))
+                test['data'],
+                utils.extract_content_type(headers, default='')[0])
         else:
             body = ''
 
@@ -466,7 +467,7 @@ class HTTPTestCase(unittest.TestCase):
         If the output is long, it is limited by either GABBI_MAX_CHARS_OUTPUT
         in the environment or the MAX_CHARS_OUTPUT constant.
         """
-        if utils.not_binary(self.content_type):
+        if utils.not_binary(utils.parse_content_type(self.content_type)[0]):
             if expected in iterable:
                 return
 

@@ -45,6 +45,43 @@ class BinaryTypesTest(unittest.TestCase):
                              '%s should be binary' % media_type)
 
 
+class ParseContentTypeTest(unittest.TestCase):
+
+    def test_parse_simple(self):
+        self.assertEqual(
+            ('text/plain', 'latin-1'),
+            utils.parse_content_type('text/plain; charset=latin-1'))
+
+    def test_parse_extra(self):
+        self.assertEqual(
+            ('text/plain', 'latin-1'),
+            utils.parse_content_type(
+                'text/plain; charset=latin-1; version=1.2'))
+
+    def test_parse_default(self):
+        self.assertEqual(
+            ('text/plain', 'utf-8'),
+            utils.parse_content_type('text/plain'))
+
+    def test_parse_error_default(self):
+        self.assertEqual(
+            ('text/plain', 'utf-8'),
+            utils.parse_content_type(
+                'text/plain; face=ouch; charset=latin-1;'))
+
+    def test_parse_nocharset_default(self):
+        self.assertEqual(
+            ('text/plain', 'utf-8'),
+            utils.parse_content_type(
+                'text/plain; face=ouch'))
+
+    def test_parse_override_default(self):
+        self.assertEqual(
+            ('text/plain', 'latin-1'),
+            utils.parse_content_type(
+                'text/plain; face=ouch', default_charset='latin-1'))
+
+
 class ExtractContentTypeTest(unittest.TestCase):
 
     def test_extract_content_type_default_both(self):

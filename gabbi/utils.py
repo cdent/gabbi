@@ -68,26 +68,11 @@ def decode_response_content(header_dict, content):
         return content
 
 
-def extract_content_type(header_dict):
-    """Extract content-type from headers."""
+def extract_content_type(header_dict, default='application/binary'):
+    """Extract parsed content-type from headers."""
     content_type = header_dict.get('content-type',
-                                   'application/binary').strip().lower()
-    charset = 'utf-8'
-    if ';' in content_type:
-        content_type, parameter_strings = (attr.strip() for attr
-                                           in content_type.split(';', 1))
-        try:
-            parameter_pairs = [atom.strip().split('=')
-                               for atom in parameter_strings.split(';')]
-            parameters = {name: value for name, value in parameter_pairs}
-            charset = parameters['charset']
-        except (ValueError, KeyError):
-            # KeyError when no charset found.
-            # ValueError when the parameter_strings are poorly
-            # formed (for example trailing ;)
-            pass
-
-    return (content_type, charset)
+                                   default).strip().lower()
+    return parse_content_type(content_type)
 
 
 def get_colorizer(stream):
@@ -124,6 +109,26 @@ def not_binary(content_type):
             content_type.endswith('+json') or
             content_type == 'application/javascript' or
             content_type.startswith('application/json'))
+
+
+def parse_content_type(content_type, default_charset='utf-8'):
+    """Parse content type value for media type and charset."""
+    charset = default_charset
+    if ';' in content_type:
+        content_type, parameter_strings = (attr.strip() for attr
+                                           in content_type.split(';', 1))
+        try:
+            parameter_pairs = [atom.strip().split('=')
+                               for atom in parameter_strings.split(';')]
+            parameters = {name: value for name, value in parameter_pairs}
+            charset = parameters['charset']
+        except (ValueError, KeyError):
+            # KeyError when no charset found.
+            # ValueError when the parameter_strings are poorly
+            # formed (for example trailing ;)
+            pass
+
+    return (content_type, charset)
 
 
 def host_info_from_target(target, prefix=None):
