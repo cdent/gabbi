@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.23.0
+------
+
+Better :doc:`documentation <loader>` of how to run gabbi in a
+concurrent environment. Improved handling of pytest fixtures and
+test counts.
+
 1.22.0
 ------
 

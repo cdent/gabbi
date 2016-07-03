@@ -1,0 +1,6 @@
+
+tests:
+    - name: one
+      url: /
+    - name: two
+      url: http://example.com/moo
