@@ -106,8 +106,18 @@ class JSONResponseHandler(ResponseHandler):
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.json_data))
         expected = test.replace_template(value)
-        test.assertEqual(expected, match, 'Unable to match %s as %s, got %s'
-                         % (path, expected, match))
+        # If expected is a string, check to see if it is a regex.
+        if (hasattr(expected, 'startswith') and expected.startswith('/')
+                and expected.endswith('/')):
+            expected = expected.strip('/').rstrip('/')
+            test.assertRegexpMatches(
+                match, expected,
+                'Expect jsonpath %s to match /%s/, got %s' %
+                (path, expected, match))
+        else:
+            test.assertEqual(expected, match,
+                             'Unable to match %s as %s, got %s' %
+                             (path, expected, match))
 
 
 class ForbiddenHeadersResponseHandler(ResponseHandler):
