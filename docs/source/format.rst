@@ -157,6 +157,11 @@ Response Expectations
                                    content type of ``application/json``
                                    or containing ``+json``)
 
+                                   If the value is wrapped in ``/.../``
+                                   the result of the JSONPath query
+                                   will be compared against the
+                                   value as a regular expression.
+
    ``poll``                        A dictionary of two keys:
 
                                    * ``count``: An integer stating the

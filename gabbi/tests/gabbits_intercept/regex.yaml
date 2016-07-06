@@ -1,8 +1,19 @@
-# Confirm regex handling in response headers
+# Confirm regex handling in response and json path headers
 tests:
-- name: regex test
+- name: regex header test
   url: /cow?alpha=1
   method: PUT
   response_headers:
       x-gabbi-url: /cow\?al.*=1/
       location: $SCHEME://$NETLOC/cow?alpha=1
+
+- name: regex jsonpath test
+  PUT: /cow
+  request_headers:
+    content-type: application/json
+  data:
+    alpha: cow
+    beta: pig
+  response_json_paths:
+    $.alpha: /ow$/
+    $.beta: /(?!cow).*/
