@@ -34,14 +34,13 @@ tests:
           count: 3
           delay: .01
       response_json_paths:
-          $.x[0]: '1'
-          $.y[0]: '2'
-          $.z[0]: '3.4'
+          $.x[0]: 1
+          $.y[0]: 2
+          $.z[0]: 3.4
 
 
     - name: loop location
       url: $LOCATION
-      verbose: True
       poll:
           count: $RESPONSE['$.z[0]']
           delay: .01

@@ -143,12 +143,14 @@ class HTTPTestCase(unittest.TestCase):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
-                message[k] = self.replace_template(message[k])
+                message[k] = self.replace_template(message[k],
+                                                   retype_numerals)
             return message
         if isinstance(message, list):
             new_message = []
             for line in message:
-                new_message.append(self.replace_template(line))
+                new_message.append(
+                    self.replace_template(line, retype_numerals))
             return new_message
 
         for replacer in REPLACERS:

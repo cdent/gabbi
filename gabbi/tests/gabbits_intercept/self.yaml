@@ -21,9 +21,9 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/cow?alpha=1
   response_strings:
-      - '"alpha": ["1"]'
+      - '"alpha": [1]'
   response_json_paths:
-      alpha[0]: "1"
+      alpha[0]: 1
 
 - name: bogus method
   url: /
@@ -37,11 +37,11 @@ tests:
 - name: query returned
   url: /somewhere?foo=1&bar=2&bar=3
   response_strings:
-      - "\"bar\": [\"2\", \"3\"]"
+      - "\"bar\": [2, 3]"
   response_json_paths:
       bar:
-          - "2"
-          - "3"
+          - 2
+          - 3
 
 - name: simple post
   url: /named/thing
@@ -109,7 +109,7 @@ tests:
 - name: test pluggable response
   url: /foo?alpha=1
   response_test:
-      - 'COW"alpha": ["1"]'
+      - 'COW"alpha": [1]'
       - COWAnother line
 
 - name: fail pluggable response
@@ -117,7 +117,7 @@ tests:
   url: /foo?alpha=1
   xfail: true
   response_test:
-      - 'CO"alpha": ["1"]'
+      - 'CO"alpha": [1]'
 
 - name: test exception wrapper
   desc: simple wsgi will raise exception
