@@ -139,7 +139,7 @@ class HTTPTestCase(unittest.TestCase):
             self.prior.run(result.TestResult())
         self._run_test()
 
-    def replace_template(self, message, make_numbers=False):
+    def replace_template(self, message, retype_numerals=False):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
@@ -162,7 +162,7 @@ class HTTPTestCase(unittest.TestCase):
                         raise AssertionError(
                             'unable to replace %s in %s, data unavailable: %s'
                             % (template, message, exc))
-                    if make_numbers:
+                    if retype_numerals:
                         try:
                             if '.' in message:
                                 message = float(message)
@@ -389,8 +389,12 @@ class HTTPTestCase(unittest.TestCase):
             body = ''
 
         if test['poll']:
-            count = test['poll'].get('count', 1)
-            delay = test['poll'].get('delay', 1)
+            count = self.replace_template(test['poll'].get('count', 1),
+                                          retype_numerals=True)
+            delay = self.replace_template(test['poll'].get('delay', 1),
+                                          retype_numerals=True)
+            # Count must be an int, even if it came in as a float
+            count = int(count)
             failure = None
             while count:
                 try:
@@ -433,7 +437,7 @@ class HTTPTestCase(unittest.TestCase):
                 else:
                     return info
         else:
-            data = self.replace_template(data, make_numbers=True)
+            data = self.replace_template(data, retype_numerals=True)
             return json.dumps(data)
         return self.replace_template(data)
 
