@@ -28,5 +28,5 @@ For the implementation of the above see :meth:`~gabbi.driver.build_tests`.
 
 .. _wsgi-intercept: https://pypi.python.org/pypi/wsgi_intercept
 .. _intercept examples: https://github.com/cdent/gabbi/blob/master/gabbi/tests/test_intercept.py
-.. _full examples: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_intercept/google.yaml
+.. _full examples: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_live/google.yaml
 .. _live examples: https://github.com/cdent/gabbi/blob/master/gabbi/tests/test_live.py
