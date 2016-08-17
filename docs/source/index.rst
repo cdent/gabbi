@@ -16,6 +16,7 @@
    handlers
    runner
    release
+   faq
    gabbi
 
 Gabbi
