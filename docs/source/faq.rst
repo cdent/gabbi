@@ -10,6 +10,8 @@ Frequently Asked Questions
           As this document grows it will gain a more refined
           structure.
 
+.. highlight:: yaml
+
 General
 ~~~~~~~
 
@@ -21,6 +23,33 @@ built in any programming language.
 
 Testing Style
 ~~~~~~~~~~~~~
+
+Can I have variables in my YAML file?
+-------------------------------------
+
+Gabbi provides the ``$ENVIRON`` :ref:`substitution
+<state-substitution>` which can operate a bit like variables that
+are set elsewhere and then used in the tests defined by the YAML.
+
+If you find it necessary to have variables within a single YAML file
+you take advantage of YAML `alias nodes`_ list this::
+
+    vars:
+      - &uuid_1 5613AABF-BAED-4BBA-887A-252B2D3543F8
+
+    tests:
+    - name: send a uuid to a post
+      POST: /resource
+      request_headers:
+        content-type: application/json
+      data:
+        uuid: *uuid_1
+
+You can alias all sorts of nodes, not just single items. Be aware
+that the replacement of an alias node happens while the YAML is
+being loaded, before gabbi does any processing.
+
+.. _alias nodes: http://www.yaml.org/spec/1.2/spec.html#id2786196
 
 How many tests should be put in one YAML file?
 ----------------------------------------------
