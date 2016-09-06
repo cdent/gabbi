@@ -128,6 +128,34 @@ class HandlersTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self._assert_handler(handler)
 
+    def test_response_json_paths_regex(self):
+        handler = handlers.JSONResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.objects[0].name': '/ow/',
+        }}
+        self.test.json_data = {
+            'objects': [{'name': 'cow',
+                         'location': 'barn'},
+                        {'name': 'chris',
+                         'location': 'house'}]
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_regex_number(self):
+        handler = handlers.JSONResponseHandler(self.test_class)
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.objects[0].name': '/\d+/',
+        }}
+        self.test.json_data = {
+            'objects': [{'name': 99,
+                         'location': 'barn'},
+                        {'name': 'chris',
+                         'location': 'house'}]
+        }
+        self._assert_handler(handler)
+
     def test_response_headers(self):
         handler = handlers.HeadersResponseHandler(self.test_class)
         self.test.response = {'content-type': 'text/plain'}

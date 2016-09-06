@@ -110,6 +110,8 @@ class JSONResponseHandler(ResponseHandler):
         if (hasattr(expected, 'startswith') and expected.startswith('/')
                 and expected.endswith('/')):
             expected = expected.strip('/').rstrip('/')
+            # match may be a number so stringify
+            match = str(match)
             test.assertRegexpMatches(
                 match, expected,
                 'Expect jsonpath %s to match /%s/, got %s' %
