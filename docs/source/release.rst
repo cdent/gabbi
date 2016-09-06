@@ -132,6 +132,7 @@ gabbi.
 * Michael McCune
 * Imran Hayder
 * Julien Danjou
+* Danek Duvall
 * Marc Abramowitz
 
 .. _commit logs: https://github.com/cdent/gabbi/commits
