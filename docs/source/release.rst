@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.25.0
+------
+
+Allow the ``test_loader_name`` arg to
+:meth:`gabbi.driver.build_tests` to override the prefix of the
+pretty printed name of generated tests.
+
 1.24.0
 ------
 
