@@ -36,7 +36,8 @@ class TestMaker(object):
     """
 
     def __init__(self, test_base_name, test_defaults, test_directory,
-                 fixture_classes, loader, host, port, intercept, prefix):
+                 fixture_classes, loader, host, port, intercept, prefix,
+                 test_loader_name=None):
         self.test_base_name = test_base_name
         self.test_defaults = test_defaults
         self.default_keys = set(test_defaults.keys())
@@ -47,6 +48,7 @@ class TestMaker(object):
         self.loader = loader
         self.intercept = intercept
         self.prefix = prefix
+        self.test_loader_name = test_loader_name
 
     def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
@@ -87,6 +89,10 @@ class TestMaker(object):
                              'port': self.port,
                              'prefix': self.prefix,
                              'prior': prior_test})
+        # We've been asked to, make this test class think it comes
+        # from a different module.
+        if self.test_loader_name:
+            klass.__module__ = self.test_loader_name
 
         tests = self.loader.loadTestsFromTestCase(klass)
         # Return the first (and only) test in the klass.
@@ -157,7 +163,8 @@ class TestBuilder(type):
 
 
 def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
-                         host, port, fixture_module, intercept, prefix=''):
+                         host, port, fixture_module, intercept, prefix='',
+                         test_loader_name=None):
     """Generate a GabbiSuite from a dict represent a list of tests.
 
     The dict takes the form:
@@ -193,7 +200,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix)
+                           prefix, test_loader_name)
     file_suite = suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:

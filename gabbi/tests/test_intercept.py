@@ -69,6 +69,7 @@ def load_tests(loader, tests, pattern):
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
                               intercept=simple_wsgi.SimpleWsgi,
+                              test_loader_name=__name__,
                               prefix=prefix,
                               fixture_module=sys.modules[__name__],
                               response_handlers=[TestResponseHandler])

@@ -52,7 +52,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param host: The host to test against. Do not use with ``intercept``.
     :param port: The port to test against. Used with ``host``.
     :param intercept: WSGI app factory for wsgi-intercept.
-    :param test_loader_name: Base name for test classes. Rarely used.
+    :param test_loader_name: Base name for test classes. Use this to align the
+                             naming of the tests with other tests in a system.
     :param fixture_module: Python module containing fixture classes.
     :param response_handers: :class:`~gabbi.handlers.ResponseHandler` classes.
     :type response_handlers: List of ResponseHandler classes.
@@ -73,10 +74,14 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         if force_ssl and not require_ssl:
             require_ssl = force_ssl
 
+    # If the client has not provided a name to use as our base,
+    # create one so that tests are effectively namespaced.
     if test_loader_name is None:
-        test_loader_name = inspect.stack()[1]
-        test_loader_name = os.path.splitext(os.path.basename(
-            test_loader_name[1]))[0]
+        all_test_base_name = inspect.stack()[1]
+        all_test_base_name = os.path.splitext(
+            os.path.basename(all_test_base_name[1]))[0]
+    else:
+        all_test_base_name = None
 
     # Initialize response handlers.
     response_handlers = response_handlers or []
@@ -92,8 +97,9 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
         if intercept:
             host = str(uuid.uuid4())
         suite_dict = utils.load_yaml(yaml_file=test_file)
-        test_base_name = '%s_%s' % (
-            test_loader_name, os.path.splitext(os.path.basename(test_file))[0])
+        test_base_name = os.path.splitext(os.path.basename(test_file))[0]
+        if all_test_base_name:
+            test_base_name = '%s_%s' % (all_test_base_name, test_base_name)
 
         if require_ssl:
             if 'defaults' in suite_dict:
@@ -103,7 +109,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
-            fixture_module, intercept, prefix)
+            fixture_module, intercept, prefix, test_loader_name)
         top_suite.addTest(file_suite)
     return top_suite
 
