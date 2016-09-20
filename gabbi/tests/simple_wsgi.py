@@ -55,6 +55,20 @@ class SimpleWsgi(object):
             ('X-Gabbi-url', full_request_url),
         ]
 
+        # clean up numbers in query_data
+        cleaned_query = {}
+        for key, values in query_data.items():
+            newvalues = []
+            for item in values:
+                try:
+                    item = float(item) if '.' in item else int(item)
+                except (ValueError, TypeError):
+                    pass
+                newvalues.append(item)
+            cleaned_query[key] = newvalues
+
+        query_data = cleaned_query
+
         if request_method == 'DIE':
             raise Exception('because you asked me to')
 

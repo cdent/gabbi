@@ -31,8 +31,8 @@ tests:
           x-gabbi-url: $SCHEME://$NETLOC/foo?bar=1&bar=2
           content-type: application/json
       response_json_paths:
-          $.bar[0]: "1"
-          $.bar[1]: "2"
+          $.bar[0]: 1
+          $.bar[1]: 2
 
     - name: replacers in params
       url: /foo

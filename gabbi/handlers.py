@@ -105,7 +105,7 @@ class JSONResponseHandler(ResponseHandler):
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.json_data))
-        expected = test.replace_template(value)
+        expected = test.replace_template(value, retype_numerals=True)
         # If expected is a string, check to see if it is a regex.
         if (hasattr(expected, 'startswith') and expected.startswith('/')
                 and expected.endswith('/')):

@@ -139,12 +139,19 @@ class HTTPTestCase(unittest.TestCase):
             self.prior.run(result.TestResult())
         self._run_test()
 
-    def replace_template(self, message):
+    def replace_template(self, message, retype_numerals=False):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
-                message[k] = self.replace_template(message[k])
+                message[k] = self.replace_template(message[k],
+                                                   retype_numerals)
             return message
+        if isinstance(message, list):
+            new_message = []
+            for line in message:
+                new_message.append(
+                    self.replace_template(line, retype_numerals))
+            return new_message
 
         for replacer in REPLACERS:
             template = '$%s' % replacer
@@ -157,6 +164,15 @@ class HTTPTestCase(unittest.TestCase):
                         raise AssertionError(
                             'unable to replace %s in %s, data unavailable: %s'
                             % (template, message, exc))
+                    if retype_numerals:
+                        try:
+                            if '.' in message:
+                                message = float(message)
+                            else:
+                                message = int(message)
+                        except ValueError:
+                            # Message does not behave like a number
+                            pass
             except TypeError:
                 # Message is not a string
                 pass
@@ -375,8 +391,12 @@ class HTTPTestCase(unittest.TestCase):
             body = ''
 
         if test['poll']:
-            count = test['poll'].get('count', 1)
-            delay = test['poll'].get('delay', 1)
+            count = self.replace_template(test['poll'].get('count', 1),
+                                          retype_numerals=True)
+            delay = self.replace_template(test['poll'].get('delay', 1),
+                                          retype_numerals=True)
+            # Count must be an int, even if it came in as a float
+            count = int(count)
             failure = None
             while count:
                 try:
@@ -419,7 +439,8 @@ class HTTPTestCase(unittest.TestCase):
                 else:
                     return info
         else:
-            data = json.dumps(data)
+            data = self.replace_template(data, retype_numerals=True)
+            return json.dumps(data)
         return self.replace_template(data)
 
     def _test_status(self, expected_status, observed_status):
