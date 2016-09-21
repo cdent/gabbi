@@ -25,7 +25,7 @@ Workarounds
 ~~~~~~~~~~~
 
 pytest produces warnings about yield tests. Can I make them stop?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------
 
 Yes, run as ``py.test --disable-pytest-warnings`` to quiet the
 warnings. Or use a version of pytest less than ``3.0``. For more details
