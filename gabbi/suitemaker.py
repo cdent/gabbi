@@ -37,7 +37,7 @@ class TestMaker(object):
 
     def __init__(self, test_base_name, test_defaults, test_directory,
                  fixture_classes, loader, host, port, intercept, prefix,
-                 test_loader_name=None):
+                 test_loader_name=None, inner_fixtures=None):
         self.test_base_name = test_base_name
         self.test_defaults = test_defaults
         self.default_keys = set(test_defaults.keys())
@@ -49,6 +49,7 @@ class TestMaker(object):
         self.intercept = intercept
         self.prefix = prefix
         self.test_loader_name = test_loader_name
+        self.inner_fixtures = inner_fixtures or []
 
     def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
@@ -83,6 +84,7 @@ class TestMaker(object):
                             {'test_data': test,
                              'test_directory': self.test_directory,
                              'fixtures': self.fixture_classes,
+                             'inner_fixtures': self.inner_fixtures,
                              'http': http_class,
                              'host': self.host,
                              'intercept': self.intercept,
@@ -164,7 +166,7 @@ class TestBuilder(type):
 
 def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
                          host, port, fixture_module, intercept, prefix='',
-                         test_loader_name=None):
+                         test_loader_name=None, inner_fixtures=None):
     """Generate a GabbiSuite from a dict represent a list of tests.
 
     The dict takes the form:
@@ -200,7 +202,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix, test_loader_name)
+                           prefix, test_loader_name, inner_fixtures)
     file_suite = suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:

@@ -51,6 +51,9 @@ class RunnerTest(unittest.TestCase):
 
         self._argv = sys.argv
         sys.argv = ['gabbi-run', '%s:%s' % (host, port)]
+        # Cleanup the custom response_handler
+        case.HTTPTestCase.response_handlers = []
+        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def tearDown(self):
         sys.stdin = self._stdin

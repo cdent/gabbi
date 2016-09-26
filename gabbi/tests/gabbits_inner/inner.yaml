@@ -1,0 +1,14 @@
+
+fixtures:
+    - OuterFixture
+
+tests:
+
+- name: get one
+  GET: /
+
+- name: get two
+  GET: /
+
+- name: get three
+  GET: /

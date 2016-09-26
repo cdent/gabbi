@@ -42,7 +42,7 @@ from gabbi import utils
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
                 response_handlers=None, prefix='', require_ssl=False,
-                url=None):
+                url=None, inner_fixtures=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -60,6 +60,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param prefix: A URL prefix for all URLs that are not fully qualified.
     :param url: A full URL to test against. Replaces host, port and prefix.
     :param require_ssl: If ``True``, make all tests default to using SSL.
+    :param inner_fixtures: A list of ``Fixtures`` to use per test
+    :type inner_fixtures: List of fixtures.Fixture clases.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
@@ -109,7 +111,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
-            fixture_module, intercept, prefix, test_loader_name)
+            fixture_module, intercept, prefix, test_loader_name,
+            inner_fixtures)
         top_suite.addTest(file_suite)
     return top_suite
 
