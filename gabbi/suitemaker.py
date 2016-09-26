@@ -37,7 +37,8 @@ class TestMaker(object):
 
     def __init__(self, test_base_name, test_defaults, test_directory,
                  fixture_classes, loader, host, port, intercept, prefix,
-                 test_loader_name=None, inner_fixtures=None):
+                 response_handlers, content_handlers, test_loader_name=None,
+                 inner_fixtures=None):
         self.test_base_name = test_base_name
         self.test_defaults = test_defaults
         self.default_keys = set(test_defaults.keys())
@@ -50,6 +51,8 @@ class TestMaker(object):
         self.prefix = prefix
         self.test_loader_name = test_loader_name
         self.inner_fixtures = inner_fixtures or []
+        self.content_handlers = content_handlers
+        self.response_handlers = response_handlers
 
     def make_one_test(self, test_dict, prior_test):
         """Create one single HTTPTestCase.
@@ -88,6 +91,8 @@ class TestMaker(object):
                              'http': http_class,
                              'host': self.host,
                              'intercept': self.intercept,
+                             'content_handlers': self.content_handlers,
+                             'response_handlers': self.response_handlers,
                              'port': self.port,
                              'prefix': self.prefix,
                              'prior': prior_test})
@@ -166,7 +171,8 @@ class TestBuilder(type):
 
 def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
                          host, port, fixture_module, intercept, prefix='',
-                         test_loader_name=None, inner_fixtures=None):
+                         handlers=None, test_loader_name=None,
+                         inner_fixtures=None):
     """Generate a GabbiSuite from a dict represent a list of tests.
 
     The dict takes the form:
@@ -188,8 +194,19 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
         # the original exception in favor of a generic error
         raise GabbiFormatError('malformed test file, invalid format')
 
+    handlers = handlers or []
+    response_handlers = []
+    content_handlers = []
+
     # Merge global with per-suite defaults
     default_test_dict = copy.deepcopy(case.HTTPTestCase.base_test)
+    for handler in handlers:
+        default_test_dict.update(handler.test_base)
+        if handler.response_handler:
+            response_handlers.append(handler.response_handler)
+        if handler.content_handler:
+            content_handlers.append(handler.content_handler)
+
     local_defaults = _validate_defaults(suite_dict.get('defaults', {}))
     test_update(default_test_dict, local_defaults)
 
@@ -202,7 +219,9 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix, test_loader_name, inner_fixtures)
+                           prefix, response_handlers, content_handlers,
+                           test_loader_name=test_loader_name,
+                           inner_fixtures=inner_fixtures)
     file_suite = suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:

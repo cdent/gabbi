@@ -23,7 +23,7 @@ from wsgi_intercept.interceptor import Urllib3Interceptor
 
 from gabbi import case
 from gabbi import exception
-from gabbi import handlers
+from gabbi.handlers import base
 from gabbi import runner
 from gabbi.tests.simple_wsgi import SimpleWsgi
 
@@ -232,7 +232,7 @@ class RunnerTest(unittest.TestCase):
         self._stderr.write(sys.stderr.read())
 
 
-class HTMLResponseHandler(handlers.ResponseHandler):
+class HTMLResponseHandler(base.ResponseHandler):
 
     test_key_suffix = 'html'
     test_key_value = {}

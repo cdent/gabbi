@@ -15,10 +15,10 @@
 
 import unittest
 
-from gabbi import case
+from gabbi.handlers import jsonhandler
 
 
-extract = case.HTTPTestCase.extract_json_path_value
+extract = jsonhandler.JSONHandler.extract_json_path_value
 nested_data = {
     'objects': [
         {'name': 'one', 'value': 'alpha'},
