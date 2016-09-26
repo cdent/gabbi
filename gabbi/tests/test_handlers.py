@@ -17,7 +17,8 @@ import json
 import unittest
 
 from gabbi import case
-from gabbi import handlers
+from gabbi.handlers import core
+from gabbi.handlers import jsonhandler
 from gabbi import suitemaker
 
 
@@ -32,29 +33,46 @@ class HandlersTest(unittest.TestCase):
         super(HandlersTest, self).setUp()
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
-                                           {'test_data': {}})
+                                           {'test_data': {},
+                                           'content_handlers': []})
+
+    def test_empty_response_handler(self):
+        self.test.test_data = {'url': '$RESPONSE["barnabas"]'}
+        self.test.response = {'content-type': 'unmatchable'}
+        self.test.response_data = ''
+        self.test.prior = self.test
+
+        url = self.test('test_request').replace_template(
+            self.test.test_data['url'])
+        self.assertEqual('barnabas', url)
+
+        self.test.response_data = None
+        self.test.content_handlers = [jsonhandler.JSONHandler()]
+        url = self.test('test_request').replace_template(
+            self.test.test_data['url'])
+        self.assertEqual('barnabas', url)
 
     def test_response_strings(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbeta\n'
         self._assert_handler(handler)
 
     def test_response_strings_fail(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbta\n'
         with self.assertRaises(AssertionError):
             self._assert_handler(handler)
 
     def test_response_strings_fail_big_output(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        handler = core.StringResponseHandler()
         self.test.content_type = "text/plain"
-        self.test.json_data = None
+        self.test.response_data = None
         self.test.test_data = {'response_strings': ['alpha', 'beta']}
         self.test.output = 'alpha\nbta\n' * 1000
         with self.assertRaises(AssertionError) as cm:
@@ -64,18 +82,22 @@ class HandlersTest(unittest.TestCase):
         self.assertEqual(2036, len(msg))
 
     def test_response_strings_fail_big_payload(self):
-        handler = handlers.StringResponseHandler(self.test_class)
+        string_handler = core.StringResponseHandler()
+        # Register the JSON handler so response_data is set.
+        json_handler = jsonhandler.JSONHandler()
+        self.test.response_handlers = [string_handler, json_handler]
+        self.test.content_handlers = [json_handler]
         self.test.content_type = "application/json"
         self.test.test_data = {'response_strings': ['foobar']}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cw',
                          'location': 'barn'},
                         {'name': 'chris',
                          'location': 'house'}] * 100
         }
-        self.test.output = json.dumps(self.test.json_data)
+        self.test.output = json.dumps(self.test.response_data)
         with self.assertRaises(AssertionError) as cm:
-            self._assert_handler(handler)
+            self._assert_handler(string_handler)
 
         msg = str(cm.exception)
         self.assertEqual(2038, len(msg))
@@ -83,13 +105,13 @@ class HandlersTest(unittest.TestCase):
         self.assertIn('      "location": "house"', msg)
 
     def test_response_json_paths(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -98,13 +120,13 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_fail_data(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': 'cow',
             '$.objects[1].location': 'house',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cw',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -114,12 +136,12 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_fail_path(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[1].name': 'cow',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -129,12 +151,12 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_regex(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': '/ow/',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -143,12 +165,12 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_regex_number(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': '/\d+/',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 99,
                          'location': 'barn'},
                         {'name': 'chris',
@@ -157,7 +179,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = core.HeadersResponseHandler()
         self.test.response = {'content-type': 'text/plain'}
 
         self.test.test_data = {'response_headers': {
@@ -171,7 +193,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_regex(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': '/text/plain/',
         }}
@@ -179,7 +201,7 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_headers_fail_data(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'content-type': 'text/plain',
         }}
@@ -191,7 +213,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_response_headers_fail_header(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'location': '/somewhere',
         }}
@@ -202,7 +224,7 @@ class HandlersTest(unittest.TestCase):
                       str(failure.exception))
 
     def test_resonse_headers_stringify(self):
-        handler = handlers.HeadersResponseHandler(self.test_class)
+        handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'x-alpha-beta': 2.0,
         }}

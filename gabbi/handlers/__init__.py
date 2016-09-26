@@ -10,18 +10,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+"""Package for response and content handlers that process the body of
+a response in various ways.
+"""
 
-from gabbi.handlers import base
+from gabbi.handlers import core
+from gabbi.handlers import jsonhandler
 
-
-def gabbi_response_handlers():
-    return [CustomResponseHandler]
-
-
-class CustomResponseHandler(base.ResponseHandler):
-
-    test_key_suffix = 'custom'
-    test_key_value = []
-
-    def action(self, test, item, value=None):
-        test.assertTrue(item in test.output)
+# A list of the default handlers
+RESPONSE_HANDLERS = [
+    core.ForbiddenHeadersResponseHandler,
+    core.HeadersResponseHandler,
+    core.StringResponseHandler,
+    jsonhandler.JSONHandler,
+]
