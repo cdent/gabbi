@@ -31,7 +31,6 @@ from unittest import suite
 import uuid
 import warnings
 
-from gabbi import case
 from gabbi import exception
 from gabbi import handlers
 from gabbi import reporter
@@ -41,8 +40,8 @@ from gabbi import utils
 
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
-                response_handlers=None, prefix='', require_ssl=False,
-                url=None):
+                response_handlers=None, content_handlers=None,
+                prefix='', require_ssl=False, url=None):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -57,6 +56,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param fixture_module: Python module containing fixture classes.
     :param response_handers: :class:`~gabbi.handlers.ResponseHandler` classes.
     :type response_handlers: List of ResponseHandler classes.
+    :param content_handlers: ContentHandler classes.
+    :type content_handlers: List of ContentHandler classes.
     :param prefix: A URL prefix for all URLs that are not fully qualified.
     :param url: A full URL to test against. Replaces host, port and prefix.
     :param require_ssl: If ``True``, make all tests default to using SSL.
@@ -83,10 +84,15 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     else:
         all_test_base_name = None
 
-    # Initialize response handlers.
+    # Initialize response and content handlers. This is effectively
+    # duplication of effort but not results. This allows for
+    # backwards compatibility for existing callers.
     response_handlers = response_handlers or []
-    for handler in handlers.RESPONSE_HANDLERS + response_handlers:
-        handler(case.HTTPTestCase)
+    content_handlers = content_handlers or []
+    handler_objects = []
+    for handler in (content_handlers + response_handlers
+                    + handlers.RESPONSE_HANDLERS):
+        handler_objects.append(handler())
 
     top_suite = suite.TestSuite()
     for test_file in glob.iglob('%s/*.yaml' % path):
@@ -109,7 +115,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
-            fixture_module, intercept, prefix, test_loader_name)
+            fixture_module, intercept, prefix, test_loader_name,
+            handlers=handler_objects)
         top_suite.addTest(file_suite)
     return top_suite
 
@@ -117,7 +124,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
                       fixture_module=None, response_handlers=None,
-                      require_ssl=False, url=None):
+                      content_handlers=None, require_ssl=False, url=None):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -135,6 +142,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         test_loader_name=test_loader_name,
                         fixture_module=fixture_module,
                         response_handlers=response_handlers,
+                        content_handlers=content_handlers,
                         prefix=prefix, require_ssl=require_ssl,
                         url=url)
 
