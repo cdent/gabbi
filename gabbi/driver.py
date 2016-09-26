@@ -115,8 +115,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
-            fixture_module, intercept, prefix, test_loader_name,
-            handlers=handler_objects)
+            fixture_module, intercept, prefix=prefix,
+            test_loader_name=test_loader_name, handlers=handler_objects)
         top_suite.addTest(file_suite)
     return top_suite
 

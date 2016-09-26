@@ -215,7 +215,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
 
     test_maker = TestMaker(test_base_name, default_test_dict, test_directory,
                            fixture_classes, loader, host, port, intercept,
-                           prefix, response_handlers, content_handlres,
+                           prefix, response_handlers, content_handlers,
                            test_loader_name)
     file_suite = suite.GabbiSuite()
     prior_test = None

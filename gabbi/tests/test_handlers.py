@@ -151,12 +151,12 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_regex(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': '/ow/',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 'cow',
                          'location': 'barn'},
                         {'name': 'chris',
@@ -165,12 +165,12 @@ class HandlersTest(unittest.TestCase):
         self._assert_handler(handler)
 
     def test_response_json_paths_regex_number(self):
-        handler = handlers.JSONResponseHandler(self.test_class)
+        handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
             '$.objects[0].name': '/\d+/',
         }}
-        self.test.json_data = {
+        self.test.response_data = {
             'objects': [{'name': 99,
                          'location': 'barn'},
                         {'name': 'chris',
