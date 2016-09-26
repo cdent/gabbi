@@ -13,7 +13,6 @@
 """Test that the CLI works as expected
 """
 
-import copy
 import sys
 import unittest
 from uuid import uuid4
@@ -21,7 +20,6 @@ from uuid import uuid4
 from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
 
-from gabbi import case
 from gabbi import exception
 from gabbi.handlers import base
 from gabbi import runner
@@ -51,18 +49,12 @@ class RunnerTest(unittest.TestCase):
 
         self._argv = sys.argv
         sys.argv = ['gabbi-run', '%s:%s' % (host, port)]
-        # Cleanup the custom response_handler
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def tearDown(self):
         sys.stdin = self._stdin
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
-        # Cleanup the custom response_handler
-        case.HTTPTestCase.response_handlers = []
-        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]

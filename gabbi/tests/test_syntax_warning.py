@@ -12,15 +12,12 @@
 # under the License.
 """Test that the driver warns on bad yaml name."""
 
-import copy
 import os
 import unittest
 import warnings
 
-from gabbi import case
 from gabbi import driver
 from gabbi import exception
-from gabbi import handlers
 
 
 TESTS_DIR = 'warning_gabbits'
@@ -32,12 +29,6 @@ class DriverTest(unittest.TestCase):
         super(DriverTest, self).setUp()
         self.loader = unittest.defaultTestLoader
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-        # TODO(cdent): Work around a scoping bug in response
-        # handlers (the class variable has had a test handler
-        # appended to it). The content-handlers branch fixes this so we
-        # should just switch to that.
-        case.HTTPTestCase.response_handlers = handlers.RESPONSE_HANDLERS
-        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
 
     def test_driver_warngs_on_files(self):
         with warnings.catch_warnings(record=True) as the_warnings:

@@ -15,16 +15,13 @@
 An "outer" fixture runs one per test suite. An "inner is per test.
 """
 
-import copy
 import os
 import sys
 
 import fixtures
 
-from gabbi import case
 from gabbi import driver
 from gabbi import fixture
-from gabbi import handlers
 from gabbi.tests import simple_wsgi
 
 
@@ -37,12 +34,6 @@ class OuterFixture(fixture.GabbiFixture):
     """Assert an outer fixture is only started once and is stopped."""
 
     def start_fixture(self):
-        # TODO(cdent): Work around a scoping bug in response
-        # handlers (the class variable has had a test handler
-        # appended to it). The content-handlers branch fixes this so we
-        # should just switch to that.
-        case.HTTPTestCase.response_handlers = handlers.RESPONSE_HANDLERS
-        case.HTTPTestCase.base_test = copy.copy(case.BASE_TEST)
         global COUNT_OUTER
         COUNT_OUTER += 1
 
