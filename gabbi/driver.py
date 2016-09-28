@@ -62,8 +62,9 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param prefix: A URL prefix for all URLs that are not fully qualified.
     :param url: A full URL to test against. Replaces host, port and prefix.
     :param require_ssl: If ``True``, make all tests default to using SSL.
-    :param inner_fixtures: A list of ``Fixtures`` to use per test
-    :type inner_fixtures: List of fixtures.Fixture clases.
+    :param inner_fixtures: A list of ``Fixtures`` to use with each
+                           individual test request.
+    :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 

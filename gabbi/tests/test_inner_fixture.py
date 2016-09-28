@@ -12,7 +12,7 @@
 # under the License.
 """Test the works of inner and outer fixtures.
 
-An "outer" fixture runs one per test suite. An "inner is per test.
+An "outer" fixture runs once per test suite. An "inner" is per test request.
 """
 
 import os
