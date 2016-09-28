@@ -30,7 +30,7 @@ class DriverTest(unittest.TestCase):
         self.loader = unittest.defaultTestLoader
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
 
-    def test_driver_warngs_on_files(self):
+    def test_driver_warning_on_files(self):
         with warnings.catch_warnings(record=True) as the_warnings:
             driver.build_tests(
                 self.test_dir, self.loader, host='localhost', port=8001)
