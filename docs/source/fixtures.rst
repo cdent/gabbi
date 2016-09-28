@@ -3,7 +3,7 @@ Fixtures
 
 Each suite of tests is represented by a single YAML file, and may
 optionally use one or more fixtures to provide the necessary
-environment for tests to run.
+environment required by the tests in that file.
 
 Fixtures are implemented as nested context managers. Subclasses
 of :class:`~gabbi.fixture.GabbiFixture` must implement
@@ -37,3 +37,31 @@ about the exception will be stored on the fixture so that the
 ``stop_fixture`` method can decide if the exception should change how
 the fixture should clean up. The exception information can be found on
 ``exc_type``, ``exc_value`` and ``traceback`` method attributes.
+
+Inner Fixtures
+==============
+
+In some contexts (for example CI environments with a large
+number of tests being run in a broadly concurrent environment where
+output is logged to a single file) it can be important to capture and
+consolidate stray output that is produced during the tests and display
+it associated with an individual test. This can help debugging and
+avoids unusable output that is the result of multiple streams being
+interleaved.
+
+Inner fixtures have been added to support this. These are fixtures
+more in line with the tradtional ``unittest`` concept of fixtures:
+a class on which ``setUp`` and ``cleanUp`` is automatically called.
+
+:func:`~gabbi.driver.build_tests` accepts a named parameter
+arguments of ``inner_fixtures``. The value of that argument may be
+an ordered list of fixtures.Fixture_ classes that will be called
+when each individual test is set up.
+
+An example fixture that could be useful is the FakeLogger_.
+
+.. note:: At this time ``inner_fixtures`` are not supported when
+          using the pytest :doc:`loader <loader>`.
+
+.. _fixtures.Fixture: https://pypi.python.org/pypi/fixtures
+.. _FakeLogger: https://pypi.python.org/pypi/fixtures#fakelogger
