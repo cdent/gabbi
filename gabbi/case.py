@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""A single HTTP request represented as a subclass of ``unittest.TestCase``
+"""A single HTTP request represented as a subclass of ``testtools.TestCase``
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
@@ -23,14 +23,14 @@ import functools
 import os
 import re
 import sys
+from testtools import testcase
 import time
-from unittest import case
 from unittest import result
 
-import fixtures
 import six
 from six.moves import http_cookies
 from six.moves.urllib import parse as urlparse
+import testtools
 import wsgi_intercept
 
 from gabbi import __version__
@@ -79,21 +79,21 @@ def potentialFailure(func):
             try:
                 func(self)
             except Exception:
-                if hasattr(case, '_ExpectedFailure'):
-                    raise case._ExpectedFailure(sys.exc_info())
+                if hasattr(testcase, '_ExpectedFailure'):
+                    raise testcase._ExpectedFailure(sys.exc_info())
                 else:
                     self._addExpectedFailure(self.result, sys.exc_info())
             else:
                 if hasattr(self, '_addUnexpectedSuccess'):
                     self._addUnexpectedSuccess(self.result)
                 else:
-                    raise case._UnexpectedSuccess
+                    raise testcase._UnexpectedSuccess
         else:
             func(self)
     return wrapper
 
 
-class HTTPTestCase(fixtures.TestWithFixtures):
+class HTTPTestCase(testtools.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
