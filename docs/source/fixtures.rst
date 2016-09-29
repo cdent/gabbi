@@ -38,6 +38,8 @@ about the exception will be stored on the fixture so that the
 the fixture should clean up. The exception information can be found on
 ``exc_type``, ``exc_value`` and ``traceback`` method attributes.
 
+.. _inner-fixtures:
+
 Inner Fixtures
 ==============
 

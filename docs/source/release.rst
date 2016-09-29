@@ -5,6 +5,15 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.26.0
+------
+
+Switch from response handlers to :doc:`handlers` to allow more
+flexible processing of both response _and_ request bodies.
+
+Add :ref:`inner fixtures <inner-fixtures>` for per test fixtures,
+useful for output capturing.
+
 1.25.0
 ------
 
