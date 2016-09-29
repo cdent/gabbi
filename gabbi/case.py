@@ -24,10 +24,10 @@ import os
 import re
 import sys
 import time
-import unittest
 from unittest import case
 from unittest import result
 
+import fixtures
 import six
 from six.moves import http_cookies
 from six.moves.urllib import parse as urlparse
@@ -93,7 +93,7 @@ def potentialFailure(func):
     return wrapper
 
 
-class HTTPTestCase(unittest.TestCase):
+class HTTPTestCase(fixtures.TestWithFixtures):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
@@ -108,6 +108,8 @@ class HTTPTestCase(unittest.TestCase):
     def setUp(self):
         if not self.has_run:
             super(HTTPTestCase, self).setUp()
+            for fixture in self.inner_fixtures:
+                self.useFixture(fixture())
 
     def tearDown(self):
         if not self.has_run:
