@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Implementation of a command-line runner of single gabbi files."""
+"""Implementation of a command-line runner of single Gabbi files."""
 
 import argparse
 from importlib import import_module
@@ -93,22 +93,30 @@ def run():
     host, port, prefix, force_ssl = utils.host_info_from_target(
         args.target, args.prefix)
 
-    # Initialize response handlers.
-    handler_objects = initialize_handlers(args.response_handlers)
+    response_handlers = initialize_handlers(args.response_handlers)
 
-    data = utils.load_yaml(handle=sys.stdin)
+    success = execute(sys.stdin, response_handlers, host, port, prefix,
+                      force_ssl, args.failfast)
+    sys.exit(not success)
+
+
+def execute(handle, response_handlers, host, port, prefix,  # TODO(FND): rename
+            force_ssl=False, failfast=False):
+    data = utils.load_yaml(handle)
     if force_ssl:
         if 'defaults' in data:
             data['defaults']['ssl'] = True
         else:
             data['defaults'] = {'ssl': True}
+
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
         loader, 'input', data, '.', host, port, None, None, prefix=prefix,
-        handlers=handler_objects)
+        handlers=response_handlers)
+
     result = ConciseTestRunner(
-        verbosity=2, failfast=args.failfast).run(test_suite)
-    sys.exit(not result.wasSuccessful())
+        verbosity=2, failfast=failfast).run(test_suite)
+    return result.wasSuccessful()
 
 
 def initialize_handlers(response_handlers):
