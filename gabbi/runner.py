@@ -88,6 +88,13 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
+    parser.add_argument(
+        '-f',
+        nargs='?', default=None,
+        dest='input_files',
+        action='append',
+        help='input files'
+    )
 
     args = parser.parse_args()
     host, port, prefix, force_ssl = utils.host_info_from_target(
@@ -95,9 +102,26 @@ def run():
 
     response_handlers = initialize_handlers(args.response_handlers)
 
-    success = execute(sys.stdin, response_handlers, host, port, prefix,
-                      force_ssl, args.failfast)
-    sys.exit(not success)
+    input_files = args.input_files
+    if input_files is None:
+        input_files = [sys.stdin]
+
+    failfast = args.failfast
+    failure = False
+    for input_file in input_files:
+        params = (response_handlers, host, port, prefix, force_ssl, failfast)
+        # XXX(FND): special-casing; use generic stream detection instead?
+        if input_file is sys.stdin:
+            success = execute(input_file, *params)
+        else:  # file path
+            with open(input_file, "r") as fh:
+                success = execute(fh, *params)
+
+        failure = not success
+        if failure and failfast:
+            break
+
+    sys.exit(failure)
 
 
 def execute(handle, response_handlers, host, port, prefix,  # TODO(FND): rename

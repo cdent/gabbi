@@ -56,6 +56,27 @@ class RunnerTest(unittest.TestCase):
         sys.stderr = self._stderr
         sys.argv = self._argv
 
+    def test_input_files(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        sys.argv.insert(1, "-f")
+        sys.argv.insert(2, "gabbi/tests/gabbits_runner/minimal_success.yaml")
+
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+        sys.argv.insert(3, "-f")
+        sys.argv.insert(4, "gabbi/tests/gabbits_runner/minimal_failure.yaml")
+
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertFailure(err)
+
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
 
