@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Implementation of a command-line runner of single gabbi files."""
+"""Implementation of a command-line runner of single Gabbi files."""
 
 import argparse
 from importlib import import_module
@@ -88,27 +88,59 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
+    parser.add_argument(
+        '-f',
+        nargs='?', default=None,
+        dest='input_files',
+        action='append',
+        help='input files'
+    )
 
     args = parser.parse_args()
     host, port, prefix, force_ssl = utils.host_info_from_target(
         args.target, args.prefix)
 
-    # Initialize response handlers.
-    handler_objects = initialize_handlers(args.response_handlers)
+    response_handlers = initialize_handlers(args.response_handlers)
 
-    data = utils.load_yaml(handle=sys.stdin)
+    input_files = args.input_files
+    if input_files is None:
+        input_files = [sys.stdin]
+
+    failfast = args.failfast
+    failure = False
+    for input_file in input_files:
+        params = (response_handlers, host, port, prefix, force_ssl, failfast)
+        # XXX(FND): special-casing; use generic stream detection instead?
+        if input_file is sys.stdin:
+            success = execute(input_file, *params)
+        else:  # file path
+            with open(input_file, "r") as fh:
+                success = execute(fh, *params)
+
+        failure = not success
+        if failure and failfast:
+            break
+
+    sys.exit(failure)
+
+
+def execute(handle, response_handlers, host, port, prefix,  # TODO(FND): rename
+            force_ssl=False, failfast=False):
+    data = utils.load_yaml(handle)
     if force_ssl:
         if 'defaults' in data:
             data['defaults']['ssl'] = True
         else:
             data['defaults'] = {'ssl': True}
+
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
         loader, 'input', data, '.', host, port, None, None, prefix=prefix,
-        handlers=handler_objects)
+        handlers=response_handlers)
+
     result = ConciseTestRunner(
-        verbosity=2, failfast=args.failfast).run(test_suite)
-    sys.exit(not result.wasSuccessful())
+        verbosity=2, failfast=failfast).run(test_suite)
+    return result.wasSuccessful()
 
 
 def initialize_handlers(response_handlers):
