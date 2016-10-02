@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Implementation of a command-line runner of single Gabbi files."""
+"""Implementation of a command-line runner for gabbi files (AKA suites)."""
 
 import argparse
 from importlib import import_module
@@ -88,6 +88,13 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
+    parser.add_argument(
+        '-f',
+        nargs='?', default=None,
+        dest='input_files',
+        action='append',
+        help='input files'
+    )
 
     args = parser.parse_args()
     host, port, prefix, force_ssl = utils.host_info_from_target(
@@ -95,9 +102,27 @@ def run():
 
     handler_objects = initialize_handlers(args.response_handlers)
 
-    success = run_suite(sys.stdin, handler_objects, host, port, prefix,
-                        force_ssl, args.failfast)
-    sys.exit(not success)
+    input_files = args.input_files
+    if input_files is None:
+        input_files = [sys.stdin]
+
+    failfast = args.failfast
+    failure = False
+    for input_file in input_files:
+        params = (handler_objects, host, port, prefix, force_ssl, failfast)
+        # XXX(FND): special-casing; use generic stream detection instead?
+        if input_file is sys.stdin:
+            success = run_suite(input_file, *params)
+        else:  # file path
+            with open(input_file, 'r') as fh:
+                success = run_suite(fh, *params)
+
+        if not failure:  # once failed, this is considered immutable
+            failure = not success
+        if failure and failfast:
+            break
+
+    sys.exit(failure)
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
