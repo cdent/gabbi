@@ -17,6 +17,8 @@ from importlib import import_module
 import sys
 import unittest
 
+from six import string_types
+
 from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
 from gabbi import suitemaker
@@ -107,12 +109,11 @@ def run():
     failfast = args.failfast
     failure = False
     for input_file in input_files:
-        # XXX(FND): special-casing; use generic stream detection instead?
-        if input_file is sys.stdin:
-            success = _run(input_file)
-        else:  # file path
+        if isinstance(input_file, string_types):  # file path
             with open(input_file, 'r') as fh:
                 success = _run(fh)
+        else:  # file handle
+            success = _run(input_file)
 
         if not failure:  # once failed, this is considered immutable
             failure = not success
