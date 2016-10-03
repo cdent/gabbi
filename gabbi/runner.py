@@ -102,16 +102,17 @@ def run():
 
     handler_objects = initialize_handlers(args.response_handlers)
 
+    _run = lambda fh: run_suite(fh, handler_objects, host, port, prefix,
+                                force_ssl, failfast)
     failfast = args.failfast
     failure = False
     for input_file in input_files:
-        params = (handler_objects, host, port, prefix, force_ssl, failfast)
         # XXX(FND): special-casing; use generic stream detection instead?
         if input_file is sys.stdin:
-            success = run_suite(input_file, *params)
+            success = _run(input_file)
         else:  # file path
             with open(input_file, 'r') as fh:
-                success = run_suite(fh, *params)
+                success = _run(fh)
 
         if not failure:  # once failed, this is considered immutable
             failure = not success
