@@ -61,13 +61,7 @@ def run():
 
     Output is formatted as unittest summary information.
     """
-    argv = sys.argv
-    try:  # extract file paths, separated by `--`
-        i = argv.index("--")
-        input_files = argv[i + 1:]
-        argv = argv[:i]
-    except ValueError:  # no file paths
-        input_files = [sys.stdin]
+    argv, input_files = extract_file_paths(sys.argv, default_files=[sys.stdin])
 
     parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
     parser.add_argument(
@@ -176,6 +170,20 @@ def load_response_handlers(import_path):
         if callable(custom_handlers):
             custom_handlers = custom_handlers()
     return custom_handlers
+
+
+def extract_file_paths(argv, default_files=None):
+    """Extract command-line arguments following the `--` end-of-options
+    delimiter, if any.
+    """
+    try:  # extract file paths, separated by `--`
+        i = argv.index("--")
+        input_files = argv[i + 1:]
+        argv = argv[:i]
+    except ValueError:
+        input_files = default_files
+
+    return argv, input_files
 
 
 if __name__ == '__main__':
