@@ -59,6 +59,13 @@ def run():
 
     Output is formatted as unittest summary information.
     """
+    argv = sys.argv
+    try:  # extract file paths, separated by `--`
+        i = argv.index("--")
+        input_files = argv[i + 1:]
+        argv = argv[:i]
+    except ValueError:  # no file paths
+        input_files = [sys.stdin]
 
     parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
     parser.add_argument(
@@ -88,23 +95,12 @@ def run():
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
     )
-    parser.add_argument(
-        '-f',
-        nargs='?', default=None,
-        dest='input_files',
-        action='append',
-        help='input files'
-    )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv[1:])
     host, port, prefix, force_ssl = utils.host_info_from_target(
         args.target, args.prefix)
 
     handler_objects = initialize_handlers(args.response_handlers)
-
-    input_files = args.input_files
-    if input_files is None:
-        input_files = [sys.stdin]
 
     failfast = args.failfast
     failure = False
