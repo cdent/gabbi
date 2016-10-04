@@ -17,8 +17,6 @@ from importlib import import_module
 import sys
 import unittest
 
-from six import string_types
-
 from gabbi import handlers
 from gabbi.reporter import ConciseTestRunner
 from gabbi import suitemaker
@@ -63,8 +61,7 @@ def run():
     """
     parser = _make_argparser()
 
-    argv, input_files = extract_file_paths(sys.argv, default_files=[sys.stdin])
-
+    argv, input_files = extract_file_paths(sys.argv)
     args = parser.parse_args(argv[1:])
 
     host, port, prefix, force_ssl = utils.host_info_from_target(
@@ -74,25 +71,27 @@ def run():
 
     failfast = args.failfast
     failure = False
-    for input_file in input_files:
-        if isinstance(input_file, string_types):  # file path
+
+    if not input_files:
+        success = run_suite(sys.stdin, handler_objects, host, port,
+                            prefix, force_ssl, failfast)
+        failure = not success
+    else:
+        for input_file in input_files:
             with open(input_file, 'r') as fh:
                 success = run_suite(fh, handler_objects, host, port,
                                     prefix, force_ssl, failfast)
-        else:  # file handle
-            success = run_suite(input_file, handler_objects, host, port,
-                                prefix, force_ssl, failfast)
-
-        if not failure:  # once failed, this is considered immutable
-            failure = not success
-        if failure and failfast:
-            break
+            if not failure:  # once failed, this is considered immutable
+                failure = not success
+            if failure and failfast:
+                break
 
     sys.exit(failure)
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
               failfast=False):
+    """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle)
     if force_ssl:
         if 'defaults' in data:
@@ -146,7 +145,7 @@ def load_response_handlers(import_path):
     return custom_handlers
 
 
-def extract_file_paths(argv, default_files=None):
+def extract_file_paths(argv):
     """Extract command-line arguments following the `--` end-of-options
     delimiter, if any.
     """
@@ -155,7 +154,7 @@ def extract_file_paths(argv, default_files=None):
         input_files = argv[i + 1:]
         argv = argv[:i]
     except ValueError:
-        input_files = default_files
+        input_files = None
 
     return argv, input_files
 
