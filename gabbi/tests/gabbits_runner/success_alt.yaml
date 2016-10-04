@@ -1,0 +1,6 @@
+tests:
+
+- name: expected success
+  GET: /baz
+
+  status: 200

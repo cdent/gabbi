@@ -5,8 +5,9 @@ If there is a running web service that needs to be tested and
 creating a test loader with :meth:`~gabbi.driver.build_tests` is
 either inconvenient or overkill it is possible to run YAML test
 files directly from the command line with the console-script
-``gabbi-run``. It accepts YAML on ``stdin``, generates and runs
-tests and outputs a summary of the results.
+``gabbi-run``. It accepts YAML on ``stdin`` or as multiple file
+arguments, and generates and runs tests and outputs a summary of
+the results.
 
 The provided YAML may not use custom :doc:`fixtures` but otherwise
 uses the default :doc:`format`. :doc:`host` information is either
@@ -18,6 +19,15 @@ line::
 or::
 
     gabbi-run http://host:port < /my/test.yaml
+
+To test with one or more files the following command syntax may be
+used::
+
+    gabbi-run http://host:port -- /my/test.yaml /my/other.yaml
+
+.. note:: The filename arguments must come after a ``--`` and all
+          other arguments (host, port, prefix, failfast) must come
+          before the ``--``.
 
 To facilitate using the same tests against the same application mounted
 in different locations in a WSGI server, a ``prefix`` may be provided

@@ -1,0 +1,6 @@
+tests:
+
+- name: expected failure
+  GET: /
+
+  status: 666
