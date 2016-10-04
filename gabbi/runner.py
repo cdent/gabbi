@@ -98,16 +98,16 @@ def run():
 
     handler_objects = initialize_handlers(args.response_handlers)
 
-    _run = lambda fh: run_suite(fh, handler_objects, host, port, prefix,
-                                force_ssl, failfast)
     failfast = args.failfast
     failure = False
     for input_file in input_files:
         if isinstance(input_file, string_types):  # file path
             with open(input_file, 'r') as fh:
-                success = _run(fh)
+                success = run_suite(fh, handler_objects, host, port,
+                                    prefix, force_ssl, failfast)
         else:  # file handle
-            success = _run(input_file)
+            success = run_suite(input_file, handler_objects, host, port,
+                                prefix, force_ssl, failfast)
 
         if not failure:  # once failed, this is considered immutable
             failure = not success
