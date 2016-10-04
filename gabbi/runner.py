@@ -61,38 +61,12 @@ def run():
 
     Output is formatted as unittest summary information.
     """
+    parser = _make_argparser()
+
     argv, input_files = extract_file_paths(sys.argv, default_files=[sys.stdin])
 
-    parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
-    parser.add_argument(
-        'target',
-        nargs='?', default='stub',
-        help='A fully qualified URL (with optional path as prefix) '
-             'to the primary target or a host and port, : separated. '
-             'If using an IPV6 address for the host in either form, '
-             'wrap it in \'[\' and \']\'.'
-    )
-    parser.add_argument(
-        'prefix',
-        nargs='?', default=None,
-        help='Path prefix where target app is mounted. Only used when '
-             'target is of the form host[:port]'
-    )
-    parser.add_argument(
-        '-x', '--failfast',
-        action='store_true',
-        help='Exit on first failure'
-    )
-    parser.add_argument(
-        '-r', '--response-handler',
-        nargs='?', default=None,
-        dest='response_handlers',
-        action='append',
-        help='Custom response handler. Should be an import path of the '
-             'form package.module or package.module:class.'
-    )
-
     args = parser.parse_args(argv[1:])
+
     host, port, prefix, force_ssl = utils.host_info_from_target(
         args.target, args.prefix)
 
@@ -184,6 +158,39 @@ def extract_file_paths(argv, default_files=None):
         input_files = default_files
 
     return argv, input_files
+
+
+def _make_argparser():
+    """Set up the argparse.ArgumentParser."""
+    parser = argparse.ArgumentParser(description='Run gabbi tests from STDIN')
+    parser.add_argument(
+        'target',
+        nargs='?', default='stub',
+        help='A fully qualified URL (with optional path as prefix) '
+             'to the primary target or a host and port, : separated. '
+             'If using an IPV6 address for the host in either form, '
+             'wrap it in \'[\' and \']\'.'
+    )
+    parser.add_argument(
+        'prefix',
+        nargs='?', default=None,
+        help='Path prefix where target app is mounted. Only used when '
+             'target is of the form host[:port]'
+    )
+    parser.add_argument(
+        '-x', '--failfast',
+        action='store_true',
+        help='Exit on first failure'
+    )
+    parser.add_argument(
+        '-r', '--response-handler',
+        nargs='?', default=None,
+        dest='response_handlers',
+        action='append',
+        help='Custom response handler. Should be an import path of the '
+             'form package.module or package.module:class.'
+    )
+    return parser
 
 
 if __name__ == '__main__':
