@@ -53,9 +53,14 @@ def run():
 
         gabbi-run http://example.com:9999/mountpoint < mytest.yaml
 
-    Use `-x` or `--failfast` to abort after the first error or failure:
+    Use `-x` or `--failfast` to abort after the first error or failure::
 
         gabbi-run -x example.com:9999 /mountpoint < mytest.yaml
+
+    Multiple files may be named as arguments, separated from other arguments
+    by a ``--``. Each file will be run as a separate test suite::
+
+        gabbi-run http://example.com -- /path/to/x.yaml /path/to/y.yaml
 
     Output is formatted as unittest summary information.
     """
