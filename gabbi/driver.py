@@ -151,15 +151,26 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         prefix=prefix, require_ssl=require_ssl,
                         url=url)
 
+    test_list = []
     for test in tests:
         if hasattr(test, '_tests'):
             # Establish fixtures as if they were tests. These will
             # be cleaned up by the pytester plugin.
-            yield 'start_%s' % test._tests[0].__class__.__name__, \
-                test.start, result
+            test_list.append(('start_%s' % test._tests[0].__class__.__name__, test.start, result))
             for subtest in test:
-                yield '%s' % subtest.__class__.__name__, subtest, result
-            yield 'stop_%s' % test._tests[0].__class__.__name__, test.stop
+                test_list.append(('%s' % subtest.__class__.__name__, subtest, result))
+            test_list.append(('stop_%s' % test._tests[0].__class__.__name__, test.stop))
+
+    return test_list
+
+
+# temporarily here for testing, there has to be some kind of test
+# that is being parameterized.
+def test_pytest(test, result):
+    try:
+        test(result)
+    except TypeError:
+        test()
 
 
 def test_suite_from_yaml(loader, test_base_name, test_yaml, test_directory,
