@@ -129,7 +129,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
                       fixture_module=None, response_handlers=None,
-                      content_handlers=None, require_ssl=False, url=None):
+                      content_handlers=None, require_ssl=False, url=None,
+                      metafunc=None):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -156,16 +157,33 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
         if hasattr(test, '_tests'):
             # Establish fixtures as if they were tests. These will
             # be cleaned up by the pytester plugin.
-            test_list.append(('start_%s' % test._tests[0].__class__.__name__, test.start, result))
+            test_list.append(('start_%s' % test._tests[0].__class__.__name__,
+                              test.start, result))
             for subtest in test:
-                test_list.append(('%s' % subtest.__class__.__name__, subtest, result))
-            test_list.append(('stop_%s' % test._tests[0].__class__.__name__, test.stop))
+                test_list.append(('%s' % subtest.__class__.__name__,
+                                  subtest, result))
+            test_list.append(('stop_%s' % test._tests[0].__class__.__name__,
+                              test.stop))
 
-    return test_list
+    if metafunc:
+        if metafunc.function == test_pytest:
+            ids = []
+            args = []
+            for test in test_list:
+                if len(test) >=3:
+                    name, method, arg = test
+                else:
+                    name, method = test
+                    arg = None
+                ids.append(name)
+                args.append((method, arg))
+
+            metafunc.parametrize("test, result", argvalues=args, ids=ids)
+    else:
+        # preserve backwards compatibility with old calling style
+        return test_list
 
 
-# temporarily here for testing, there has to be some kind of test
-# that is being parameterized.
 def test_pytest(test, result):
     try:
         test(result)

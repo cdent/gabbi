@@ -19,9 +19,9 @@ without duplication.
 
 import os
 
-from gabbi import driver
-# this test_* needs to be imported bare or things do not work
+# TODO: this test_* needs to be imported bare or things do not work
 from gabbi.driver import test_pytest
+from gabbi import driver
 from gabbi.tests import simple_wsgi
 from gabbi.tests import test_intercept
 
@@ -29,25 +29,10 @@ TESTS_DIR = 'gabbits_intercept'
 
 
 def pytest_generate_tests(metafunc):
-
     os.environ['GABBI_TEST_URL'] = 'takingnames'
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    test_generator = driver.py_test_generator(
+    driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
         fixture_module=test_intercept,
-        response_handlers=[test_intercept.TestResponseHandler])
-
-    if metafunc.function == test_pytest:
-
-        ids = []
-        args = []
-        for test in test_generator:
-            if len(test) >=3:
-                name, method, arg = test
-            else:
-                name, method = test
-                arg = None
-            ids.append(name)
-            args.append((method, arg))
-
-        metafunc.parametrize("test, result", argvalues=args, ids=ids)
+        response_handlers=[test_intercept.TestResponseHandler],
+        metafunc=metafunc)
