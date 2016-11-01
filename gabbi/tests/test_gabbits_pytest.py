@@ -19,9 +19,9 @@ without duplication.
 
 import os
 
-# TODO: this test_* needs to be imported bare or things do not work
-from gabbi.driver import test_pytest
 from gabbi import driver
+# TODO(cdent): this test_* needs to be imported bare or things do not work
+from gabbi.driver import test_pytest  # noqa
 from gabbi.tests import simple_wsgi
 from gabbi.tests import test_intercept
 

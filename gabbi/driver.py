@@ -170,7 +170,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
             ids = []
             args = []
             for test in test_list:
-                if len(test) >=3:
+                if len(test) >= 3:
                     name, method, arg = test
                 else:
                     name, method = test
@@ -185,9 +185,9 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
 
 
 def test_pytest(test, result):
-    try:
+    if result:
         test(result)
-    except TypeError:
+    else:
         test()
 
 
