@@ -360,7 +360,7 @@ class HTTPTestCase(testtools.TestCase):
                 raise exception.GabbiFormatError(
                     'malformed headers in test %s: %s' % (test['name'], exc))
 
-        if test['data'] is not '':
+        if test['data'] != '':
             body = self._test_data_to_string(
                 test['data'],
                 utils.extract_content_type(headers, default='')[0])
