@@ -15,6 +15,7 @@
 import io
 import os
 
+import six
 import yaml
 
 
@@ -62,7 +63,7 @@ def decode_response_content(header_dict, content):
     """Decode content to a proper string."""
     content_type, charset = extract_content_type(header_dict)
 
-    if not_binary(content_type):
+    if not_binary(content_type) and isinstance(content, six.binary_type):
         return content.decode(charset)
     else:
         return content
