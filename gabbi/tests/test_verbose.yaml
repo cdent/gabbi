@@ -1,9 +1,0 @@
-tests:
-
-  - name: POST data with verbose true
-    verbose: true
-    POST: /
-    request_headers:
-        content-type: application/json
-    data:
-        'text'
