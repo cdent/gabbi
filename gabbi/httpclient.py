@@ -147,7 +147,7 @@ class VerboseHttp(Http):
             # we could pretty print any printable output by using a
             # handler's loads() and dumps(). Not doing that now
             # because it would be pointless (no other interesting
-            # handlers) and this may approach may be entirely wrong.
+            # handlers) and this approach may be entirely wrong.
             if jsonhandler.JSONHandler.accepts(content_type):
                 data = jsonhandler.JSONHandler.loads(content)
                 content = jsonhandler.JSONHandler.dumps(data, pretty=True)
