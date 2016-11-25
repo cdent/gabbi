@@ -1,0 +1,18 @@
+tests:
+
+- name: POST data with verbose true
+  verbose: true
+  POST: /
+  request_headers:
+    content-type: application/json
+  data:
+    - our text
+
+- name: structured data
+  verbose: true
+  POST: /
+  request_headers:
+      content-type: application/json
+  data:
+     cow: moo
+     dog: bark

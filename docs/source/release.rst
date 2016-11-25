@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.28.0
+------
+
+When verbosely displaying request and response bodies that are
+JSON, pretty print for improved readability.
+
 1.27.0
 ------
 
