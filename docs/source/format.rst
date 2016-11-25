@@ -44,7 +44,9 @@ Metadata
                 and body. If set to ``headers`` or ``body``, only
                 the corresponding part of the request and
                 response will be printed. If the output is a TTY,
-                colors will be used. See
+                colors will be used. If the body content-type is
+                JSON it will be formatted for improved
+                readability. See
                 :class:`~gabbi.httpclient.VerboseHttp` for
                 details.
 
