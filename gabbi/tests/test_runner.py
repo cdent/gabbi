@@ -228,6 +228,27 @@ class RunnerTest(unittest.TestCase):
             except SystemExit as err:
                 self.assertSuccess(err)
 
+    def test_verbose_output_formatting(self):
+        """Confirm that a verbose test handles output properly."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/test_verbose.yaml')
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn('"our text"', output)
+        self.assertIn('"cow": "moo"', output)
+        self.assertIn('"dog": "bark"', output)
+        # confirm pretty printing
+        self.assertIn('{\n', output)
+        self.assertIn('}\n', output)
+
     def assertSuccess(self, exitError):
         errors = exitError.args[0]
         if errors:

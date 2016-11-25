@@ -19,6 +19,7 @@ import sys
 
 import urllib3
 
+from gabbi.handlers import jsonhandler
 from gabbi import utils
 
 
@@ -138,11 +139,20 @@ class VerboseHttp(Http):
 
     def _print_body(self, headers, content):
         """Output body if not binary."""
-        if self._show_body and utils.not_binary(
-                utils.extract_content_type(headers)[0]):
+        content_type = utils.extract_content_type(headers)[0]
+        if self._show_body and utils.not_binary(content_type):
+            content = utils.decode_response_content(headers, content)
+            # TODO(cdent): Using the JSONHandler here instead of
+            # just the json module to make it clear that eventually
+            # we could pretty print any printable output by using a
+            # handler's loads() and dumps(). Not doing that now
+            # because it would be pointless (no other interesting
+            # handlers) and this approach may be entirely wrong.
+            if jsonhandler.JSONHandler.accepts(content_type):
+                data = jsonhandler.JSONHandler.loads(content)
+                content = jsonhandler.JSONHandler.dumps(data, pretty=True)
             self._verbose_output('')
-            self._verbose_output(
-                utils.decode_response_content(headers, content))
+            self._verbose_output(content)
 
     def _print_header(self, name, value, prefix='', stream=None):
         """Output one single header."""
