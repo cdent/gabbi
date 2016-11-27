@@ -267,8 +267,9 @@ flexibility when doing a ``POST`` or ``PUT``. If the value is not a
 string (that is, it is a sequence or structure) it is treated as a
 data structure which is turned into a JSON string. If the value is a
 string that begins with ``<@`` then the rest of the string is treated
-as a filepath to the loaded. The path is relative to the test directory.
-If the value is an undecorated string, that's the value.
+as a filepath to be loaded. The path is relative to the test directory
+and may not traverse up into parent directories. If the value is an
+undecorated string, that's the value.
 
 When reading from a file care should be taken to ensure that a
 reasonable content-type is set for the data as this will control if any
