@@ -22,7 +22,8 @@ from six.moves import mock
 @mock.patch(
     'gabbi.case.open',
     new_callable=mock.mock_open,
-    read_data='dummy content'
+    read_data='dummy content',
+    create=True,
 )
 class DataFileTest(unittest.TestCase):
     """Reading from local file is only allowed at or below the
