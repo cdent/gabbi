@@ -249,6 +249,53 @@ class RunnerTest(unittest.TestCase):
         self.assertIn('{\n', output)
         self.assertIn('}\n', output)
 
+    def _run_verbosity_arg(self):
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/verbosity.yaml')
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        return output
+
+    def test_verbosity_arg_none(self):
+        """Confirm --verbose handling."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        output = self._run_verbosity_arg()
+        self.assertEqual('', output)
+
+    def test_verbosity_arg_body(self):
+        """Confirm --verbose handling."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port),
+                    '--verbose=body']
+
+        output = self._run_verbosity_arg()
+        self.assertIn('{\n  "cat": "poppy"\n}', output)
+        self.assertNotIn('application/json', output)
+
+    def test_verbosity_arg_headers(self):
+        """Confirm --verbose handling."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port),
+                    '--verbose=headers']
+
+        output = self._run_verbosity_arg()
+        self.assertNotIn('{\n  "cat": "poppy"\n}', output)
+        self.assertIn('application/json', output)
+
+    def test_verbosity_arg_all(self):
+        """Confirm --verbose handling."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port),
+                    '--verbose=all']
+
+        output = self._run_verbosity_arg()
+        self.assertIn('{\n  "cat": "poppy"\n}', output)
+        self.assertIn('application/json', output)
+
     def assertSuccess(self, exitError):
         errors = exitError.args[0]
         if errors:
