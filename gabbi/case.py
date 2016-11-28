@@ -243,7 +243,13 @@ class HTTPTestCase(testtools.TestCase):
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
-        path = os.path.join(self.test_directory, os.path.basename(filename))
+        path = os.path.join(self.test_directory, filename)
+        has_dir_traversal = os.path.relpath(
+            path, start=self.test_directory).startswith(os.pardir)
+        if has_dir_traversal:
+            raise ValueError(
+                'Attempted loading of data file outside test directory: %s'
+                % filename)
         with open(path, mode='rb') as data_file:
             return data_file.read()
 
