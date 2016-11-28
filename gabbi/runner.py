@@ -14,6 +14,7 @@
 
 import argparse
 from importlib import import_module
+import os
 import sys
 import unittest
 
@@ -88,8 +89,10 @@ def run():
     else:
         for input_file in input_files:
             with open(input_file, 'r') as fh:
+                data_dir = os.path.dirname(input_file)
                 success = run_suite(fh, handler_objects, host, port,
-                                    prefix, force_ssl, failfast, verbosity)
+                                    prefix, force_ssl, failfast, data_dir,
+                                    verbosity)
             if not failure:  # once failed, this is considered immutable
                 failure = not success
             if failure and failfast:
@@ -99,7 +102,7 @@ def run():
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
-              failfast=False, verbosity=False):
+              failfast=False, data_dir='.', verbosity=False):
     """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle)
     if force_ssl:
@@ -115,7 +118,7 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
 
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
-        loader, 'input', data, '.', host, port, None, None, prefix=prefix,
+        loader, 'input', data, data_dir, host, port, None, None, prefix=prefix,
         handlers=handler_objects)
 
     result = ConciseTestRunner(
