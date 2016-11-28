@@ -50,3 +50,6 @@ YAML will default to ``ssl: True``.
 
 If a ``-x`` or ``--failfast`` argument is provided then ``gabbi-run`` will
 exit after the first test failure.
+
+Use ``-v`` or ``--verbose`` with a value of ``all``, ``headers`` or ``body``
+to turn on :ref:`verbosity <metadata>` for all tests being run.

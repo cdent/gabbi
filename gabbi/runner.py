@@ -58,6 +58,9 @@ def run():
 
         gabbi-run -x example.com:9999 /mountpoint < mytest.yaml
 
+    Use `-v` or `--verbose` with a value of `all`, `headers` or `body` to
+    turn on verbosity for all tests being run.
+
     Multiple files may be named as arguments, separated from other arguments
     by a ``--``. Each file will be run as a separate test suite::
 
@@ -75,19 +78,21 @@ def run():
 
     handler_objects = initialize_handlers(args.response_handlers)
 
+    verbosity = args.verbosity
     failfast = args.failfast
     failure = False
 
     if not input_files:
         success = run_suite(sys.stdin, handler_objects, host, port,
-                            prefix, force_ssl, failfast)
+                            prefix, force_ssl, failfast, verbosity)
         failure = not success
     else:
         for input_file in input_files:
             with open(input_file, 'r') as fh:
                 data_dir = os.path.dirname(input_file)
                 success = run_suite(fh, handler_objects, host, port,
-                                    prefix, force_ssl, failfast, data_dir)
+                                    prefix, force_ssl, failfast, data_dir,
+                                    verbosity)
             if not failure:  # once failed, this is considered immutable
                 failure = not success
             if failure and failfast:
@@ -97,7 +102,7 @@ def run():
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
-              failfast=False, data_dir='.'):
+              failfast=False, data_dir='.', verbosity=False):
     """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle)
     if force_ssl:
@@ -105,6 +110,11 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
             data['defaults']['ssl'] = True
         else:
             data['defaults'] = {'ssl': True}
+    if verbosity:
+        if 'defaults' in data:
+            data['defaults']['verbose'] = verbosity
+        else:
+            data['defaults'] = {'verbose': verbosity}
 
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
@@ -195,6 +205,12 @@ def _make_argparser():
         action='append',
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        dest='verbosity',
+        choices=['all', 'body', 'headers'],
+        help='Turn on test verbosity for all tests run in this session.'
     )
     return parser
 
