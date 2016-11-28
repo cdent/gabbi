@@ -22,6 +22,7 @@ from wsgi_intercept.interceptor import Urllib3Interceptor
 
 from gabbi import exception
 from gabbi.handlers import base
+from gabbi.handlers.jsonhandler import JSONHandler
 from gabbi import runner
 from gabbi.tests.simple_wsgi import SimpleWsgi
 
@@ -248,6 +249,28 @@ class RunnerTest(unittest.TestCase):
         # confirm pretty printing
         self.assertIn('{\n', output)
         self.assertIn('}\n', output)
+
+    def test_data_dir_good(self):
+        """Confirm that data dir is the test file's dir."""
+        sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/test_data.yaml')
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+        # Compare the verbose output of tests with pretty printed
+        # data.
+        with open('gabbi/tests/gabbits_runner/subdir/sample.json') as data:
+            data = JSONHandler.loads(data.read())
+            expected_string = JSONHandler.dumps(data, pretty=True)
+
+        sys.stdout.seek(0)
+        output = sys.stdout.read()
+        self.assertIn(expected_string, output)
 
     def assertSuccess(self, exitError):
         errors = exitError.args[0]

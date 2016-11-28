@@ -1,0 +1,8 @@
+tests:
+
+- name: POST data from file
+  verbose: true
+  POST: /
+  request_headers:
+    content-type: application/json
+  data: <@subdir/sample.json
