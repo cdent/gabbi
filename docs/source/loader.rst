@@ -67,7 +67,35 @@ pytest
 .. _pytest_loader:
 
 Since pytest does not support the ``load_tests`` system, a different
-way of generating tests is required. A test file must be created
+way of generating tests is required. Two techniques are supported.
+
+The original method (described below) used yield statements to
+generate tests which pytest would collect. This style of tests is
+deprecated as of ``pytest>=3.0`` so a new style using pytest
+fixtures has been developed.
+
+pytest >= 3.0
+-------------
+
+In the newer technique, a test file is created that uses the
+``pytest_generate_tests`` hook. Special care must be taken to always
+import the ``test_pytest`` method which is the base test that the
+pytest hook parametrizes to generate the tests from the YAML files.
+Without the method, the hook will not be called and no tests generated.
+
+Here is a simple example file:
+
+.. literalinclude:: pytest3.0-example.py
+   :language: python
+
+This can then be run with the usual pytest commands. For example::
+
+   py.test -svx pytest3.0-example.py
+
+pytest < 3.0
+------------
+
+When using the older technique, test file must be created
 that calls :meth:`~gabbi.driver.py_test_generator` and yields the
 generated tests. That will look a bit like this:
 
@@ -78,14 +106,11 @@ This can then be run with the usual pytest commands. For example::
 
    py.test -svx pytest-example.py
 
-.. warning:: In ``pytest>=3.0`` yield tests are deprecated and using
-             them will cause pytest to produce a warning. If you
-             wish to ignore and hide these warnings add the
-             ``--disable-pytest-warnings`` parameter to the
-             invocation of ``py.test`` or use a version of pytest
-             earlier than version ``3.0``. A new way of creating gabbi
-             tests that works more effectively with modern pytest is
-             being developed.
+The older technique will continue to work with all versions of
+``pytest<4.0`` but ``>=3.0`` will produce warnings. If you want to
+use the older technique but not see the warnings add
+``--disable-pytest-warnings`` parameter to the invocation of
+``py.test``.
 
 .. _source distribution: https://github.com/cdent/gabbi
 .. _the tutorial repo: https://github.com/cdent/gabbi-demo
