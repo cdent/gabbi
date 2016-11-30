@@ -265,18 +265,23 @@ Data
 ----
 
 The ``data`` key has some special handing to allow for a bit more
-flexibility when doing a ``POST`` or ``PUT``. If the value is not a
-string (that is, it is a sequence or structure) it is treated as a
-data structure which is turned into a JSON string. If the value is a
-string that begins with ``<@`` then the rest of the string is treated
-as a filepath to be loaded. The path is relative to the test directory
-and may not traverse up into parent directories. If the value is an
-undecorated string, that's the value.
+flexibility when doing a ``POST`` or ``PUT``:
 
-When reading from a file care should be taken to ensure that a
-reasonable content-type is set for the data as this will control if any
-encoding is done of the resulting string value. If it is text, json, xml
-or javascript it will be encoded to UTF-8.
+* If the value is not a string (that is, it is a sequence or structure)
+  it is treated as a data structure that will be turned into a
+  string by the ``dumps`` method on the relevant
+  :doc:`content handler <handlers>`. For example if the content-type of
+  the body is ``application/json`` the data structure will be turned
+  into a JSON string.
+* If the value is a string that begins with ``<@`` then the rest of the
+  string is treated as a filepath to be loaded. The path is relative
+  to the test directory and may not traverse up into parent directories.
+* If the value is an undecorated string, that's the value.
+
+.. note:: When reading from a file care should be taken to ensure that a
+          reasonable content-type is set for the data as this will control
+          if any encoding is done of the resulting string value. If it
+          is text, json, xml or javascript it will be encoded to UTF-8.
 
 
 .. _the gabbi tests: https://github.com/cdent/gabbi/tree/master/gabbi/tests/gabbits_intercept
