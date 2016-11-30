@@ -20,22 +20,19 @@ without duplication.
 import os
 
 from gabbi import driver
+# TODO(cdent): this test_* needs to be imported bare or things do not work
+from gabbi.driver import test_pytest  # noqa
 from gabbi.tests import simple_wsgi
 from gabbi.tests import test_intercept
 
 TESTS_DIR = 'gabbits_intercept'
 
 
-def test_from_build():
-
+def pytest_generate_tests(metafunc):
     os.environ['GABBI_TEST_URL'] = 'takingnames'
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    test_generator = driver.py_test_generator(
+    driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
         fixture_module=test_intercept,
-        response_handlers=[test_intercept.TestResponseHandler])
-
-    # TODO(cdent): Where is our Python3!
-    # yield from test_generator
-    for test in test_generator:
-        yield test
+        response_handlers=[test_intercept.TestResponseHandler],
+        metafunc=metafunc)

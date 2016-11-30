@@ -30,9 +30,11 @@ STOPS = {}
 
 def get_cleanname(item):
     """Extract a test name from a pytest Function item."""
-    cleanname = item.name[2:]
-    cleanname = cleanname[:-2]
-    return cleanname
+    if '[' in item.name:
+        cleanname = item.name.split('[', 1)[1]
+        cleanname = cleanname.split(']', 1)[0]
+        return cleanname
+    return item.name
 
 
 def get_suitename(name):
@@ -86,10 +88,13 @@ def a_pytest_collection_modifyitems(items, config):
             continue
         suitename = get_suitename(cleanname)
         if cleanname.startswith('start_'):
-            STARTS[suitename] = item
+            test = item.callspec.params['test']
+            result = item.callspec.params['result']
+            STARTS[suitename] = (test, result)
             deselected.append(item)
         elif cleanname.startswith('stop_'):
-            STOPS[suitename] = item
+            test = item.callspec.params['test']
+            STOPS[suitename] = test
             deselected.append(item)
         else:
             remaining.append(item)
@@ -118,20 +123,11 @@ def pytest_runtest_setup(item):
     run its priors after running this.
     """
     if hasattr(item, 'starter'):
-        try:
-            # Python 2
-            item.starter.function(item.starter.obj.__self__, item._args[0])
-        except TypeError:
-            # Python 3
-            item.starter.function(item._args[0])
+        test, result = item.starter
+        test(result)
 
 
 def pytest_runtest_teardown(item, nextitem):
     """Run a stopper if a test has one."""
     if hasattr(item, 'stopper'):
-        try:
-            # Python 2
-            item.stopper.function(item.stopper.obj.__self__)
-        except TypeError:
-            # Python 3
-            item.stopper.function()
+        item.stopper()
