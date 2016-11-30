@@ -261,6 +261,8 @@ to use the functionality. See also :doc:`example` for a collection
 of examples and the `gabbi-demo`_ tutorial.
 
 
+.. _data:
+
 Data
 ----
 

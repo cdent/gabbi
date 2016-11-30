@@ -58,7 +58,7 @@ gabbi Package
     :show-inheritance:
 
 :mod:`handlers.jsonhandler` Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gabbi.handlers.jsonhandler
     :members:

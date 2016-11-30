@@ -5,6 +5,20 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.29.0
+------
+
+Filenames used to read data into tests using the ``<@`` syntax
+may now use pathnames relative to the YAML file. See :ref:`data`.
+
+:doc:`gabbi-run <runner>` gains a --verbose parameter to force
+all tests run in a session to run with :ref:`verbose <metadata>`
+set.
+
+When using :ref:`pytest <pytest_loader>` to load tests, a new
+mechanism is available which avoids warnings produced in when using
+a version of pytest greater than ``3.0``.
+
 1.28.0
 ------
 
