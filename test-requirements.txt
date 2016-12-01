@@ -1,5 +1,6 @@
 mock ; python_version < '3.3'
 testrepository
 coverage
+pytest-cov
 hacking
 sphinx
