@@ -84,7 +84,8 @@ def run():
 
     if not input_files:
         success = run_suite(sys.stdin, handler_objects, host, port,
-                            prefix, force_ssl, failfast, verbosity)
+                            prefix, force_ssl, failfast,
+                            verbosity=verbosity)
         failure = not success
     else:
         for input_file in input_files:
