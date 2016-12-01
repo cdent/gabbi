@@ -273,6 +273,24 @@ class RunnerTest(unittest.TestCase):
         output = sys.stdout.read()
         self.assertIn(expected_string, output)
 
+    def test_stdin_data_dir(self):
+        """Confirm data dir as '.' when reading from stdin."""
+        sys.stdin = StringIO("""
+        tests:
+        - name: expected success
+          POST: /
+          request_headers:
+            content-type: application/json
+          data: <@gabbi/tests/gabbits_runner/subdir/sample.json
+          response_json_paths:
+            $.items.house: blue
+        """)
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
     def _run_verbosity_arg(self):
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/verbosity.yaml')

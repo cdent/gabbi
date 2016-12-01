@@ -92,8 +92,9 @@ def run():
             with open(input_file, 'r') as fh:
                 data_dir = os.path.dirname(input_file)
                 success = run_suite(fh, handler_objects, host, port,
-                                    prefix, force_ssl, failfast, data_dir,
-                                    verbosity)
+                                    prefix, force_ssl, failfast,
+                                    data_dir=data_dir,
+                                    verbosity=verbosity)
             if not failure:  # once failed, this is considered immutable
                 failure = not success
             if failure and failfast:
