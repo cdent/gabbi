@@ -73,3 +73,13 @@ tests:
 - name: backref json fail end
   xfail: true
   url: $RESPONSE['url']
+
+- name: get a historical response
+  GET: $HISTORY['post some json'].$RESPONSE['a']
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/1
+
+- name: get a historical response via jsonpath
+  GET: $HISTORY['post some json'].$RESPONSE['$.b']
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/2

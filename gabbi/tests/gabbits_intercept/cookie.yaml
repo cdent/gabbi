@@ -17,3 +17,10 @@ tests:
   GET: /foobar?$COOKIE
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/foobar
+
+- name: use a historical cookie
+  desc: Use a cookie from a test other than the last
+  GET: /foobar?$HISTORY['get a cookie'].$COOKIE
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/foobar?session=1234
+
