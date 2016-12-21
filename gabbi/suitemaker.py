@@ -101,7 +101,7 @@ class TestMaker(object):
                              'prefix': self.prefix,
                              'prior': prior_test,
                              'history': history,
-                            })
+                             })
         # We've been asked to, make this test class think it comes
         # from a different module.
         if self.test_loader_name:

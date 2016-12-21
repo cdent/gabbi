@@ -30,7 +30,7 @@ class HistoryTest(unittest.TestCase):
                                            {'test_data': {},
                                             'content_handlers': [],
                                             'history': {},
-                                           })
+                                            })
 
     def test_header_replace_prior(self):
         self.test.test_data = '$HEADERS["content-type"]'
