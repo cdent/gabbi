@@ -33,3 +33,13 @@ tests:
       key1: value2
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB?key1=value2
+
+- name: get a historical url
+  GET: $HISTORY['get a url the first time'].$URL
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB
+
+- name: get prior url
+  GET: $URL
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/3ADE1BBB

@@ -80,6 +80,10 @@ class TestMaker(object):
 
         http_class = httpclient.get_http(verbose=test['verbose'],
                                          caption=test['name'])
+        if prior_test:
+            history = prior_test.history
+        else:
+            history = {}
 
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
@@ -95,13 +99,16 @@ class TestMaker(object):
                              'response_handlers': self.response_handlers,
                              'port': self.port,
                              'prefix': self.prefix,
-                             'prior': prior_test})
+                             'prior': prior_test,
+                             'history': history,
+                             })
         # We've been asked to, make this test class think it comes
         # from a different module.
         if self.test_loader_name:
             klass.__module__ = self.test_loader_name
 
         tests = self.loader.loadTestsFromTestCase(klass)
+        history[test['name']] = tests._tests[0]
         # Return the first (and only) test in the klass.
         return tests._tests[0]
 

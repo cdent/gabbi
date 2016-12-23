@@ -48,6 +48,7 @@ REPLACERS = [
     'LOCATION',
     'COOKIE',
     'LAST_URL',
+    'URL',
     'HEADERS',
     'RESPONSE',
 ]
@@ -209,11 +210,21 @@ class HTTPTestCase(testtools.TestCase):
 
         With cookie data from set-cookie in the prior request.
         """
-        response_cookies = self.prior.response['set-cookie']
+        return re.sub(self._simple_replacer_regex('COOKIE'),
+                      self._cookie_replacer, message)
+
+    def _cookie_replacer(self, match):
+        """Replace a regex match with the cookie of a previous response."""
+        case = match.group('case')
+        if case:
+            referred_case = self.history[case]
+        else:
+            referred_case = self.prior
+        response_cookies = referred_case.response['set-cookie']
         cookies = http_cookies.SimpleCookie()
         cookies.load(response_cookies)
         cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
-        return message.replace('$COOKIE', cookie_string)
+        return cookie_string
 
     def _headers_replace(self, message):
         """Replace a header indicator in a message with that headers value from
@@ -225,7 +236,12 @@ class HTTPTestCase(testtools.TestCase):
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
         header_key = match.group('arg')
-        return self.prior.response[header_key.lower()]
+        case = match.group('case')
+        if case:
+            referred_case = self.history[case]
+        else:
+            referred_case = self.prior
+        return referred_case.response[header_key.lower()]
 
     def _last_url_replace(self, message):
         """Replace $LAST_URL in a message.
@@ -234,12 +250,39 @@ class HTTPTestCase(testtools.TestCase):
         """
         return message.replace('$LAST_URL', self.prior.url)
 
+    def _url_replace(self, message):
+        """Replace $URL in a message.
+
+        With the URL used in a previous request.
+        """
+        return re.sub(self._simple_replacer_regex('URL'),
+                      self._url_replacer, message)
+
+    def _url_replacer(self, match):
+        """Replace a regex match with the value of a previous url."""
+        case = match.group('case')
+        if case:
+            referred_case = self.history[case]
+        else:
+            referred_case = self.prior
+        return referred_case.url
+
     def _location_replace(self, message):
         """Replace $LOCATION in a message.
 
-        With the location header from the prior request.
+        With the location header from a previous request.
         """
-        return message.replace('$LOCATION', self.prior.location)
+        return re.sub(self._simple_replacer_regex('LOCATION'),
+                      self._location_replacer, message)
+
+    def _location_replacer(self, match):
+        """Replace a regex match with the value of a previous location."""
+        case = match.group('case')
+        if case:
+            referred_case = self.history[case]
+        else:
+            referred_case = self.prior
+        return referred_case.location
 
     def _load_data_file(self, filename):
         """Read a file from the current test directory."""
@@ -290,23 +333,43 @@ class HTTPTestCase(testtools.TestCase):
         return urlparse.urlunsplit((parsed_url.scheme, parsed_url.netloc,
                                     parsed_url.path, query_string, ''))
 
+    _history_regex = (
+        r"(?:\$HISTORY\[(?P<quote1>['\"])(?P<case>.+?)(?P=quote1)\]\.)??"
+    )
+
     @staticmethod
     def _replacer_regex(key):
         """Compose a regular expression for test template variables."""
-        return r"\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % key
+        case = HTTPTestCase._history_regex
+        return r"%s\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % (
+            case, key)
+
+    @staticmethod
+    def _simple_replacer_regex(key):
+        """Compose a regular expression for simple variable replacement."""
+        case = HTTPTestCase._history_regex
+        return r"%s\$%s" % (case, key)
 
     def _response_replace(self, message):
-        """Replace a content from the prior request with a value."""
-        replacer_class = self.get_content_handler(
-            self.prior.response.get('content-type'))
-        if replacer_class:
-            replacer_func = replacer_class.gen_replacer(self)
-        else:
-            # If no handler can be found use the null replacer,
-            # which returns "foo" when "$RESPONSE['foo']".
-            replacer_func = base.ContentHandler.gen_replacer(self)
+        """Replace a content path with the value from a previous response."""
         return re.sub(self._replacer_regex('RESPONSE'),
-                      replacer_func, message)
+                      self._response_replacer, message)
+
+    def _response_replacer(self, match):
+        """Replace a regex match with the value from a previous response."""
+        response_path = match.group('arg')
+        case = match.group('case')
+        if case:
+            referred_case = self.history[case]
+        else:
+            referred_case = self.prior
+        replacer_class = self.get_content_handler(
+            referred_case.response.get('content-type'))
+        # If no handler can be found use the null replacer,
+        # which returns "foo" when "$RESPONSE['foo']".
+        replacer_class = replacer_class or base.ContentHandler
+        return replacer_class.replacer(
+            referred_case.response_data, response_path)
 
     def _run_request(self, url, method, headers, body, redirect=False):
         """Run the http request and decode output.

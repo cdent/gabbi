@@ -54,6 +54,11 @@ tests:
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/named/thing
 
+- name: use a historical location
+  url: $HISTORY['simple post'].$LOCATION
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/named/thing
+
 - name: checklimit
   url: /
 
@@ -69,6 +74,11 @@ tests:
 
 - name: get location from headers
   url: $HEADERS['locaTion']
+  response_headers:
+      x-gabbi-url: $SCHEME://$NETLOC/somewhere
+
+- name: get historical location from headers
+  url: $HISTORY['post a body'].$HEADERS['locaTion']
   response_headers:
       x-gabbi-url: $SCHEME://$NETLOC/somewhere
 

@@ -87,16 +87,8 @@ class ContentHandler(ResponseHandler):
         return False
 
     @classmethod
-    def gen_replacer(cls, test):
-        """Return a function which does RESPONSE replacing."""
-        def replacer_func(match):
-            path = match.group('arg')
-            return cls.replacer(test.prior.response_data, path)
-        return replacer_func
-
-    @classmethod
     def replacer(cls, response_data, path):
-        """Return the string the is replacing RESPONSE."""
+        """Return the string that is replacing RESPONSE."""
         return path
 
     @staticmethod
