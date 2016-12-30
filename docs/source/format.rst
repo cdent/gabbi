@@ -57,10 +57,10 @@ Metadata
                 Note that the test will be run anyway.
    ===========  =================================================  ============
 
-Note: When tests are generated dynamically, the ``TestCase`` name will include
-the respective test's ``name``, lowercased with spaces transformed to ``_``. In
-at least some test runners this will allow you to select and filter on test
-name.
+.. note:: When tests are generated dynamically, the ``TestCase`` name will
+          include the respective test's ``name``, lowercased with spaces
+          transformed to ``_``. In at least some test runners this will allow
+          you to select and filter on test name.
 
 .. _request-parameters:
 
@@ -89,11 +89,11 @@ Request Parameters
    ``method``            The HTTP request method.                  defaults to
                                                                    ``GET``
 
-   ``url``               The URL to request. This can either be a  **required**
-                         full path (e.g. "/index") or a fully
-                         qualified URL (i.e. including host and
-                         scheme, e.g.
-                         "http://example.org/index") — see
+   ``url``               The URL to request. This can either be a  Either this
+                         full path (e.g. "/index") or a fully      or the
+                         qualified URL (i.e. including host and    shortcut
+                         scheme, e.g.                              above is
+                         "http://example.org/index") — see         **required**
                          :doc:`host` for details.
 
    ``request_headers``   A dictionary of key-value pairs
