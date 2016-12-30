@@ -213,31 +213,59 @@ Substitution
 ------------
 
 There are a number of magical variables that can be used to make
-reference to the state of a current test or the one just prior. These
-are replaced with real values during test processing. They are
-processed in the order given.
+reference to the state of a current test, the one just prior or any
+test prior to the current one. The variables are replaced with real
+values during test processing.
 
-* ``$SCHEME``: The current scheme/protocol (usually ``http`` or ``https``).
-* ``$NETLOC``: The host and potentially port of the request.
+Global
+******
+
 * ``$ENVIRON['<environment variable>']``: The name of an environment
   variable. Its value will replace the magical variable. If the
   string value of the environment variable is ``"True"`` or
   ``"False"`` then the resulting value will be the corresponding
   boolean, not a string.
+
+Current Test
+************
+
+* ``$SCHEME``: The current scheme/protocol (usually ``http`` or ``https``).
+* ``$NETLOC``: The host and potentially port of the request.
+
+Immediately Prior Test
+**********************
+
 * ``$COOKIE``: All the cookies set by any ``Set-Cookie`` headers in
   the prior response, including only the cookie key and value pairs
   and no metadata (e.g. ``expires`` or ``domain``).
-* ``$LAST_URL``: The URL defined in the prior request, after
-  substitutions have been made.
+* ``$URL``: The URL defined in the prior request, after
+  substitutions have been made. For backwards compatibility with
+  earlier releases ``$LAST_URL`` may also be used, but if
+  ``$HISTORY`` (see below) is being used, ``$URL`` must be used.
 * ``$LOCATION``: The location header returned in the prior response.
 * ``$HEADERS['<header>']``: The value of any header from the
   prior response.
 * ``$RESPONSE['<json path>']``: A JSONPath query into the prior
   response. See :doc:`jsonpath` for more on formatting.
 
-Where a single-quote character, ``'``, is shown above you may also use a
-double-quote character, ``"``, but in any given expression the same
-character must be used at both ends.
+Any Previous Test
+*****************
+
+* ``$HISTORY['<test name>'].<magical variable expression>``: Any variable
+  which refers to a prior test may be used in an expression that refers to
+  any earlier test in the same file by identifying the target test by its
+  name in a ``$HISTORY`` dictionary. For example, to refer to a value
+  in a JSON object in the response of a test named ``post json``::
+
+    $HISTORY['post json'].$RESPONSE['$.key']
+
+  This is a very powerful feature that could lead to test that are
+  difficult for humans to read. Take care to optimize for the
+  maintainers that will come after you, not yourself.
+
+.. note:: Where a single-quote character, ``'``, is shown in the variables
+          above you may also use a double-quote character, ``"``, but in any
+          given expression the same character must be used at both ends.
 
 All of these variables may be used in all of the following fields:
 

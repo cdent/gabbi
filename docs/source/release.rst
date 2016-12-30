@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.30.0
+------
+
+Thanks to Samuel Fekete, tests can use the ``$HISTORY`` dictionary
+to refer to any prior test in the same file, not just the one
+immediately prior, when doing :ref:`substitutions <state-substitution>`.
+
 1.29.0
 ------
 
@@ -171,6 +178,7 @@ gabbi.
 * Mehdi Abaakouk
 * Jason Myers
 * Kim Raymoure
+* Samuel Fekete
 * Michael McCune
 * Imran Hayder
 * Julien Danjou
