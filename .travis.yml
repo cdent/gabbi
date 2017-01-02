@@ -12,6 +12,7 @@ matrix:
         - env: TOXENV=pypy
         - env: TOXENV=pep8
         - env: TOXENV=py27-pytest
+        - env: TOXENV=gnocchi
         - python: 3.5
           env: TOXENV=py35
         - python: 3.5
@@ -26,6 +27,8 @@ matrix:
           env: TOXENV=py36
         - python: 3.6
           env: TOXENV=py36-pytest
+    allow_failures:
+        - env: TOXENV=gnocchi
 
 notifications:
       irc: "chat.freenode.net#gabbi"
