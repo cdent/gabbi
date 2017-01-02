@@ -1,23 +1,31 @@
 sudo: false
 language: python
-python:
-      - "3.5"
 install:
       - pip install tox 
 script:
       - tox
-env:
-      - TOXENV=py27
-      - TOXENV=py33
-      - TOXENV=py34
-      - TOXENV=py35
-      - TOXENV=pypy
-      - TOXENV=pep8
-      - TOXENV=py35-failskip
-      - TOXENV=py35-limit
-      - TOXENV=py35-prefix
-      - TOXENV=py27-pytest
-      - TOXENV=py35-pytest
+matrix:
+    include:
+        - env: TOXENV=py27
+        - env: TOXENV=py33
+        - env: TOXENV=py34
+        - env: TOXENV=pypy
+        - env: TOXENV=pep8
+        - env: TOXENV=py27-pytest
+        - python: 3.5
+          env: TOXENV=py35
+        - python: 3.5
+          env: TOXENV=py35-pytest
+        - python: 3.5
+          env: TOXENV=py35-failskip
+        - python: 3.5
+          env: TOXENV=py35-limit
+        - python: 3.5
+          env: TOXENV=py35-prefix
+        - python: 3.6
+          env: TOXENV=py36
+        - python: 3.6
+          env: TOXENV=py36-pytest
 
 notifications:
       irc: "chat.freenode.net#gabbi"

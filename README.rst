@@ -20,7 +20,7 @@ looks like this::
 See the docs_ for more details on the many features and formats for
 setting request headers and bodies and evaluating responses.
 
-Gabbi is tested with Python 2.7, 3.4, 3.5 and pypy.
+Gabbi is tested with Python 2.7, 3.4, 3.5, 3.6 and pypy.
 
 Tests can be run using `unittest`_ style test runners, `pytest`_
 or from the command line with a `gabbi-run`_ script.
