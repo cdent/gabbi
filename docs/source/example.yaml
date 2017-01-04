@@ -41,15 +41,24 @@ tests:
 # for url-encoding the URL.
 
       url: /
+      method: GET
 
 # If no status or method are provided they default to "200" and
 # "GET".
+
+# Instead of explicitly stating "url" and "method" you can join
+# those two keys into one key representing the method. The method
+# *must* be uppercase.
+
+    - name: another test for root
+      desc: Same test as above but with GET key
+      GET: /
 
 # A single test can override settings in defaults (set above).
 
     - name: root without ssl redirects
       ssl: False
-      url: /
+      GET: /
       status: 302
 
 # When evaluating response headers it is possible to use a regular
@@ -63,7 +72,7 @@ tests:
     - name: follow root without ssl redirect
       ssl: False
       redirects: True
-      url: /
+      GET: /
       status: 200 # This is the response code after the redirect.
 
 # URLs can express query parameters in two ways: either in the url
@@ -74,7 +83,7 @@ tests:
 # but not necessarily in that order.
 
     - name: create a url with parameters
-      url: /foo?section=news
+      GET: /foo?section=news
       query_parameters:
           article:
               - 1
@@ -87,7 +96,7 @@ tests:
 # two together form the core value of gabbi.
 
     - name: test accept
-      url: /resource
+      GET: /resource
       request_headers:
           accept: application/json
       response_headers:
@@ -97,7 +106,7 @@ tests:
 # expressed in a test as follows.
 
     - name: test forbidden headers
-      url: /resource
+      GET: /resource
       response_forbidden_headers:
           - x-special-header
 
@@ -106,8 +115,7 @@ tests:
 # request body.
 
     - name: post some text
-      url: /text_repo
-      method: POST
+      POST: /text_repo
       request_headers:
           content-type: text/plain
       data: "I'm storing this"
@@ -117,8 +125,7 @@ tests:
 # You must supply an appropriate content-type request header.
 
     - name: post some json
-      url: /json_repo
-      method: POST
+      POST: /json_repo
       request_headers:
           content-type: application/json
       data:
@@ -133,8 +140,7 @@ tests:
 # be assumed to be UTF-8 encoded.
 
     - name: post an image
-      url: /image_repo
-      method: POST
+      POST: /image_repo
       request_headers:
           content-type: image/png
       data: <@kittens.png
@@ -143,16 +149,14 @@ tests:
 
     - name: patch an image
       skip: patching images not yet implemented
-      url: /image_repo/12d96fb8-e78c-11e4-8c03-685b35afa334
-      method: PATCH
+      PATCH: /image_repo/12d96fb8-e78c-11e4-8c03-685b35afa334
 
 # Or a single request can be marked that it is expected to fail.
 
     - name: check allow headers
       desc: the framework doesn't do allow yet
       xfail: True
-      url: /post_only_url
-      method: PUT
+      PUT: /post_only_url
       status: 405
       response_headers:
           allow: POST
@@ -162,15 +166,14 @@ tests:
 # response. Note that the strings are members of a list.
 
     - name: check for css file
-      url: /blog/posts/12
+      GET: /blog/posts/12
       response_strings:
           - normalize.css
 
 # For JSON responses, JSONPath rules can be used.
 
     - name: post some json get back json
-      url: /json_repo
-      method: POST
+      POST: /json_repo
       request_headers:
           content-type: application/json
       data:
@@ -196,7 +199,7 @@ tests:
 # location (host and port).
 
     - name: get the thing we just posted
-      url: $LOCATION
+      GET: $LOCATION
       request_headers:
           x-magic-exchange: $HEADERS['x-magic-exchange']
           x-token: $ENVIRON['OS_TOKEN']
@@ -212,8 +215,7 @@ tests:
 # with a delay for a set number of times.
 
     - name: create asynch
-      url: /async_creator
-      method: POST
+      POST: /async_creator
       request_headers:
           content-type: application/json
       data:
@@ -222,7 +224,7 @@ tests:
       status: 202
 
     - name: poll for created resource
-      url: $LOCATION
+      GET: $LOCATION
       poll:
           count: 10 # try up to ten times
           delay: .5 # wait .5 seconds between each try
