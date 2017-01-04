@@ -21,16 +21,6 @@ Is gabbi only for testing Python-based APIs?
 No, you can use :doc:`gabbi-run <runner>` to test an HTTP service
 built in any programming language.
 
-Workarounds
-~~~~~~~~~~~
-
-pytest produces warnings about yield tests. Can I make them stop?
------------------------------------------------------------------
-
-Yes, run as ``py.test --disable-pytest-warnings`` to quiet the
-warnings. Or use a version of pytest less than ``3.0``. For more details
-see :ref:`pytest <pytest_loader>`.
-
 Testing Style
 ~~~~~~~~~~~~~
 
