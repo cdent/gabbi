@@ -148,7 +148,7 @@ class VerboseHttp(Http):
             # handler's loads() and dumps(). Not doing that now
             # because it would be pointless (no other interesting
             # handlers) and this approach may be entirely wrong.
-            if jsonhandler.JSONHandler.accepts(content_type):
+            if content and jsonhandler.JSONHandler.accepts(content_type):
                 data = jsonhandler.JSONHandler.loads(content)
                 content = jsonhandler.JSONHandler.dumps(data, pretty=True)
             self._verbose_output('')
