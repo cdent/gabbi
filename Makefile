@@ -5,7 +5,7 @@ clean:
 	find . -name "*.pyc" |xargs rm || true
 	rm -r dist || true
 	rm -r build || true
-	rm -r .tox || true
+	rm -rf .tox || true
 	rm -r .testrepository || true
 	rm -r cover .coverage || true
 	rm -r .eggs || true
