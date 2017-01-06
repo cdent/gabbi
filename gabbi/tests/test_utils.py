@@ -32,6 +32,7 @@ class BinaryTypesTest(unittest.TestCase):
         'application/javascript',
         'application/json',
         'application/json-home',
+        'application/xml',
     ]
 
     def test_not_binary(self):

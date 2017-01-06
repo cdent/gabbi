@@ -109,7 +109,8 @@ def not_binary(content_type):
             content_type.endswith('+xml') or
             content_type.endswith('+json') or
             content_type == 'application/javascript' or
-            content_type.startswith('application/json'))
+            content_type.startswith('application/json') or
+            content_type.startswith('application/xml'))
 
 
 def parse_content_type(content_type, default_charset='utf-8'):
