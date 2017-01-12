@@ -21,6 +21,32 @@ Is gabbi only for testing Python-based APIs?
 No, you can use :doc:`gabbi-run <runner>` to test an HTTP service
 built in any programming language.
 
+How do I run just one test?
+---------------------------
+
+Each YAML file contains a sequence of tests, each test within each file has a
+name. That name is translated to the name of the test by replacing spaces with
+an ``_``.
+
+When running tests that are :doc:`generated dynamically <loader>`, filtering
+based on the test name prior to the test being collected will not work in some
+test runners.  Test runners that use a ``--load-list`` functionality can be
+convinced to filter after discovery.
+
+`pytest` does this directly with the ``-k`` keyword flag.
+
+When using testrepository with tox as used in gabbi's own tests it is possible
+to pass a filter in the tox command::
+
+    tox -epy27 -- get_the_widget
+
+When using ``testtools.run`` and similar test runners it's a bit more
+complicated. It is necessary to provide the full name of the test as a list to
+``--load-list``::
+
+    python -m testtools.run --load-list \
+        <(echo package.tests.test_api.yamlfile_get_the_widge.test_request)
+
 Testing Style
 ~~~~~~~~~~~~~
 
