@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.31.0
+------
+
+Effectively capture a failure in a :doc:`fixture <fixtures>` and
+report the traceback. Without this some test runners swallow the
+error and discovering problems when developing fixtures can be quite
+challenging.
+
 1.30.0
 ------
 

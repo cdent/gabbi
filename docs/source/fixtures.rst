@@ -38,6 +38,12 @@ about the exception will be stored on the fixture so that the
 the fixture should clean up. The exception information can be found on
 ``exc_type``, ``exc_value`` and ``traceback`` method attributes.
 
+If an exception is raised when a fixture is started (in
+``start_fixture``) the first test in the suite using the fixture
+will be marked with an error using the traceback from the exception
+and all the tests in the suite will be skipped. This ensures that
+fixture failure is adequately captured and reported by test runners.
+
 .. _inner-fixtures:
 
 Inner Fixtures
