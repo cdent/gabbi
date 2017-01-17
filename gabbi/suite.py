@@ -16,6 +16,7 @@ This suite has two features: the contained tests are ordered and there
 are suite-level fixtures that operate as context managers.
 """
 
+import sys
 import unittest
 
 from wsgi_intercept import interceptor
@@ -58,6 +59,26 @@ class GabbiSuite(unittest.TestSuite):
         except unittest.SkipTest as exc:
             for test in self._tests:
                 result.addSkip(test, str(exc))
+        # If we have an exception in the nested fixtures, that means
+        # there's been an exception somewhere in the cycle other
+        # than a specific test (as that would have been caught
+        # already), thus from a fixture. If that exception were to
+        # continue to raise here, then some test runners would
+        # swallow it and the traceback of the failure would be
+        # undiscoverable. To ensure the traceback is reported (via
+        # the testrunner) to a human, the first test in the suite is
+        # marked as having an error (it's fixture failed) and then
+        # the entire suite is skipped, and the result stream told
+        # we're done. If there are no tests (an empty suite) the
+        # exception is re-raised.
+        except Exception as exc:
+            if self._tests:
+                result.addError(self._tests[0], sys.exc_info())
+                for test in self._tests:
+                    result.addSkip(test, 'fixture failure')
+                result.stop()
+            else:
+                raise
 
         return result
 
