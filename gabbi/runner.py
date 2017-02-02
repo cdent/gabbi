@@ -12,6 +12,8 @@
 # under the License.
 """Implementation of a command-line runner for gabbi files (AKA suites)."""
 
+from __future__ import print_function
+
 import argparse
 from importlib import import_module
 import os
@@ -81,6 +83,8 @@ def run():
     verbosity = args.verbosity
     failfast = args.failfast
     failure = False
+    # Keep track of file names that have failures.
+    failures = []
 
     if not input_files:
         success = run_suite(sys.stdin, handler_objects, host, port,
@@ -89,22 +93,28 @@ def run():
         failure = not success
     else:
         for input_file in input_files:
+            name = os.path.splitext(os.path.basename(input_file))[0]
             with open(input_file, 'r') as fh:
                 data_dir = os.path.dirname(input_file)
                 success = run_suite(fh, handler_objects, host, port,
                                     prefix, force_ssl, failfast,
                                     data_dir=data_dir,
-                                    verbosity=verbosity)
+                                    verbosity=verbosity, name=name)
+            if not success:
+                failures.append(input_file)
             if not failure:  # once failed, this is considered immutable
                 failure = not success
             if failure and failfast:
                 break
 
+    if failures:
+        print("There were failures in the following files:", file=sys.stderr)
+        print('\n'.join(failures), file=sys.stderr)
     sys.exit(failure)
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
-              failfast=False, data_dir='.', verbosity=False):
+              failfast=False, data_dir='.', verbosity=False, name='input'):
     """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle)
     if force_ssl:
@@ -120,8 +130,8 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
 
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
-        loader, 'input', data, data_dir, host, port, None, None, prefix=prefix,
-        handlers=handler_objects)
+        loader, name, data, data_dir, host, port, None, None, prefix=prefix,
+        handlers=handler_objects, test_loader_name='gabbi-runner')
 
     result = ConciseTestRunner(
         verbosity=2, failfast=failfast).run(test_suite)
