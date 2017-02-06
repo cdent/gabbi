@@ -29,6 +29,11 @@ used::
           other arguments (host, port, prefix, failfast) must come
           before the ``--``.
 
+.. note:: If files are provided, test output will use names
+          including the name of the file. If any single file includes
+          an error, the name of the file will be included in a summary
+          of failed files at the end of the test report.
+
 To facilitate using the same tests against the same application mounted
 in different locations in a WSGI server, a ``prefix`` may be provided
 as a second argument::

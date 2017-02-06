@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.32.0
+------
+
+Better failure reporting when using :doc:`gabbi-run <runner>` with
+multiple files. Test names are based on the files and a summary of
+failed files is provided at the end of the report.
+
 1.31.0
 ------
 
