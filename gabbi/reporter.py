@@ -80,7 +80,8 @@ class ConciseTestResult(TextTestResult):
             self.stream.writeln('\t[unexpected success]')
 
     def getDescription(self, test):
-        name = test.test_data['name']
+        # Chop the test method ('test_request') off the test.id().
+        name = test.id().rsplit('.', 1)[0]
         desc = test.test_data.get('desc', None)
         return ': '.join((name, desc)) if desc else name
 
