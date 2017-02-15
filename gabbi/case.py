@@ -474,7 +474,7 @@ class HTTPTestCase(testtools.TestCase):
                 info = self._load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
                     try:
-                        info = str(info, 'UTF-8')
+                        info = six.text_type(info, 'UTF-8')
                     except TypeError:
                         info = info.encode('UTF-8')
                     data = info
