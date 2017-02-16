@@ -34,7 +34,7 @@ tests:
           content-type: application/json
       data: <@data.json
       response_json_paths:
-          foo.bar: 1
+          foo['bár']: 1
 
     - name: load image file
       url: /
@@ -42,3 +42,10 @@ tests:
       request_headers:
           content-type: image/png
       data: <@kitten.png
+
+    - name: load encoded text
+      url: /
+      method: POST
+      request_headers:
+          content-type: text/plain
+      data: <@utf8.txt
