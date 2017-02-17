@@ -436,6 +436,11 @@ class HTTPTestCase(testtools.TestCase):
         else:
             body = ''
 
+        # ensure body is bytes, encoding as UTF-8 because that's
+        # what we do here
+        if isinstance(body, six.text_type):
+            body = body.encode('UTF-8')
+
         if test['poll']:
             count = test['poll'].get('count', 1)
             delay = test['poll'].get('delay', 1)
@@ -473,11 +478,7 @@ class HTTPTestCase(testtools.TestCase):
             if data.startswith('<@'):
                 info = self._load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
-                    try:
-                        info = str(info, 'UTF-8')
-                    except TypeError:
-                        info = info.encode('UTF-8')
-                    data = info
+                    data = six.text_type(info, 'UTF-8')
                 else:
                     return info
         else:
