@@ -53,7 +53,8 @@ def create_url(base_url, host, port=None, prefix='', ssl=False):
     path = parsed_url.path
 
     # Guard against a prefix of None
-    if prefix:
+    # Without the startswith check, the tests in prefix.yaml fail.
+    if prefix and not path.startswith(prefix):
         path = '%s%s' % (prefix, path)
 
     return urlparse.urlunsplit((scheme, netloc, path, query_string, ''))
