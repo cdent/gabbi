@@ -63,7 +63,9 @@ def create_url(base_url, host, port=None, prefix='', ssl=False):
     # this covers most common cases and will be okay until someone
     # reports a bug.
     if prefix and not path.startswith(prefix):
-        path = '%s%s' % (prefix, path)
+        prefix = prefix.rstrip('/')
+        path = path.lstrip('/')
+        path = '%s/%s' % (prefix, path)
 
     return urlparse.urlunsplit((scheme, netloc, path, query_string, ''))
 
