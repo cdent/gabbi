@@ -23,6 +23,7 @@ import functools
 import os
 import re
 import sys
+import json
 from testtools import testcase
 import time
 from unittest import result
@@ -352,8 +353,27 @@ class HTTPTestCase(testtools.TestCase):
 
     def _response_replace(self, message):
         """Replace a content path with the value from a previous response."""
-        return re.sub(self._replacer_regex('RESPONSE'),
-                      self._response_replacer, message)
+        string = re.sub(self._replacer_regex('RESPONSE'),
+                        self._response_replacer, message)
+        try:
+            return self._json_loads_coerce_types(string)
+        except (ValueError, AttributeError):
+            # `string` was not a valid JSON representation.
+            return string
+
+    @staticmethod
+    def _json_loads_coerce_types(string):
+        """Ensure that all numerical JSON values are properly parsed"""
+        json_rep = json.loads(string)
+        for key, val in json_rep.items():
+            if isinstance(val, basestring):
+                try:
+                    num_val = float(val)
+                    json_rep[key] = num_val
+                except ValueError:
+                    # Value is not a number and does not need coercing.
+                    continue
+        return json.dumps(json_rep)
 
     def _response_replacer(self, match):
         """Replace a regex match with the value from a previous response."""
