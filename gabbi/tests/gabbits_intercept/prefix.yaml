@@ -1,0 +1,20 @@
+
+tests:
+
+- name: provide a link
+  POST: /
+  request_headers:
+      content-type: application/json
+  data:
+      link: $ENVIRON['GABBI_PREFIX']/barnabas
+      relative: link
+
+- name: get that link
+  GET: $RESPONSE['$.link']
+  response_headers:
+      x-gabbi-url: "///[a-f0-9:-]+$ENVIRON['GABBI_PREFIX']/barnabas/"
+
+- name: get relative link
+  GET: $HISTORY['provide a link'].$RESPONSE['$.relative']
+  response_headers:
+      x-gabbi-url: "///[a-f0-9:-]+$ENVIRON['GABBI_PREFIX']/link/"
