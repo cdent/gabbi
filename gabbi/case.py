@@ -20,10 +20,10 @@ made using urllib3. Assertions are made against the reponse.
 from collections import OrderedDict
 import copy
 import functools
+import json
 import os
 import re
 import sys
-import json
 from testtools import testcase
 import time
 from unittest import result
@@ -356,9 +356,13 @@ class HTTPTestCase(testtools.TestCase):
         string = re.sub(self._replacer_regex('RESPONSE'),
                         self._response_replacer, message)
         try:
-            return self._json_loads_coerce_types(string)
+            if string[0] == '{':
+                # Looks like a JSON object.
+                return self._json_loads_coerce_types(string)
+            else:
+                return self.json_loads(string)
         except (ValueError, AttributeError):
-            # `string` was not a valid JSON representation.
+            # `string` was neither a JSON object or a number.
             return string
 
     @staticmethod
@@ -366,12 +370,19 @@ class HTTPTestCase(testtools.TestCase):
         """Ensure that all numerical JSON values are properly parsed"""
         json_rep = json.loads(string)
         for key, val in json_rep.items():
-            if isinstance(val, basestring):
+            # Since we expect the exception to happen often,
+            # test to see if it's worth even attempting to parse
+            # i.e. it looks like a number.
+            if isinstance(val, six.string_types) and val[:1].isdigit():
                 try:
-                    num_val = float(val)
-                    json_rep[key] = num_val
+                    int_val = int(val)
+                    json_rep[key] = int_val
                 except ValueError:
-                    # Value is not a number and does not need coercing.
+                    pass
+                try:
+                    float_val = float(val)
+                    json_rep[key] = float_val
+                except ValueError:
                     continue
         return json.dumps(json_rep)
 
