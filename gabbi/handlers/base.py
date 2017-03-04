@@ -107,4 +107,4 @@ class ContentHandler(ResponseHandler):
     @classmethod
     def coerce(self, value):
         """Coerce value to a particular type."""
-        return value
+        pass
