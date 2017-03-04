@@ -76,11 +76,7 @@ class JSONHandler(base.ContentHandler):
         json_rep = json.loads(value)
         for k, v in json_rep.items():
             try:
-                # Need to consider other JSON types, i.e. objects and arrays.
-                if '.' in value:
-                    json_rep[k] = float(v)
-                else:
-                    json_rep[k] = int(v)
+                json_rep[k] = json.loads(v)
             except ValueError:
                 json_rep[k] = v
         return json.dumps(json_rep)
