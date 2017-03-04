@@ -71,6 +71,20 @@ class JSONHandler(base.ContentHandler):
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
 
+    @classmethod
+    def coerce(self, value):
+        json_rep = json.loads(value)
+        for k, v in json_rep.items():
+            try:
+                # Need to consider other JSON types, i.e. objects and arrays.
+                if '.' in value:
+                    json_rep[k] = float(v)
+                else:
+                    json_rep[k] = int(v)
+            except ValueError:
+                json_rep[k] = v
+        return json.dumps(json_rep)
+
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
         # NOTE: This process has some advantages over other process that

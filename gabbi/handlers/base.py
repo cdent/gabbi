@@ -103,3 +103,8 @@ class ContentHandler(ResponseHandler):
     def loads(data):
         """Create structured (Python) data from a stream."""
         return data
+
+    @classmethod
+    def coerce(self, value):
+        """Coerce value to a particular type."""
+        return value

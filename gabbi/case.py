@@ -20,7 +20,6 @@ made using urllib3. Assertions are made against the reponse.
 from collections import OrderedDict
 import copy
 import functools
-import json
 import os
 import re
 import sys
@@ -148,7 +147,7 @@ class HTTPTestCase(testtools.TestCase):
                 return handler
         return None
 
-    def replace_template(self, message):
+    def replace_template(self, message, content_handler_cls=None):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
@@ -166,6 +165,13 @@ class HTTPTestCase(testtools.TestCase):
                         raise AssertionError(
                             'unable to replace %s in %s, data unavailable: %s'
                             % (template, message, exc))
+                    if content_handler_cls:
+                        try:
+                            message = content_handler_cls.coerce(message)
+                        except (KeyError, AttributeError, ValueError) as exc:
+                            raise AssertionError(
+                                'unable to coerce types in %s: %s'
+                                % (message, exc))
             except TypeError:
                 # Message is not a string
                 pass
@@ -353,38 +359,8 @@ class HTTPTestCase(testtools.TestCase):
 
     def _response_replace(self, message):
         """Replace a content path with the value from a previous response."""
-        string = re.sub(self._replacer_regex('RESPONSE'),
-                        self._response_replacer, message)
-        try:
-            if string[0] == '{':
-                # Looks like a JSON object.
-                return self._json_loads_coerce_types(string)
-            else:
-                return self.json_loads(string)
-        except (ValueError, AttributeError):
-            # `string` was neither a JSON object or a number.
-            return string
-
-    @staticmethod
-    def _json_loads_coerce_types(string):
-        """Ensure that all numerical JSON values are properly parsed"""
-        json_rep = json.loads(string)
-        for key, val in json_rep.items():
-            # Since we expect the exception to happen often,
-            # test to see if it's worth even attempting to parse
-            # i.e. it looks like a number.
-            if isinstance(val, six.string_types) and val[:1].isdigit():
-                try:
-                    int_val = int(val)
-                    json_rep[key] = int_val
-                except ValueError:
-                    pass
-                try:
-                    float_val = float(val)
-                    json_rep[key] = float_val
-                except ValueError:
-                    continue
-        return json.dumps(json_rep)
+        return re.sub(self._replacer_regex('RESPONSE'),
+                      self._response_replacer, message)
 
     def _response_replacer(self, match):
         """Replace a regex match with the value from a previous response."""
@@ -505,6 +481,7 @@ class HTTPTestCase(testtools.TestCase):
 
         If the data is not binary, replace template strings.
         """
+        content_handler_cls = None
         if isinstance(data, str):
             if data.startswith('<@'):
                 info = self._load_data_file(data.replace('<@', '', 1))
@@ -513,13 +490,14 @@ class HTTPTestCase(testtools.TestCase):
                 else:
                     return info
         else:
-            dumper_class = self.get_content_handler(content_type)
-            if dumper_class:
-                data = dumper_class.dumps(data)
+            content_handler_cls = self.get_content_handler(content_type)
+            if content_handler_cls:
+                data = content_handler_cls.dumps(data)
             else:
                 raise ValueError(
                     'unable to process data to %s' % content_type)
-        return self.replace_template(data)
+        return self.replace_template(data,
+                                     content_handler_cls=content_handler_cls)
 
     def _test_status(self, expected_status, observed_status):
         """Confirm we got the expected status.
