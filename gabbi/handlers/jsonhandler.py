@@ -73,14 +73,24 @@ class JSONHandler(base.ContentHandler):
 
     @classmethod
     def coerce(self, value):
-        json_rep = json.loads(value)
-        json_rv = {}
-        for k, v in json_rep.items():
-            try:
-                json_rv[k] = json.loads(v)
-            except (ValueError, TypeError):
-                json_rv[k] = v
-        return json.dumps(json_rv)
+        """Coerce a value into valid JSON and dump the results"""
+        json_rep = value
+
+        try:
+            json_rep = json.loads(value)
+        except (ValueError, TypeError):
+            pass
+
+        if isinstance(json_rep, dict):
+            json_rv = {}
+            for k, v in json_rep.items():
+                try:
+                    json_rv[k] = json.loads(v)
+                except (ValueError, TypeError):
+                    json_rv[k] = v
+            return json.dumps(json_rv)
+        else:
+            return json.dumps(json_rep)
 
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
@@ -97,7 +107,7 @@ class JSONHandler(base.ContentHandler):
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.response_data))
-        expected = test.replace_template(value)
+        expected = test.replace_template(value, content_handler_cls=self)
         # If expected is a string, check to see if it is a regex.
         if (hasattr(expected, 'startswith') and expected.startswith('/')
                 and expected.endswith('/')):
@@ -109,6 +119,10 @@ class JSONHandler(base.ContentHandler):
                 'Expect jsonpath %s to match /%s/, got %s' %
                 (path, expected, match))
         else:
+            # Comparisons can fail due to typing issues, e.g. '1' and u'1'.
+            # Coerce the values given the current content handler we are in.
+            expected = self.coerce(expected)
+            match = self.coerce(match)
             test.assertEqual(expected, match,
                              'Unable to match %s as %s, got %s' %
                              (path, expected, match))
