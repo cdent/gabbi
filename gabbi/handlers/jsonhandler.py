@@ -74,12 +74,13 @@ class JSONHandler(base.ContentHandler):
     @classmethod
     def coerce(self, value):
         json_rep = json.loads(value)
+        json_rv = {}
         for k, v in json_rep.items():
             try:
-                json_rep[k] = json.loads(v)
-            except ValueError:
-                json_rep[k] = v
-        return json.dumps(json_rep)
+                json_rv[k] = json.loads(v)
+            except (ValueError, TypeError):
+                json_rv[k] = v
+        return json.dumps(json_rv)
 
     def action(self, test, path, value=None):
         """Test json_paths against json data."""

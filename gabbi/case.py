@@ -151,7 +151,8 @@ class HTTPTestCase(testtools.TestCase):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
-                message[k] = self.replace_template(message[k])
+                message[k] = self.replace_template(message[k],
+                                                   content_handler_cls)
             return message
 
         for replacer in REPLACERS:
