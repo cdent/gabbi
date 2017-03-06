@@ -79,6 +79,7 @@ class JSONHandler(base.ContentHandler):
         try:
             json_rep = json.loads(value)
         except (ValueError, TypeError):
+            # Couldn't parse the value as a JSON type.
             pass
 
         if isinstance(json_rep, dict):
@@ -107,7 +108,7 @@ class JSONHandler(base.ContentHandler):
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.response_data))
-        expected = test.replace_template(value, content_handler_cls=self)
+        expected = test.replace_template(value)
         # If expected is a string, check to see if it is a regex.
         if (hasattr(expected, 'startswith') and expected.startswith('/')
                 and expected.endswith('/')):
