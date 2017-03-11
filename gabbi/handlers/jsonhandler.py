@@ -13,6 +13,7 @@
 """JSON-related content handling."""
 
 import json
+import ast
 
 from gabbi.handlers import base
 from gabbi import json_parser
@@ -88,7 +89,10 @@ class JSONHandler(base.ContentHandler):
                 try:
                     json_rv[k] = json.loads(v)
                 except (ValueError, TypeError):
-                    json_rv[k] = v
+                    try:
+                        json_rv[k] = ast.literal_eval(v)
+                    except (ValueError, SyntaxError):
+                        json_rv[k] = v
             return json.dumps(json_rv)
         else:
             return json.dumps(json_rep)
