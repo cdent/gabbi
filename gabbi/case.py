@@ -201,6 +201,10 @@ class HTTPTestCase(testtools.TestCase):
         """Replace an indicator in a message with the environment value."""
         value = re.sub(self._replacer_regex('ENVIRON'),
                        self._environ_replacer, message)
+        if value == "False":
+            return False
+        if value == "True":
+            return True
         return value
 
     @staticmethod

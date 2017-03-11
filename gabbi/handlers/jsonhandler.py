@@ -89,7 +89,7 @@ class JSONHandler(base.ContentHandler):
                 pass
             try:
                 json_rep = ast.literal_eval(value)
-            except (ValueError, TypeError):
+            except (ValueError, SyntaxError):
                 pass
 
             json_rv = json_rep
