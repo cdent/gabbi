@@ -154,6 +154,8 @@ class HTTPTestCase(testtools.TestCase):
                 message[k] = self.replace_template(message[k],
                                                    content_handler_cls)
             return message
+        if isinstance(message, list):
+            return [self.replace_template(val, content_handler_cls) for val in message]
 
         for replacer in REPLACERS:
             template = '$%s' % replacer
@@ -166,16 +168,17 @@ class HTTPTestCase(testtools.TestCase):
                         raise AssertionError(
                             'unable to replace %s in %s, data unavailable: %s'
                             % (template, message, exc))
-                    if content_handler_cls:
-                        try:
-                            message = content_handler_cls.coerce(message)
-                        except (KeyError, AttributeError, ValueError) as exc:
-                            raise AssertionError(
-                                'unable to coerce types in %s: %s'
-                                % (message, exc))
             except TypeError:
                 # Message is not a string
                 pass
+
+        if content_handler_cls:
+            try:
+                message = content_handler_cls.coerce(message)
+            except (KeyError, AttributeError, ValueError) as exc:
+                raise AssertionError(
+                    'unable to coerce types in %s: %s'
+                    % (message, exc))
 
         return message
 

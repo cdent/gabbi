@@ -14,6 +14,9 @@
 
 import json
 import ast
+import re
+
+from six import string_types
 
 from gabbi.handlers import base
 from gabbi import json_parser
@@ -75,27 +78,29 @@ class JSONHandler(base.ContentHandler):
     @classmethod
     def coerce(self, value):
         """Coerce a value into valid JSON and dump the results"""
-        json_rep = value
+        def coerce_go(value):
+            """Recursively transform a value into a Python datatype"""
+            json_rep = value
 
-        try:
-            json_rep = json.loads(value)
-        except (ValueError, TypeError):
-            # Couldn't parse the value as a JSON type.
-            pass
+            # Attempt to parse the value as a JSON object or Python datatype.
+            try:
+                json_rep = json.loads(value)
+            except (ValueError, TypeError):
+                pass
+            try:
+                json_rep = ast.literal_eval(value)
+            except (ValueError, TypeError):
+                pass
 
-        if isinstance(json_rep, dict):
-            json_rv = {}
-            for k, v in json_rep.items():
-                try:
-                    json_rv[k] = json.loads(v)
-                except (ValueError, TypeError):
-                    try:
-                        json_rv[k] = ast.literal_eval(v)
-                    except (ValueError, SyntaxError):
-                        json_rv[k] = v
-            return json.dumps(json_rv)
-        else:
-            return json.dumps(json_rep)
+            json_rv = json_rep
+            if isinstance(json_rep, dict):
+                json_rv = {k: coerce_go(v) for (k, v) in json_rep.items()}
+            elif isinstance(json_rep, list):
+                json_rv = [coerce_go(v) for v in json_rep]
+            return json_rv
+
+        value = coerce_go(value)
+        return json.dumps(value)
 
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
