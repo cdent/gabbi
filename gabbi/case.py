@@ -442,8 +442,9 @@ class HTTPTestCase(testtools.TestCase):
             body = body.encode('UTF-8')
 
         if test['poll']:
-            count = test['poll'].get('count', 1)
-            delay = test['poll'].get('delay', 1)
+            count = int(float(self.replace_template(
+                test['poll'].get('count', 1))))
+            delay = float(self.replace_template(test['poll'].get('delay', 1)))
             failure = None
             while count:
                 try:
