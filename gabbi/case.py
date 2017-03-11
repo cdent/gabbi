@@ -155,7 +155,8 @@ class HTTPTestCase(testtools.TestCase):
                                                    content_handler_cls)
             return message
         if isinstance(message, list):
-            return [self.replace_template(val, content_handler_cls) for val in message]
+            cls = content_handler_cls
+            return [self.replace_template(v, cls) for v in message]
 
         for replacer in REPLACERS:
             template = '$%s' % replacer

@@ -12,11 +12,8 @@
 # under the License.
 """JSON-related content handling."""
 
-import json
 import ast
-import re
-
-from six import string_types
+import json
 
 from gabbi.handlers import base
 from gabbi import json_parser
