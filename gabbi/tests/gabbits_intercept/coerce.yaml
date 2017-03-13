@@ -76,7 +76,7 @@ tests:
       - "beta": "max"
       - [1, 2]
 
-- name: post to httpbin
+- name: post extra data
   POST: /
   data:
     a: 1
@@ -89,7 +89,7 @@ tests:
     g: null
     h:
       key:
-        less_key: [1.0, 2.0, 3.0]
+        less_key: [1, true, null]
         more_key: 1
   response_json_paths:
     a: 1
@@ -102,9 +102,8 @@ tests:
     g: null
     h:
       key:
-        less_key: [1.0, 2.0, 3.0]
+        less_key: [1, true, null]
         more_key: 1
-  status: 200
 
 - name: Check posted data
   POST: /
@@ -117,8 +116,8 @@ tests:
     f: $RESPONSE['$.f']
     g: $RESPONSE['$.g']
     h: $RESPONSE['$.h']
-    response_json_paths:
-      a: 1
+  response_json_paths:
+    a: 1
     b: 1.0
     c: [1,2,3]
     d: true
@@ -128,64 +127,61 @@ tests:
     g: null
     h:
       key:
-        less_key: [1.0, 2.0, 3.0]
-    more_key: 1
-    status: 200
+        less_key: [1, true, null]
+        more_key: 1
 
-    #- name: Post again and check the results
-    #POST: /
-    #data:
-    #a: $HISTORY['post to httpbin'].$RESPONSE['$.a']
-    #b: $HISTORY['post to httpbin'].$RESPONSE['$.b']
-    #c: $HISTORY['post to httpbin'].$RESPONSE['$.c']
-    #d: $HISTORY['post to httpbin'].$RESPONSE['$.d']
-    #e: $HISTORY['post to httpbin'].$RESPONSE['$.e']
-    #f: $HISTORY['post to httpbin'].$RESPONSE['$.f']
-    #g: $HISTORY['post to httpbin'].$RESPONSE['$.g']
-    #h: $HISTORY['post to httpbin'].$RESPONSE['$.h']
-    #response_json_paths:
-    #a: $ENVIRON['A']
-    #b: $ENVIRON['B']
-    #c: $ENVIRON['C']
-    #d: $ENVIRON['D']
-    #e: $ENVIRON['E']
-    #f:
-    #key: $ENVIRON['F']
-    #g: $ENVIRON['G']
-    #h:
-    #key:
-    #less_key:
-    #- $ENVIRON['P']
-    #- $ENVIRON['Q']
-    #- $ENVIRON['R']
-    #more_key: $ENVIRON['S']
-    #status: 200
- 
-    #- name: Post again and check the results (reversed)
-    #POST: /
-    #data:
-    #a: $ENVIRON['A']
-    #b: $ENVIRON['B']
-    #c: $ENVIRON['C']
-    #d: $ENVIRON['D']
-    #e: $ENVIRON['E']
-    #f:
-    #key: $ENVIRON['F']
-    #g: $ENVIRON['G']
-    #h:
-    #key:
-    #less_key:
-    #- $ENVIRON['P']
-    #- $ENVIRON['Q']
-    #- $ENVIRON['R']
-    #more_key: $ENVIRON['S']
-    #response_json_paths:
-    #a: $HISTORY['Check posted data'].$RESPONSE['$.a']
-    #b: $HISTORY['Check posted data'].$RESPONSE['$.b']
-    #c: $HISTORY['Check posted data'].$RESPONSE['$.c']
-    #d: $HISTORY['Check posted data'].$RESPONSE['$.d']
-    #e: $HISTORY['Check posted data'].$RESPONSE['$.e']
-    #f: $HISTORY['Check posted data'].$RESPONSE['$.f']
-    #g: $HISTORY['Check posted data'].$RESPONSE['$.g']
-    #h: $HISTORY['Check posted data'].$RESPONSE['$.h']
-    #status: 200
+- name: Post again and check the results
+  POST: /
+  data:
+    a: $HISTORY['post extra data'].$RESPONSE['$.a']
+    b: $HISTORY['post extra data'].$RESPONSE['$.b']
+    c: $HISTORY['post extra data'].$RESPONSE['$.c']
+    d: $HISTORY['post extra data'].$RESPONSE['$.d']
+    e: $HISTORY['post extra data'].$RESPONSE['$.e']
+    f: $HISTORY['post extra data'].$RESPONSE['$.f']
+    g: $HISTORY['post extra data'].$RESPONSE['$.g']
+    h: $HISTORY['post extra data'].$RESPONSE['$.h']
+  response_json_paths:
+    a: $ENVIRON['ONE']
+    b: $ENVIRON['DECIMAL']
+    c: $ENVIRON['ARRAY_STRING']
+    d: $ENVIRON['TRUE']
+    e: $ENVIRON['FALSE']
+    f:
+      key: $ENVIRON['STRING']
+    g: $ENVIRON['NULL']
+    h:
+      key:
+        less_key:
+          - $ENVIRON['ONE']
+          - $ENVIRON['TRUE']
+          - $ENVIRON['NULL']
+        more_key: $ENVIRON['ONE']
+
+- name: Post again and check the results (reversed)
+  POST: /
+  data:
+    a: $ENVIRON['ONE']
+    b: $ENVIRON['DECIMAL']
+    c: $ENVIRON['ARRAY_STRING']
+    d: $ENVIRON['TRUE']
+    e: $ENVIRON['FALSE']
+    f:
+      key: $ENVIRON['STRING']
+    g: $ENVIRON['NULL']
+    h:
+      key:
+        less_key:
+          - $ENVIRON['ONE']
+          - $ENVIRON['TRUE']
+          - $ENVIRON['NULL']
+        more_key: $ENVIRON['ONE']
+  response_json_paths:
+    a: $HISTORY['Check posted data'].$RESPONSE['$.a']
+    b: $HISTORY['Check posted data'].$RESPONSE['$.b']
+    c: $HISTORY['Check posted data'].$RESPONSE['$.c']
+    d: $HISTORY['Check posted data'].$RESPONSE['$.d']
+    e: $HISTORY['Check posted data'].$RESPONSE['$.e']
+    f: $HISTORY['Check posted data'].$RESPONSE['$.f']
+    g: $HISTORY['Check posted data'].$RESPONSE['$.g']
+    h: $HISTORY['Check posted data'].$RESPONSE['$.h']

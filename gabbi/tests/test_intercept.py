@@ -65,7 +65,16 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     # Set and environment variable for one of the tests.
     os.environ['GABBI_TEST_URL'] = 'takingnames'
+
+    # Setup environment variables for `coerce.yaml`
     os.environ['ONE'] = '1'
+    os.environ['DECIMAL'] = '1.0'
+    os.environ['ARRAY_STRING'] = '[1,2,3]'
+    os.environ['TRUE'] = 'true'
+    os.environ['FALSE'] = 'false'
+    os.environ['STRING'] = 'val'
+    os.environ['NULL'] = 'null'
+
     prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
