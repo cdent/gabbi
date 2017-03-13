@@ -65,6 +65,7 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     # Set and environment variable for one of the tests.
     os.environ['GABBI_TEST_URL'] = 'takingnames'
+    os.environ['ONE'] = '1'
     prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,
