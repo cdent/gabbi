@@ -559,8 +559,18 @@ class HTTPTestCase(testtools.TestCase):
         in the environment or the MAX_CHARS_OUTPUT constant.
         """
         if utils.not_binary(utils.parse_content_type(self.content_type)[0]):
-            if expected in iterable:
-                return
+            if isinstance(expected, dict):
+                for k in expected:
+                    v = expected[k]
+                    if isinstance(v, six.string_types):
+                        expected_regex = r'"{}": *"{}"'.format(k, v)
+                    else:
+                        expected_regex = r'"{}": *{}'.format(k, v)
+                if len(re.findall(expected_regex, iterable)) > 0:
+                    return
+            else:
+                if expected in iterable:
+                    return
 
             if self.response_data:
                 dumper_class = self.get_content_handler(self.content_type)
