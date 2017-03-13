@@ -74,6 +74,7 @@ tests:
   response_strings:
       - "alpha": 1
       - "beta": "max"
+      - [1, 2]
 
 - name: post to httpbin
   POST: /
@@ -159,7 +160,7 @@ tests:
     #- $ENVIRON['R']
     #more_key: $ENVIRON['S']
     #status: 200
-
+ 
     #- name: Post again and check the results (reversed)
     #POST: /
     #data:

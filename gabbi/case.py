@@ -566,7 +566,10 @@ class HTTPTestCase(testtools.TestCase):
                         expected_regex = r'"{}": *"{}"'.format(k, v)
                     else:
                         expected_regex = r'"{}": *{}'.format(k, v)
-                if len(re.findall(expected_regex, iterable)) > 0:
+                if re.findall(expected_regex, iterable):
+                    return
+            elif isinstance(expected, list):
+                if all((str(v) in iterable for v in expected)):
                     return
             else:
                 if expected in iterable:
