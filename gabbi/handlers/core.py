@@ -23,6 +23,8 @@ class StringResponseHandler(base.ResponseHandler):
 
     def action(self, test, expected, value=None):
         expected = test.replace_template(expected)
+        raise AssertionError('%s %s' % (type(expected),
+                                        type(test.output)))
         test.assert_in_or_print_output(expected, test.output)
 
 

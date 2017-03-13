@@ -495,6 +495,14 @@ class HTTPTestCase(testtools.TestCase):
                 else:
                     return info
         else:
+            if isinstance(data, dict):
+                data_new = {}
+                for k, v in data.items():
+                    if isinstance(v, six.string_types) and all((r not in v for r in REPLACERS)):
+                        data_new[k] = str('\"{}\"'.format(v))
+                    else:
+                        data_new[k] = v
+                data = data_new
             content_handler_cls = self.get_content_handler(content_type)
             if content_handler_cls:
                 data = content_handler_cls.dumps(data)
