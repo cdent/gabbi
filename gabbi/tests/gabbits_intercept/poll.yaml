@@ -26,7 +26,7 @@ tests:
 
     # Confirm that $LOCATION and $RESPONSE behave in poll.
     - name: create a thing
-      url: /poller?count=2&x=1&y=2
+      url: /poller?count=2&x=1&y=2&z=3.4
       method: POST
       request_headers:
           content-type: application/json
@@ -34,15 +34,16 @@ tests:
           count: 3
           delay: .01
       response_json_paths:
-          $.x[0]: '1'
-          $.y[0]: '2'
+          $.x[0]: "1"
+          $.y[0]: "2"
+          $.z[0]: "3.4"
 
 
     - name: loop location
       url: $LOCATION
       verbose: True
       poll:
-          count: 3
+          count: $RESPONSE['$.z[0]']
           delay: .01
       response_json_paths:
           $.x[0]: $RESPONSE['$.x[0]']
