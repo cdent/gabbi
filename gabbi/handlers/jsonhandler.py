@@ -42,7 +42,11 @@ class JSONHandler(base.ContentHandler):
 
     @classmethod
     def replacer(cls, response_data, match):
-        return u'{}'.format(cls.extract_json_path_value(response_data, match))
+        val = cls.extract_json_path_value(response_data, match)
+        try:
+            return unicode(val)
+        except NameError:
+            return str(val)
 
     @staticmethod
     def dumps(data, pretty=False):
