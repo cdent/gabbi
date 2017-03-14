@@ -64,7 +64,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param require_ssl: If ``True``, make all tests default to using SSL.
     :param inner_fixtures: A list of ``Fixtures`` to use with each
                            individual test request.
-    :param verbose: If ``True``, make all tests built verbose by default.
+    :param verbose: If ``True`` or ``'all'``, make fixtures verbose by default
+                    ``'headers'`` and ``'body'`` are also accepted.
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -117,11 +118,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 suite_dict['defaults']['ssl'] = True
             else:
                 suite_dict['defaults'] = {'ssl': True}
-        if verbose:
+
+        if any((verbose == opt for opt in [True, 'all', 'headers', 'body'])):
             if 'defaults' in suite_dict:
-                suite_dict['defaults']['verbose'] = True
+                suite_dict['defaults']['verbose'] = verbose
             else:
-                suite_dict['defaults'] = {'verbose': True}
+                suite_dict['defaults'] = {'verbose': verbose}
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
