@@ -184,4 +184,12 @@ tests:
     e: $HISTORY['Check posted data'].$RESPONSE['$.e']
     f: $HISTORY['Check posted data'].$RESPONSE['$.f']
     g: $HISTORY['Check posted data'].$RESPONSE['$.g']
-    h: $HISTORY['Check posted data'].$RESPONSE['$.h']
+    h:
+      key:
+        less_key:
+          - $HISTORY['Check posted data'].$RESPONSE['$.h.key.less_key[0]']
+          - $HISTORY['Check posted data'].$RESPONSE['$.h.key.less_key[1]']
+          - $HISTORY['Check posted data'].$RESPONSE['$.h.key.less_key[2]']
+        more_key: $HISTORY['Check posted data'].$RESPONSE['$.h.key.more_key']
+
+
