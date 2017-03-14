@@ -132,8 +132,12 @@ class JSONHandler(base.ContentHandler):
         else:
             # Comparisons can fail due to typing issues, e.g. '1' and u'1'.
             # Coerce the values given the current content handler we are in.
-            expected = self.coerce(expected)
-            match = self.coerce(match)
+            # Also, to prevent ordering equality issues e.g. {"foo": 1, "bar":
+            # 2} failing to compare to {"bar": 2, "foo": 1}, load the coerced
+            # value back into a valid Python datatype which should compare
+            # equality field-wise.
+            expected = json.loads(self.coerce(expected))
+            match = json.loads(self.coerce(match))
             test.assertEqual(expected, match,
                              'Unable to match %s as %s, got %s' %
                              (path, expected, match))
