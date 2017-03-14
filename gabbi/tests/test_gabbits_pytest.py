@@ -40,6 +40,10 @@ def pytest_generate_tests(metafunc):
     os.environ['FALSE'] = 'false'
     os.environ['STRING'] = 'val'
     os.environ['NULL'] = 'null'
+    try:
+        os.environ['UNICODE'] = u'\u2227'
+    except UnicodeEncodeError:
+        os.environ['UNICODE'] = u'\u2227'.encode('utf8')
 
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     driver.py_test_generator(
