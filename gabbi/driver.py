@@ -42,7 +42,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
                 response_handlers=None, content_handlers=None,
                 prefix='', require_ssl=False, url=None,
-                inner_fixtures=None):
+                inner_fixtures=None, verbose=False):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents an ordered sequence of HTTP requests.
@@ -64,6 +64,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param require_ssl: If ``True``, make all tests default to using SSL.
     :param inner_fixtures: A list of ``Fixtures`` to use with each
                            individual test request.
+    :param verbose: If ``True``, make all tests built verbose by default.
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -116,6 +117,11 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 suite_dict['defaults']['ssl'] = True
             else:
                 suite_dict['defaults'] = {'ssl': True}
+        if verbose:
+            if 'defaults' in suite_dict:
+                suite_dict['defaults']['verbose'] = True
+            else:
+                suite_dict['defaults'] = {'verbose': True}
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,
