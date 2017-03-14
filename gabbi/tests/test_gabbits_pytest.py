@@ -29,7 +29,18 @@ TESTS_DIR = 'gabbits_intercept'
 
 
 def pytest_generate_tests(metafunc):
+    # Set and environment variable for one of the tests.
     os.environ['GABBI_TEST_URL'] = 'takingnames'
+
+    # Setup environment variables for `coerce.yaml`
+    os.environ['ONE'] = '1'
+    os.environ['DECIMAL'] = '1.0'
+    os.environ['ARRAY_STRING'] = '[1,2,3]'
+    os.environ['TRUE'] = 'true'
+    os.environ['FALSE'] = 'false'
+    os.environ['STRING'] = 'val'
+    os.environ['NULL'] = 'null'
+
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
