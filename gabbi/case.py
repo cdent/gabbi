@@ -499,7 +499,7 @@ class HTTPTestCase(testtools.TestCase):
                 data_new = {}
                 for k, v in data.items():
                     if isinstance(v, six.string_types) \
-                       and all((r not in v for r in REPLACERS)):
+                       and all(('${}'.format(r) not in v for r in REPLACERS)):
                         data_new[k] = '\"{}\"'.format(v)
                     else:
                         data_new[k] = v
