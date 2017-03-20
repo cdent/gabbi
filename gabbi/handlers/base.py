@@ -13,6 +13,9 @@
 """Base classes for response and content handlers."""
 
 
+from gabbi.exception import GabbiFormatError
+
+
 class ResponseHandler(object):
     """Add functionality for making assertions about an HTTP response.
 
@@ -38,6 +41,11 @@ class ResponseHandler(object):
     def __call__(self, test):
         if test.test_data[self._key]:
             self.preprocess(test)
+            if type(self.test_key_value) != type(test.test_data[self._key]):
+                raise GabbiFormatError(
+                    "%s in '%s' has incorrect type, must be %s"
+                    % (self._key, test.test_data['name'],
+                       type(self.test_key_value)))
             for item in test.test_data[self._key]:
                 try:
                     value = test.test_data[self._key][item]

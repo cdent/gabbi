@@ -17,6 +17,7 @@ import json
 import unittest
 
 from gabbi import case
+from gabbi.exception import GabbiFormatError
 from gabbi.handlers import core
 from gabbi.handlers import jsonhandler
 from gabbi import suitemaker
@@ -104,6 +105,19 @@ class HandlersTest(unittest.TestCase):
         # Check the pprint of the json
         self.assertIn('      "location": "house"', msg)
 
+    def test_response_string_list_type(self):
+        handler = core.StringResponseHandler()
+        self.test.test_data = {
+            'name': 'omega test',
+            'response_strings': 'omega'
+        }
+        self.test.output = 'omega\n'
+        with self.assertRaises(GabbiFormatError) as exc:
+            self._assert_handler(handler)
+            self.assertIn('has incorrect type', str(exc))
+            self.assertIn("response_strings in 'omega test'",
+                          str(exc))
+
     def test_response_json_paths(self):
         handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
@@ -177,6 +191,19 @@ class HandlersTest(unittest.TestCase):
                          'location': 'house'}]
         }
         self._assert_handler(handler)
+
+    def test_response_json_paths_dict_type(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.test_data = {
+            'name': 'omega test',
+            'response_json_paths': ['alpha', 'beta']
+        }
+        self.test.output = 'omega\n'
+        with self.assertRaises(GabbiFormatError) as exc:
+            self._assert_handler(handler)
+            self.assertIn('has incorrect type', str(exc))
+            self.assertIn("response_json_paths in 'omega test'",
+                          str(exc))
 
     def test_response_headers(self):
         handler = core.HeadersResponseHandler()
