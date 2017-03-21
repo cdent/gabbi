@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.33.0
+------
+
+``count`` and ``delay`` test keys allow :ref:`substitutions
+<state-substitution>`. :meth:`gabbi.driver.build_tests` accepts
+a ``verbose`` parameter to set test :ref:`verbosity <metadata>` for
+an entire session.
+
 1.32.0
 ------
 

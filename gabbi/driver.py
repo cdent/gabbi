@@ -64,7 +64,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param require_ssl: If ``True``, make all tests default to using SSL.
     :param inner_fixtures: A list of ``Fixtures`` to use with each
                            individual test request.
-    :param verbose: If ``True`` or ``'all'``, make fixtures verbose by default
+    :param verbose: If ``True`` or ``'all'``, make tests verbose by default
                     ``'headers'`` and ``'body'`` are also accepted.
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).

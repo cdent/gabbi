@@ -277,6 +277,7 @@ All of these variables may be used in all of the following fields:
 * ``response_json_paths`` (on the value side of the key value pair)
 * ``response_headers`` (on the value side of the key value pair)
 * ``response_forbidden_headers``
+* ``count`` and ``delay`` fields of ``poll``
 
 With these variables it ought to be possible to traverse an API without any
 explicit statements about the URLs being used. If you need a
