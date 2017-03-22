@@ -147,12 +147,16 @@ class HTTPTestCase(testtools.TestCase):
                 return handler
         return None
 
-    def replace_template(self, message):
+    def replace_template(self, message, content_handler_cls=None):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
-                message[k] = self.replace_template(message[k])
+                message[k] = self.replace_template(message[k],
+                                                   content_handler_cls)
             return message
+        if isinstance(message, list):
+            cls = content_handler_cls
+            return [self.replace_template(v, cls) for v in message]
 
         for replacer in REPLACERS:
             template = '$%s' % replacer
@@ -168,6 +172,14 @@ class HTTPTestCase(testtools.TestCase):
             except TypeError:
                 # Message is not a string
                 pass
+
+        if content_handler_cls:
+            try:
+                message = content_handler_cls.coerce(message)
+            except (KeyError, AttributeError, ValueError) as exc:
+                raise AssertionError(
+                    'unable to coerce types in %s: %s'
+                    % (message, exc))
 
         return message
 
@@ -475,6 +487,7 @@ class HTTPTestCase(testtools.TestCase):
 
         If the data is not binary, replace template strings.
         """
+        content_handler_cls = None
         if isinstance(data, str):
             if data.startswith('<@'):
                 info = self._load_data_file(data.replace('<@', '', 1))
@@ -483,13 +496,23 @@ class HTTPTestCase(testtools.TestCase):
                 else:
                     return info
         else:
-            dumper_class = self.get_content_handler(content_type)
-            if dumper_class:
-                data = dumper_class.dumps(data)
+            if isinstance(data, dict):
+                data_new = {}
+                for k, v in data.items():
+                    if isinstance(v, six.string_types) \
+                       and all(('${}'.format(r) not in v for r in REPLACERS)):
+                        data_new[k] = u'\"{}\"'.format(v)
+                    else:
+                        data_new[k] = v
+                data = data_new
+            content_handler_cls = self.get_content_handler(content_type)
+            if content_handler_cls:
+                data = content_handler_cls.dumps(data)
             else:
                 raise ValueError(
                     'unable to process data to %s' % content_type)
-        return self.replace_template(data)
+        return self.replace_template(data,
+                                     content_handler_cls=content_handler_cls)
 
     def _test_status(self, expected_status, observed_status):
         """Confirm we got the expected status.
@@ -537,8 +560,21 @@ class HTTPTestCase(testtools.TestCase):
         in the environment or the MAX_CHARS_OUTPUT constant.
         """
         if utils.not_binary(utils.parse_content_type(self.content_type)[0]):
-            if expected in iterable:
-                return
+            if isinstance(expected, dict):
+                for k in expected:
+                    v = expected[k]
+                    if isinstance(v, six.string_types):
+                        expected_regex = r'"{}": *"{}"'.format(k, v)
+                    else:
+                        expected_regex = r'"{}": *{}'.format(k, v)
+                if re.findall(expected_regex, iterable):
+                    return
+            elif isinstance(expected, list):
+                if all((str(v) in iterable for v in expected)):
+                    return
+            else:
+                if expected in iterable:
+                    return
 
             if self.response_data:
                 dumper_class = self.get_content_handler(self.content_type)

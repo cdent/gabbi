@@ -10,7 +10,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 """A sample test module to exercise the code.
 
 For the sake of exploratory development.
@@ -65,6 +64,20 @@ def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     # Set and environment variable for one of the tests.
     os.environ['GABBI_TEST_URL'] = 'takingnames'
+
+    # Setup environment variables for `coerce.yaml`
+    os.environ['ONE'] = '1'
+    os.environ['DECIMAL'] = '1.0'
+    os.environ['ARRAY_STRING'] = '[1,2,3]'
+    os.environ['TRUE'] = 'true'
+    os.environ['FALSE'] = 'false'
+    os.environ['STRING'] = 'val'
+    os.environ['NULL'] = 'null'
+    try:
+        os.environ['UNICODE'] = u'\u2227'
+    except UnicodeEncodeError:
+        os.environ['UNICODE'] = u'\u2227'.encode('utf8')
+
     prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,

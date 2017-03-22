@@ -12,6 +12,7 @@
 # under the License.
 """JSON-related content handling."""
 
+import ast
 import json
 
 from gabbi.handlers import base
@@ -41,7 +42,11 @@ class JSONHandler(base.ContentHandler):
 
     @classmethod
     def replacer(cls, response_data, match):
-        return str(cls.extract_json_path_value(response_data, match))
+        val = cls.extract_json_path_value(response_data, match)
+        try:
+            return unicode(val)
+        except NameError:
+            return str(val)
 
     @staticmethod
     def dumps(data, pretty=False):
@@ -71,6 +76,33 @@ class JSONHandler(base.ContentHandler):
             raise ValueError(
                 "JSONPath '%s' failed to match on data: '%s'" % (path, data))
 
+    @classmethod
+    def coerce(self, value):
+        """Coerce a value into valid JSON and dump the results"""
+        def coerce_go(value):
+            """Recursively transform a value into a Python datatype"""
+            json_rep = value
+
+            # Attempt to parse the value as a JSON object or Python datatype.
+            try:
+                json_rep = json.loads(value)
+            except (ValueError, TypeError):
+                pass
+            try:
+                json_rep = ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                pass
+
+            json_rv = json_rep
+            if isinstance(json_rep, dict):
+                json_rv = {k: coerce_go(v) for (k, v) in json_rep.items()}
+            elif isinstance(json_rep, list):
+                json_rv = [coerce_go(v) for v in json_rep]
+            return json_rv
+
+        value = coerce_go(value)
+        return json.dumps(value)
+
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
         # NOTE: This process has some advantages over other process that
@@ -98,6 +130,14 @@ class JSONHandler(base.ContentHandler):
                 'Expect jsonpath %s to match /%s/, got %s' %
                 (path, expected, match))
         else:
+            # Comparisons can fail due to typing issues, e.g. '1' and u'1'.
+            # Coerce the values given the current content handler we are in.
+            # Also, to prevent ordering equality issues e.g. {"foo": 1, "bar":
+            # 2} failing to compare to {"bar": 2, "foo": 1}, load the coerced
+            # value back into a valid Python datatype which should compare
+            # equality field-wise.
+            expected = json.loads(self.coerce(expected))
+            match = json.loads(self.coerce(match))
             test.assertEqual(expected, match,
                              'Unable to match %s as %s, got %s' %
                              (path, expected, match))
