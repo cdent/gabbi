@@ -100,7 +100,7 @@ class ContentHandler(ResponseHandler):
         return path
 
     @staticmethod
-    def dumps(data, pretty=False):
+    def dumps(data, pretty=False, test=None):
         """Return structured data as a string.
 
         If pretty is true, prettify.

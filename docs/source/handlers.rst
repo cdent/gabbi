@@ -107,8 +107,11 @@ handler might accept ``application/x-www-form-urlencoded`` and
 
 If ``accepts`` is defined two additional static methods should be defined:
 
-* ``dumps``: Turn structured Python data from the ``data`` key in a
-  test into a string or byte stream.
+* ``dumps``: Turn structured Python data from the ``data`` key in a test into a
+  string or byte stream. The optional ``test`` param allows you to access the
+  current test case which may help with manipulations for custom content
+  handlers, e.g. multipart/form-data needs to add a `boundary` to the
+  Content-Type header in order to mark the appropriate sections of the body.
 * ``loads``: Turn a string or byte stream in a response into a Python data
   structure. Gabbi will put this data on the ``response_data``
   attribute on the test, where it can be used in the evaluations
