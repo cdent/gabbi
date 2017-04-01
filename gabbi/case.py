@@ -545,10 +545,6 @@ class HTTPTestCase(testtools.TestCase):
                 if dumper_class:
                     full_response = dumper_class.dumps(self.response_data,
                                                        pretty=True, test=self)
-                    # Sometimes, a given content handler may not hand back a
-                    # string for transmission, so we should be careful.
-                    if not isinstance(full_response, six.string_types):
-                        full_response = str(full_response)
                 else:
                     full_response = self.output
             else:
