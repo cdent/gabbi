@@ -485,7 +485,7 @@ class HTTPTestCase(testtools.TestCase):
         else:
             dumper_class = self.get_content_handler(content_type)
             if dumper_class:
-                data = dumper_class.dumps(data)
+                data = dumper_class.dumps(data, test=self)
             else:
                 raise ValueError(
                     'unable to process data to %s' % content_type)
@@ -544,7 +544,7 @@ class HTTPTestCase(testtools.TestCase):
                 dumper_class = self.get_content_handler(self.content_type)
                 if dumper_class:
                     full_response = dumper_class.dumps(self.response_data,
-                                                       pretty=True)
+                                                       pretty=True, test=self)
                 else:
                     full_response = self.output
             else:
