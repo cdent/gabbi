@@ -37,8 +37,17 @@ class EnvironReplaceTest(unittest.TestCase):
         os.environ['moo'] = "False"
         self.assertEqual(False, http_case._environ_replace(message))
 
+        os.environ['moo'] = "true"
+        self.assertEqual(True, http_case._environ_replace(message))
+
+        os.environ['moo'] = "faLse"
+        self.assertEqual(False, http_case._environ_replace(message))
+
+        os.environ['moo'] = "null"
+        self.assertEqual(None, http_case._environ_replace(message))
+
         os.environ['moo'] = "1"
-        self.assertEqual("1", http_case._environ_replace(message))
+        self.assertEqual(1, http_case._environ_replace(message))
 
         os.environ['moo'] = "cow"
         self.assertEqual("cow", http_case._environ_replace(message))

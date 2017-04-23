@@ -41,7 +41,7 @@ class JSONHandler(base.ContentHandler):
 
     @classmethod
     def replacer(cls, response_data, match):
-        return str(cls.extract_json_path_value(response_data, match))
+        return cls.extract_json_path_value(response_data, match)
 
     @staticmethod
     def dumps(data, pretty=False, test=None):

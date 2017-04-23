@@ -23,6 +23,7 @@ from gabbi import driver
 from gabbi import fixture
 from gabbi.handlers import base
 from gabbi.tests import simple_wsgi
+from gabbi.tests import util
 
 
 TESTS_DIR = 'gabbits_intercept'
@@ -64,7 +65,8 @@ SkipAllFixture = fixture.SkipAllFixture
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     # Set and environment variable for one of the tests.
-    os.environ['GABBI_TEST_URL'] = 'takingnames'
+    util.set_test_environ()
+
     prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     return driver.build_tests(test_dir, loader, host=None,

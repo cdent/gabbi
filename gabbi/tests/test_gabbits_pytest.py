@@ -24,12 +24,13 @@ from gabbi import driver
 from gabbi.driver import test_pytest  # noqa
 from gabbi.tests import simple_wsgi
 from gabbi.tests import test_intercept
+from gabbi.tests import util
 
 TESTS_DIR = 'gabbits_intercept'
 
 
 def pytest_generate_tests(metafunc):
-    os.environ['GABBI_TEST_URL'] = 'takingnames'
+    util.set_test_environ()
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     driver.py_test_generator(
         test_dir, intercept=simple_wsgi.SimpleWsgi,
