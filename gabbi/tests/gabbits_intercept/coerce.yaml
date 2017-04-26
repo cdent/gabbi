@@ -190,3 +190,12 @@ tests:
           - $HISTORY['check posted data'].$RESPONSE['$.h.key.less_key[1]']
           - $HISTORY['check posted data'].$RESPONSE['$.h.key.less_key[2]']
         more_key: $HISTORY['check posted data'].$RESPONSE['$.h.key.more_key']
+
+- name: string internal replace
+  POST: /
+  data:
+    endpoint_resp: /api/0.1/item/$HISTORY['check posted data'].$RESPONSE['$.a']
+    endpoint_var: /api/0.1/item/$ENVIRON['ONE']
+  response_json_paths:
+    endpoint_resp: /api/0.1/item/1
+    endpoint_var: /api/0.1/item/1
