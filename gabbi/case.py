@@ -154,6 +154,9 @@ class HTTPTestCase(testtools.TestCase):
                 message[k] = self.replace_template(message[k])
             return message
 
+        if isinstance(message, list):
+            return [self.replace_template(line) for line in message]
+
         for replacer in REPLACERS:
             template = '$%s' % replacer
             method = '_%s_replace' % replacer.lower()
@@ -187,13 +190,27 @@ class HTTPTestCase(testtools.TestCase):
         return value
 
     def _environ_replace(self, message):
-        """Replace an indicator in a message with the environment value."""
+        """Replace an indicator in a message with the environment value.
+
+        If value can be a number, cast it as such. If value is a form of
+        "null", "true", or "false" cast it to None, True, False.
+        """
         value = re.sub(self._replacer_regex('ENVIRON'),
                        self._environ_replacer, message)
-        if value == "False":
+        try:
+            if '.' in value:
+                value = float(value)
+            else:
+                value = int(value)
+            return value
+        except ValueError:
+            pass
+        if value.lower() == "false":
             return False
-        if value == "True":
+        if value.lower() == "true":
             return True
+        if value.lower() == "null":
+            return None
         return value
 
     @staticmethod
@@ -351,11 +368,18 @@ class HTTPTestCase(testtools.TestCase):
         return r"%s\$%s" % (case, key)
 
     def _response_replace(self, message):
-        """Replace a content path with the value from a previous response."""
-        return re.sub(self._replacer_regex('RESPONSE'),
-                      self._response_replacer, message)
+        """Replace a content path with the value from a previous response.
 
-    def _response_replacer(self, match):
+        If the match would replace the entire message, then don't cast it
+        to a string.
+        """
+        regex = self._replacer_regex('RESPONSE')
+        match = re.match('^%s$' % regex, message)
+        if match:
+            return self._response_replacer(match, preserve=True)
+        return re.sub(regex, self._response_replacer, message)
+
+    def _response_replacer(self, match, preserve=False):
         """Replace a regex match with the value from a previous response."""
         response_path = match.group('arg')
         case = match.group('case')
@@ -368,8 +392,12 @@ class HTTPTestCase(testtools.TestCase):
         # If no handler can be found use the null replacer,
         # which returns "foo" when "$RESPONSE['foo']".
         replacer_class = replacer_class or base.ContentHandler
-        return replacer_class.replacer(
+        result = replacer_class.replacer(
             referred_case.response_data, response_path)
+        if preserve:
+            return result
+        else:
+            return six.text_type(result)
 
     def _run_request(self, url, method, headers, body, redirect=False):
         """Run the http request and decode output.
@@ -485,6 +513,7 @@ class HTTPTestCase(testtools.TestCase):
         else:
             dumper_class = self.get_content_handler(content_type)
             if dumper_class:
+                data = self.replace_template(data)
                 data = dumper_class.dumps(data, test=self)
             else:
                 raise ValueError(

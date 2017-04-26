@@ -1,0 +1,201 @@
+defaults:
+  request_headers:
+      content-type: application/json
+  verbose: True
+
+tests:
+- name: post data
+  POST: /
+  data:
+      one_string: "1"
+      one_int: 1
+      one_float: 1.1
+  response_json_paths:
+      $.one_string: "1"
+      $.one_int: 1
+      $.one_float: 1.1
+  response_strings:
+      - '"one_string": "1"'
+      - '"one_int": 1'
+      - '"one_float": 1.1'
+
+- name: use data
+  desc: data will be coerced because templates in use
+  POST: /
+  data:
+      one_string: !!str "$RESPONSE['$.one_string']"
+      one_int: $RESPONSE['$.one_int']
+      one_float: $RESPONSE['$.one_float']
+  response_json_paths:
+      $.one_string: "1"
+      $.one_int: 1
+      $.one_float: 1.1
+  response_strings:
+      - '"one_string": "1"'
+      - '"one_int": 1'
+      - '"one_float": 1.1'
+
+- name: from environ
+  POST: /
+  data:
+      one_environ: $ENVIRON['ONE']
+  response_json_paths:
+      $.one_environ: 1
+  response_strings:
+      - '"one_environ": 1'
+
+- name: with list
+  POST: /
+  data:
+      - $ENVIRON['ONE']
+      - 2
+      - "3"
+  response_json_paths:
+      $[0]: 1
+      $[1]: 2
+      $[2]: "3"
+  response_strings:
+      - '[1, 2, "3"]'
+
+- name: object with list
+  desc: without recursive handling no coersion
+  POST: /
+  data:
+      collection:
+          - alpha: $ENVIRON['ONE']
+            beta: max
+          - alpha: 2
+            beta: climb
+  response_json_paths:
+      $.collection[0].alpha: 1
+      $.collection[0].beta: max
+      $.collection[1].alpha: 2
+      $.collection[1].beta: climb
+  response_strings:
+      - '"alpha": 1'
+      - '"beta": "max"'
+
+- name: post extra data
+  POST: /
+  data:
+    a: 1
+    b: 1.0
+    c: '[1,2,3]'
+    d: true
+    e: false
+    f:
+      key: val
+    g: null
+    h:
+      key:
+        less_key: [1, true, null]
+        more_key: 1
+  response_json_paths:
+    a: 1
+    b: 1.0
+    c: '[1,2,3]'
+    d: true
+    e: false
+    f:
+      key: val
+    g: null
+    h:
+      key:
+        less_key: [1, true, null]
+        more_key: 1
+
+- name: check posted data
+  POST: /
+  data:
+    a: $RESPONSE['$.a']
+    b: $RESPONSE['$.b']
+    c: $RESPONSE['$.c']
+    d: $RESPONSE['$.d']
+    e: $RESPONSE['$.e']
+    f: $RESPONSE['$.f']
+    g: $RESPONSE['$.g']
+    h: $RESPONSE['$.h']
+  response_json_paths:
+    a: 1
+    b: 1.0
+    c: '[1,2,3]'
+    d: true
+    e: false
+    f:
+      key: val
+    g: null
+    h:
+      key:
+        less_key: [1, true, null]
+        more_key: 1
+
+- name: Post again and check the results
+  POST: /
+  data:
+    a: $HISTORY['post extra data'].$RESPONSE['$.a']
+    b: $HISTORY['post extra data'].$RESPONSE['$.b']
+    c: $HISTORY['post extra data'].$RESPONSE['$.c']
+    d: $HISTORY['post extra data'].$RESPONSE['$.d']
+    e: $HISTORY['post extra data'].$RESPONSE['$.e']
+    f: $HISTORY['post extra data'].$RESPONSE['$.f']
+    g: $HISTORY['post extra data'].$RESPONSE['$.g']
+    h: $HISTORY['post extra data'].$RESPONSE['$.h']
+  response_json_paths:
+    a: $ENVIRON['ONE']
+    b: $ENVIRON['DECIMAL']
+    c: $ENVIRON['ARRAY_STRING']
+    d: $ENVIRON['TRUE']
+    e: $ENVIRON['FALSE']
+    f:
+      key: $ENVIRON['STRING']
+    g: $ENVIRON['NULL']
+    h:
+      key:
+        less_key:
+          - $ENVIRON['ONE']
+          - $ENVIRON['TRUE']
+          - $ENVIRON['NULL']
+        more_key: $ENVIRON['ONE']
+
+- name: Post again and check the results (reversed)
+  POST: /
+  data:
+    a: $ENVIRON['ONE']
+    b: $ENVIRON['DECIMAL']
+    c: $ENVIRON['ARRAY_STRING']
+    d: $ENVIRON['TRUE']
+    e: $ENVIRON['FALSE']
+    f:
+      key: $ENVIRON['STRING']
+    g: $ENVIRON['NULL']
+    h:
+      key:
+        less_key:
+          - $ENVIRON['ONE']
+          - $ENVIRON['TRUE']
+          - $ENVIRON['NULL']
+        more_key: $ENVIRON['ONE']
+  response_json_paths:
+    a: $HISTORY['check posted data'].$RESPONSE['$.a']
+    b: $HISTORY['check posted data'].$RESPONSE['$.b']
+    c: $HISTORY['check posted data'].$RESPONSE['$.c']
+    d: $HISTORY['check posted data'].$RESPONSE['$.d']
+    e: $HISTORY['check posted data'].$RESPONSE['$.e']
+    f: $HISTORY['check posted data'].$RESPONSE['$.f']
+    g: $HISTORY['check posted data'].$RESPONSE['$.g']
+    h:
+      key:
+        less_key:
+          - $HISTORY['check posted data'].$RESPONSE['$.h.key.less_key[0]']
+          - $HISTORY['check posted data'].$RESPONSE['$.h.key.less_key[1]']
+          - $HISTORY['check posted data'].$RESPONSE['$.h.key.less_key[2]']
+        more_key: $HISTORY['check posted data'].$RESPONSE['$.h.key.more_key']
+
+- name: string internal replace
+  POST: /
+  data:
+    endpoint_resp: /api/0.1/item/$HISTORY['check posted data'].$RESPONSE['$.a']
+    endpoint_var: /api/0.1/item/$ENVIRON['ONE']
+  response_json_paths:
+    endpoint_resp: /api/0.1/item/1
+    endpoint_var: /api/0.1/item/1
