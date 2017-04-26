@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.34.0
+------
+
+:ref:`Substitutions <state-substitution>` in ``$RESPONSE`` handling
+now preserve numeric types instead of casting to a string. This is
+useful when servers are expecting strong types and tests want to
+send response data back to the server.
+
 1.33.0
 ------
 
