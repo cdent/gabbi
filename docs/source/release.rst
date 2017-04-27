@@ -207,8 +207,11 @@ gabbi.
 * Chris Dent
 * FND
 * Mehdi Abaakouk
+* Tom Viner
 * Jason Myers
+* Ryan Spencer
 * Kim Raymoure
+* Travis Truman
 * Samuel Fekete
 * Michael McCune
 * Imran Hayder
