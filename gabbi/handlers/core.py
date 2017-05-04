@@ -66,7 +66,7 @@ class HeadersResponseHandler(base.ResponseHandler):
 
         if header_value.startswith('/') and header_value.endswith('/'):
             header_value = header_value.strip('/').rstrip('/')
-            test.assertRegexpMatches(
+            test.assertRegex(
                 response_value, header_value,
                 'Expect header %s to match /%s/, got %s' %
                 (header, header_value, response_value))
