@@ -34,9 +34,9 @@ test:
 	tox --skip-missing-interpreters
 
 dist: test
-	python setup.py sdist
+	python setup.py sdist bdist_wheel
 
 release: clean test cleanagain tagv pypi
 
 pypi:
-	python setup.py sdist upload
+	python setup.py sdist bdist_wheel upload --sign
