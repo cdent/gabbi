@@ -73,11 +73,8 @@ class JSONHandler(base.ContentHandler):
 
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
-        # NOTE: This process has some advantages over other process that
-        # might come along because the JSON data has already been
-        # processed (to provided for the magic template replacing).
-        # Other handlers that want access to data structures will need
-        # to do their own processing.
+        # Do template expansion in the left hand side.
+        path = test.replace_template(path)
         try:
             match = self.extract_json_path_value(
                 test.response_data, path)

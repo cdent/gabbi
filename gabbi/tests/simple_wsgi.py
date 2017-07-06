@@ -107,6 +107,11 @@ class SimpleWsgi(object):
             # fall through if we've ended the loop
         elif path_info == '/cookie':
             headers.append(('Set-Cookie', 'session=1234; domain=.example.com'))
+        elif path_info == '/jsonator':
+            json_data = json.dumps({query_data['key'][0]:
+                                    query_data['value'][0]})
+            start_response('200 OK', [('Content-Type', 'application/json')])
+            return [json_data.encode('utf-8')]
 
         start_response('200 OK', headers)
 
