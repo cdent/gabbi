@@ -5,6 +5,18 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.35.0
+------
+
+:doc:`jsonpath` handling gets two improvements:
+
+* The value side of a ``response_json_paths`` entry can be loaded
+  from a file using the ``<@file.json`` syntax also used in
+  :ref:`data`.
+* The key side of a ``response_json_paths`` entry can use
+  :ref:`substitutions <state-substitution>`. This was already true
+  for the value side.
+
 1.34.0
 ------
 
