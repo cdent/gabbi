@@ -14,6 +14,8 @@
 
 import json
 
+import six
+
 from gabbi.handlers import base
 from gabbi import json_parser
 
@@ -86,6 +88,13 @@ class JSONHandler(base.ContentHandler):
         except ValueError:
             raise AssertionError('json path %s cannot match %s' %
                                  (path, test.response_data))
+
+        # read data from disk if the value starts with '<@'
+        if isinstance(value, str) and value.startswith('<@'):
+            info = test.load_data_file(value.replace('<@', '', 1))
+            info = six.text_type(info, 'UTF-8')
+            value = self.loads(info)
+
         expected = test.replace_template(value)
         # If expected is a string, check to see if it is a regex.
         if (hasattr(expected, 'startswith') and expected.startswith('/')

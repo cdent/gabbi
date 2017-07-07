@@ -35,7 +35,7 @@ class DataFileTest(unittest.TestCase):
 
     def _assert_content_read(self, filepath):
         self.assertEqual(
-            'dummy content', self.http_case._load_data_file(filepath))
+            'dummy content', self.http_case.load_data_file(filepath))
 
     def test_load_file(self, m_open):
         self.http_case.test_directory = '.'
@@ -52,7 +52,7 @@ class DataFileTest(unittest.TestCase):
         filepath = '/top-level.private'
 
         with self.assertRaises(ValueError):
-            self.http_case._load_data_file(filepath)
+            self.http_case.load_data_file(filepath)
         self.assertFalse(m_open.called)
 
     def test_load_file_in_parent_dir(self, m_open):
@@ -60,7 +60,7 @@ class DataFileTest(unittest.TestCase):
         filepath = '../file-in-parent-dir.txt'
 
         with self.assertRaises(ValueError):
-            self.http_case._load_data_file(filepath)
+            self.http_case.load_data_file(filepath)
         self.assertFalse(m_open.called)
 
     def test_load_file_within_test_directory(self, m_open):
@@ -73,5 +73,5 @@ class DataFileTest(unittest.TestCase):
         self.http_case.test_directory = '/a/b/c'
         filepath = '../../b/E/file-in-test-dir.txt'
         with self.assertRaises(ValueError):
-            self.http_case._load_data_file(filepath)
+            self.http_case.load_data_file(filepath)
         self.assertFalse(m_open.called)
