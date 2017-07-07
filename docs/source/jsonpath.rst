@@ -64,8 +64,23 @@ lead to difficult to read tests and it also indicates that your
 gabbi tests are being used to test your serializers and data models,
 not just your API interactions.
 
+It is also possible to read raw JSON from disk for either all or
+some of a JSON response::
+
+    response_json_paths:
+        $: @<data.json
+
+or::
+
+    response_json_paths:
+        $.pets: <@pets.json
+        $.pets[0]: <@cat.json
+
+Examples like this can be found in one of gabbi's `own tests`_.
+
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 
 .. _jsonpath_rw: http://jsonpath-rw.readthedocs.io/en/latest/
 .. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.io/en/latest/
+.. _own tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_intercept/data.yaml

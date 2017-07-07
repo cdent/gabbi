@@ -58,3 +58,17 @@ tests:
       response_json_paths:
           foo['bár']: 1
           $: <@data.json
+
+    - name: partial json from disk
+      POST: /
+      request_headers:
+          content-type: application/json
+      data:
+          pets:
+              - type: cat
+                sound: meow
+              - type: dog
+                sound: woof
+      response_json_paths:
+          $.pets: <@pets.json
+          $.pets[0]: <@cat.json
