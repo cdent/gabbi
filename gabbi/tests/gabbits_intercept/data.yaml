@@ -49,3 +49,12 @@ tests:
       request_headers:
           content-type: text/plain
       data: <@utf8.txt
+
+    - name: json value from disk
+      POST: /
+      request_headers:
+          content-type: application/json
+      data: <@data.json
+      response_json_paths:
+          foo['bár']: 1
+          $: <@data.json
