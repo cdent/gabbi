@@ -1,0 +1,37 @@
+defaults:
+  request_headers:
+      content-type: application/json
+  verbose: True
+
+tests:
+- name: left side json one
+  desc: for reuse on the next test
+  POST: /
+  data:
+      alpha: alpha1
+      beta: beta1
+
+- name: expand left side
+  POST: /
+  data:
+      alpha1: alpha
+      beta1: beta
+  response_json_paths:
+      $["$RESPONSE['$.alpha']"]: alpha
+
+- name: expand environ left side
+  POST: /
+  data:
+      alpha1: alpha
+      beta1: beta
+      1: cow
+  response_json_paths:
+      $.['$ENVIRON['ONE']']: cow
+
+- name: set key and value
+  GET: /jsonator?key=$ENVIRON['ONE']&value=10
+
+- name: check key and value
+  GET: /jsonator?key=$ENVIRON['ONE']&value=10
+  response_json_paths:
+      $.["$ENVIRON['ONE']"]: $RESPONSE['$['1']']

@@ -81,6 +81,31 @@ Examples like this can be found in one of gabbi's `own tests`_.
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 
+.. _json-subs:
+
+Substitution
+------------
+
+:ref:`Substitutions <state-substitution>` can be made in both the
+left (query) and right (expected) hand sides of the json path
+expression. When subtitutions are used in the query, care must be
+taken to ensure proper quoting of the resulting value. For example
+if there is a uuid (with hyphens) at ``$RESPONSE['$.id']`` then this
+expression may fail::
+
+    $.nested.structure.$RESPONSE['$.id'].name: foobar
+
+as it will evaluate to something like::
+
+   $.nested.structure.ADC8AAFC-D564-40D1-9724-7680D3C010C2.name: foobar
+
+which may be treated as an arithemtic expression by the json path
+parser. The test author should write::
+
+    $.nested.structure["$RESPONSE['$.id']"].name: foobar
+
+to quote the result of the substitution.
+
 .. _jsonpath_rw: http://jsonpath-rw.readthedocs.io/en/latest/
 .. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.io/en/latest/
 .. _own tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_intercept/data.yaml
