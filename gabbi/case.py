@@ -174,6 +174,10 @@ class HTTPTestCase(testtools.TestCase):
 
         return message
 
+    def load_data_file(self, filename):
+        """Read a file from the current test directory."""
+        return self._load_data_file(filename)
+
     def _assert_response(self):
         """Compare the response with expected data."""
         self._test_status(self.test_data['status'], self.response['status'])
@@ -505,7 +509,7 @@ class HTTPTestCase(testtools.TestCase):
         """
         if isinstance(data, str):
             if data.startswith('<@'):
-                info = self._load_data_file(data.replace('<@', '', 1))
+                info = self.load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
                     data = six.text_type(info, 'UTF-8')
                 else:
