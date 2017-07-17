@@ -29,6 +29,7 @@ matrix:
           env: TOXENV=py36-pytest
     allow_failures:
         - env: TOXENV=gnocchi
+        - env: TOXENV=placement
 
 notifications:
       irc: "chat.freenode.net#gabbi"
