@@ -70,16 +70,17 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 
-    # Exit immediately if we have no host to access, either via a real host
-    # or an intercept.
-    if not bool(host) ^ bool(intercept):
-        raise AssertionError('must specify exactly one of host or intercept')
-
     # If url is being used, reset host, port and prefix.
     if url:
         host, port, prefix, force_ssl = utils.host_info_from_target(url)
         if force_ssl and not require_ssl:
             require_ssl = force_ssl
+
+    # Exit immediately if we have no host to access, either via a real host
+    # or an intercept.
+    if not bool(host) ^ bool(intercept):
+        raise AssertionError(
+            'must specify exactly one of host or url, or intercept')
 
     # If the client has not provided a name to use as our base,
     # create one so that tests are effectively namespaced.

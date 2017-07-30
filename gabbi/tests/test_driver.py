@@ -56,6 +56,16 @@ class DriverTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             driver.build_tests(self.test_dir, self.loader)
 
+    def test_build_with_url_provides_host(self):
+        """This confirms that url provides the required host."""
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   url='https://foo.example.com')
+        first_test = suite._tests[0]._tests[0]
+        full_url = first_test._parse_url(first_test.test_data['url'])
+        ssl = first_test.test_data['ssl']
+        self.assertEqual('https://foo.example.com/', full_url)
+        self.assertTrue(ssl)
+
     def test_build_require_ssl(self):
         suite = driver.build_tests(self.test_dir, self.loader,
                                    host='localhost',
