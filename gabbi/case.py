@@ -14,7 +14,7 @@
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
-made using urllib3. Assertions are made against the reponse.
+made using urllib3. Assertions are made against the response.
 """
 
 from collections import OrderedDict
