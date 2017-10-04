@@ -14,8 +14,8 @@
 """
 
 import copy
-import unittest
 from six.moves import mock
+import unittest
 
 from gabbi import case
 
