@@ -135,8 +135,8 @@ class HTTPTestCase(testtools.TestCase):
         if self.test_data['skip']:
             self.skipTest(self.test_data['skip'])
 
-        if self.prior and not self.prior.has_run and \
-                self.test_data['use_prior_test']:
+        if (self.prior and not self.prior.has_run and 
+                self.test_data['use_prior_test']):
             # Use a different result so we don't count this test
             # in the results.
             self.prior.run(result.TestResult())
