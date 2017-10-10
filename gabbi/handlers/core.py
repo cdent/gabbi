@@ -53,9 +53,14 @@ class HeadersResponseHandler(base.ResponseHandler):
 
     def action(self, test, header, value=None):
         header = header.lower()  # case-insensitive comparison
-
         response = test.response
-        header_value = test.replace_template(str(value))
+
+        header_value = str(value)
+        is_regex = (header_value.startswith('/') and
+                    header_value.endswith('/') and
+                    len(header_value) > 1)
+        header_value = test.replace_template(header_value,
+                                             escape_regex=is_regex)
 
         try:
             response_value = str(response[header])
@@ -64,8 +69,7 @@ class HeadersResponseHandler(base.ResponseHandler):
                 "'%s' header not present in response: %s" % (
                     header, response.keys()))
 
-        if (header_value.startswith('/') and header_value.endswith('/')
-                and len(header_value) > 1):
+        if is_regex:
             header_value = header_value[1:-1]
             test.assertRegex(
                 response_value, header_value,

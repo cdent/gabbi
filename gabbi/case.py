@@ -147,15 +147,17 @@ class HTTPTestCase(testtools.TestCase):
                 return handler
         return None
 
-    def replace_template(self, message):
+    def replace_template(self, message, escape_regex=False):
         """Replace magic strings in message."""
         if isinstance(message, dict):
             for k in message:
-                message[k] = self.replace_template(message[k])
+                message[k] = self.replace_template(message[k],
+                                                   escape_regex=escape_regex)
             return message
 
         if isinstance(message, list):
-            return [self.replace_template(line) for line in message]
+            return [self.replace_template(line, escape_regex=escape_regex)
+                    for line in message]
 
         for replacer in REPLACERS:
             template = '$%s' % replacer
@@ -163,7 +165,8 @@ class HTTPTestCase(testtools.TestCase):
             try:
                 if template in message:
                     try:
-                        message = getattr(self, method)(message)
+                        replace = getattr(self, method)
+                        message = replace(message, escape_regex=escape_regex)
                     except (KeyError, AttributeError, ValueError) as exc:
                         raise AssertionError(
                             'unable to replace %s in %s, data unavailable: %s'
@@ -193,14 +196,28 @@ class HTTPTestCase(testtools.TestCase):
         value = value.encode('UTF-8')
         return value
 
-    def _environ_replace(self, message):
+    @staticmethod
+    def _regex_replacer(replacer, escape_regex):
+        """Wrap a replacer function to escape return values in a regex."""
+        if escape_regex:
+            @functools.wraps(replacer)
+            def replace(match):
+                return re.escape(replacer(match))
+
+            return replace
+        else:
+            return replacer
+
+    def _environ_replace(self, message, escape_regex=False):
         """Replace an indicator in a message with the environment value.
 
         If value can be a number, cast it as such. If value is a form of
         "null", "true", or "false" cast it to None, True, False.
         """
         value = re.sub(self._replacer_regex('ENVIRON'),
-                       self._environ_replacer, message)
+                       self._regex_replacer(self._environ_replacer,
+                                            escape_regex),
+                       message)
         try:
             if '.' in value:
                 value = float(value)
@@ -226,13 +243,15 @@ class HTTPTestCase(testtools.TestCase):
         environ_name = match.group('arg')
         return os.environ[environ_name]
 
-    def _cookie_replace(self, message):
+    def _cookie_replace(self, message, escape_regex=False):
         """Replace $COOKIE in a message.
 
         With cookie data from set-cookie in the prior request.
         """
         return re.sub(self._simple_replacer_regex('COOKIE'),
-                      self._cookie_replacer, message)
+                      self._regex_replacer(self._cookie_replacer,
+                                           escape_regex),
+                      message)
 
     def _cookie_replacer(self, match):
         """Replace a regex match with the cookie of a previous response."""
@@ -247,12 +266,14 @@ class HTTPTestCase(testtools.TestCase):
         cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
         return cookie_string
 
-    def _headers_replace(self, message):
+    def _headers_replace(self, message, escape_regex=False):
         """Replace a header indicator in a message with that headers value from
         the prior request.
         """
         return re.sub(self._replacer_regex('HEADERS'),
-                      self._header_replacer, message)
+                      self._regex_replacer(self._header_replacer,
+                                           escape_regex),
+                      message)
 
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
@@ -264,20 +285,25 @@ class HTTPTestCase(testtools.TestCase):
             referred_case = self.prior
         return referred_case.response[header_key.lower()]
 
-    def _last_url_replace(self, message):
+    def _last_url_replace(self, message, escape_regex=False):
         """Replace $LAST_URL in a message.
 
         With the URL used in the prior request.
         """
-        return message.replace('$LAST_URL', self.prior.url)
+        last_url = self.prior.url
+        if escape_regex:
+            last_url = re.escape(last_url)
+        return message.replace('$LAST_URL', last_url)
 
-    def _url_replace(self, message):
+    def _url_replace(self, message, escape_regex=False):
         """Replace $URL in a message.
 
         With the URL used in a previous request.
         """
         return re.sub(self._simple_replacer_regex('URL'),
-                      self._url_replacer, message)
+                      self._regex_replacer(self._url_replacer,
+                                           escape_regex),
+                      message)
 
     def _url_replacer(self, match):
         """Replace a regex match with the value of a previous url."""
@@ -288,13 +314,15 @@ class HTTPTestCase(testtools.TestCase):
             referred_case = self.prior
         return referred_case.url
 
-    def _location_replace(self, message):
+    def _location_replace(self, message, escape_regex=False):
         """Replace $LOCATION in a message.
 
         With the location header from a previous request.
         """
         return re.sub(self._simple_replacer_regex('LOCATION'),
-                      self._location_replacer, message)
+                      self._regex_replacer(self._location_replacer,
+                                           escape_regex),
+                      message)
 
     def _location_replacer(self, match):
         """Replace a regex match with the value of a previous location."""
@@ -317,11 +345,13 @@ class HTTPTestCase(testtools.TestCase):
         with open(path, mode='rb') as data_file:
             return data_file.read()
 
-    def _netloc_replace(self, message):
+    def _netloc_replace(self, message, escape_regex=False):
         """Replace $NETLOC with the current host and port."""
         netloc = self.netloc
         if self.prefix:
             netloc = '%s%s' % (netloc, self.prefix)
+        if escape_regex:
+            netloc = re.escape(netloc)
         return message.replace('$NETLOC', netloc)
 
     def _parse_url(self, url):
@@ -371,7 +401,7 @@ class HTTPTestCase(testtools.TestCase):
         case = HTTPTestCase._history_regex
         return r"%s\$%s" % (case, key)
 
-    def _response_replace(self, message):
+    def _response_replace(self, message, escape_regex=False):
         """Replace a content path with the value from a previous response.
 
         If the match would replace the entire message, then don't cast it
@@ -381,7 +411,10 @@ class HTTPTestCase(testtools.TestCase):
         match = re.match('^%s$' % regex, message)
         if match:
             return self._response_replacer(match, preserve=True)
-        return re.sub(regex, self._response_replacer, message)
+        return re.sub(regex,
+                      self._regex_replacer(self._response_replacer,
+                                           escape_regex),
+                      message)
 
     def _response_replacer(self, match, preserve=False):
         """Replace a regex match with the value from a previous response."""
@@ -498,9 +531,10 @@ class HTTPTestCase(testtools.TestCase):
                               redirect=test['redirects'])
             self._assert_response()
 
-    def _scheme_replace(self, message):
+    def _scheme_replace(self, message, escape_regex=False):
         """Replace $SCHEME with the current protocol."""
-        return message.replace('$SCHEME', self.scheme)
+        scheme = re.escape(self.scheme) if escape_regex else self.scheme
+        return message.replace('$SCHEME', scheme)
 
     def _test_data_to_string(self, data, content_type):
         """Turn the request data into a string.
