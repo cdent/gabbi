@@ -178,6 +178,29 @@ class HandlersTest(unittest.TestCase):
         }
         self._assert_handler(handler)
 
+    def test_response_json_paths_regex_path_match(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '//bar//',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/bar/baz'
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_regex_path_nomatch(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '//bar//',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/foobar/baz'
+        }
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
     def test_response_json_paths_regex_number(self):
         handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
@@ -226,6 +249,40 @@ class HandlersTest(unittest.TestCase):
         }}
         self.test.response = {'content-type': 'text/plain; charset=UTF-8'}
         self._assert_handler(handler)
+
+    def test_response_headers_noregex_path_match(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '/',
+        }}
+        self.test.response = {'location': '/'}
+        self._assert_handler(handler)
+
+    def test_response_headers_noregex_path_nomatch(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '/',
+        }}
+        self.test.response = {'location': '/foo'}
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
+    def test_response_headers_regex_path_match(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '//bar//',
+        }}
+        self.test.response = {'location': '/foo/bar/baz'}
+        self._assert_handler(handler)
+
+    def test_response_headers_regex_path_nomatch(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '//bar//',
+        }}
+        self.test.response = {'location': '/foo/foobar/baz'}
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
 
     def test_response_headers_fail_data(self):
         handler = core.HeadersResponseHandler()

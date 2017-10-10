@@ -64,8 +64,9 @@ class HeadersResponseHandler(base.ResponseHandler):
                 "'%s' header not present in response: %s" % (
                     header, response.keys()))
 
-        if header_value.startswith('/') and header_value.endswith('/'):
-            header_value = header_value.strip('/').rstrip('/')
+        if (header_value.startswith('/') and header_value.endswith('/')
+                and len(header_value) > 1):
+            header_value = header_value[1:-1]
             test.assertRegex(
                 response_value, header_value,
                 'Expect header %s to match /%s/, got %s' %

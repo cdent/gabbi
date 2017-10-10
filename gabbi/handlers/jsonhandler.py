@@ -94,9 +94,11 @@ class JSONHandler(base.ContentHandler):
 
         expected = test.replace_template(value)
         # If expected is a string, check to see if it is a regex.
-        if (hasattr(expected, 'startswith') and expected.startswith('/')
-                and expected.endswith('/')):
-            expected = expected.strip('/').rstrip('/')
+        if (isinstance(expected, six.string_types)
+                and expected.startswith('/')
+                and expected.endswith('/')
+                and len(expected) > 1):
+            expected = expected[1:-1]
             # match may be a number so stringify
             match = six.text_type(match)
             test.assertRegexpMatches(
