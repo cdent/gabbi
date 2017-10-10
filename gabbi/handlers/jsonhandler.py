@@ -98,7 +98,7 @@ class JSONHandler(base.ContentHandler):
                 and expected.endswith('/')):
             expected = expected.strip('/').rstrip('/')
             # match may be a number so stringify
-            match = str(match)
+            match = six.text_type(match)
             test.assertRegexpMatches(
                 match, expected,
                 'Expect jsonpath %s to match /%s/, got %s' %

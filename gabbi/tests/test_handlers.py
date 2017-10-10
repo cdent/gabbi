@@ -171,7 +171,7 @@ class HandlersTest(unittest.TestCase):
             '$.objects[0].name': '/ow/',
         }}
         self.test.response_data = {
-            'objects': [{'name': 'cow',
+            'objects': [{'name': u'cow\U0001F404',
                          'location': 'barn'},
                         {'name': 'chris',
                          'location': 'house'}]
