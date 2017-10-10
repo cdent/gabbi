@@ -62,10 +62,11 @@ tests:
       status: 302
 
 # When evaluating response headers it is possible to use a regular
-# expression to not have to test the whole value.
+# expression to not have to test the whole value. Regular expressions match
+# anywhere in the output, not just at the beginning.
 
       response_headers:
-          location: /https/
+          location: /^https/
 
 # By default redirects will not be followed. This can be changed.
 
