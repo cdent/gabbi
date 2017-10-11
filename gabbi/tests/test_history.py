@@ -50,6 +50,15 @@ class HistoryTest(unittest.TestCase):
             self.test.test_data)
         self.assertEqual('test_content', header)
 
+    def test_header_replace_with_history_regex(self):
+        self.test.test_data = '/$HISTORY["mytest"].$HEADERS["content-type"]/'
+        self.test.response = {'content-type': 'test+content'}
+        self.test.history["mytest"] = self.test
+
+        header = self.test('test_request').replace_template(
+            self.test.test_data, escape_regex=True)
+        self.assertEqual(r'/test\+content/', header)
+
     def test_response_replace_prior(self):
         self.test.test_data = '$RESPONSE["$.object.name"]'
         json_handler = jsonhandler.JSONHandler()
@@ -64,6 +73,21 @@ class HistoryTest(unittest.TestCase):
         response = self.test('test_request').replace_template(
             self.test.test_data)
         self.assertEqual('test history', response)
+
+    def test_response_replace_prior_regex(self):
+        self.test.test_data = '/$RESPONSE["$.object.name"]/'
+        json_handler = jsonhandler.JSONHandler()
+        self.test.content_type = "application/json"
+        self.test.content_handlers = [json_handler]
+        self.test.prior = self.test
+        self.test.response = {'content-type': 'application/json'}
+        self.test.response_data = {
+            'object': {'name': 'test history.'}
+        }
+
+        response = self.test('test_request').replace_template(
+            self.test.test_data, escape_regex=True)
+        self.assertEqual(r'/test\ history\./', response)
 
     def test_response_replace_with_history(self):
         self.test.test_data = '$HISTORY["mytest"].$RESPONSE["$.object.name"]'
@@ -89,6 +113,15 @@ class HistoryTest(unittest.TestCase):
             self.test.test_data)
         self.assertEqual('test=cookie', cookie)
 
+    def test_cookie_replace_prior_regex(self):
+        self.test.test_data = '/$COOKIE/'
+        self.test.response = {'set-cookie': 'test=cookie?'}
+        self.test.prior = self.test
+
+        cookie = self.test('test_request').replace_template(
+            self.test.test_data, escape_regex=True)
+        self.assertEqual(r'/test\=cookie\?/', cookie)
+
     def test_cookie_replace_history(self):
         self.test.test_data = '$HISTORY["mytest"].$COOKIE'
         self.test.response = {'set-cookie': 'test=cookie'}
@@ -107,6 +140,15 @@ class HistoryTest(unittest.TestCase):
             self.test.test_data)
         self.assertEqual('test_location', location)
 
+    def test_location_replace_prior_regex(self):
+        self.test.test_data = '/$LOCATION/'
+        self.test.location = '..'
+        self.test.prior = self.test
+
+        location = self.test('test_request').replace_template(
+            self.test.test_data, escape_regex=True)
+        self.assertEqual(r'/\.\./', location)
+
     def test_location_replace_history(self):
         self.test.test_data = '$HISTORY["mytest"].$LOCATION'
         self.test.location = 'test_location'
@@ -124,6 +166,15 @@ class HistoryTest(unittest.TestCase):
         url = self.test('test_request').replace_template(
             self.test.test_data)
         self.assertEqual('test_url', url)
+
+    def test_url_replace_prior_regex(self):
+        self.test.test_data = '/$URL/'
+        self.test.url = 'testurl?query'
+        self.test.prior = self.test
+
+        url = self.test('test_request').replace_template(
+            self.test.test_data, escape_regex=True)
+        self.assertEqual(r'/testurl\?query/', url)
 
     def test_url_replace_history(self):
         self.test.test_data = '$HISTORY["mytest"].$URL'

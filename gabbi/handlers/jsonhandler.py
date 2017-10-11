@@ -92,13 +92,16 @@ class JSONHandler(base.ContentHandler):
             info = six.text_type(info, 'UTF-8')
             value = self.loads(info)
 
-        expected = test.replace_template(value)
         # If expected is a string, check to see if it is a regex.
-        if (hasattr(expected, 'startswith') and expected.startswith('/')
-                and expected.endswith('/')):
-            expected = expected.strip('/').rstrip('/')
+        is_regex = (isinstance(value, six.string_types) and
+                    value.startswith('/') and
+                    value.endswith('/') and
+                    len(value) > 1)
+        expected = test.replace_template(value, escape_regex=is_regex)
+        if is_regex:
+            expected = expected[1:-1]
             # match may be a number so stringify
-            match = str(match)
+            match = six.text_type(match)
             test.assertRegexpMatches(
                 match, expected,
                 'Expect jsonpath %s to match /%s/, got %s' %

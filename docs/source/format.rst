@@ -144,7 +144,8 @@ Response Expectations
                                    representing expected response header
                                    names and values. If a header's value
                                    is wrapped in ``/.../``, it will be
-                                   treated as a regular expression.
+                                   treated as a regular expression to
+                                   search for in the response header.
 
    ``response_forbidden_headers``  A list of headers which must `not`
                                    be present.
@@ -161,7 +162,7 @@ Response Expectations
 
                                    If the value is wrapped in ``/.../``
                                    the result of the JSONPath query
-                                   will be compared against the
+                                   will be searched for the
                                    value as a regular expression.
 
    ``poll``                        A dictionary of two keys:

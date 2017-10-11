@@ -171,10 +171,73 @@ class HandlersTest(unittest.TestCase):
             '$.objects[0].name': '/ow/',
         }}
         self.test.response_data = {
-            'objects': [{'name': 'cow',
+            'objects': [{'name': u'cow\U0001F404',
                          'location': 'barn'},
                         {'name': 'chris',
                          'location': 'house'}]
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_regex_path_match(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '//bar//',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/bar/baz'
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_regex_path_nomatch(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '//bar//',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/foobar/baz'
+        }
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
+    def test_response_json_paths_substitution_regex(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.location = '/foo/bar'
+        self.test.prior = self.test
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '/$LOCATION/',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/bar/baz'
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_substitution_noregex(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.location = '/foo/bar/'
+        self.test.prior = self.test
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '$LOCATION',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/bar/baz'
+        }
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
+    def test_response_json_paths_substitution_esc_regex(self):
+        handler = jsonhandler.JSONHandler()
+        self.test.location = '/foo/bar?query'
+        self.test.prior = self.test
+        self.test.content_type = "application/json"
+        self.test.test_data = {'response_json_paths': {
+            '$.pathtest': '/$LOCATION/',
+        }}
+        self.test.response_data = {
+            'pathtest': '/foo/bar?query=value'
         }
         self._assert_handler(handler)
 
@@ -226,6 +289,70 @@ class HandlersTest(unittest.TestCase):
         }}
         self.test.response = {'content-type': 'text/plain; charset=UTF-8'}
         self._assert_handler(handler)
+
+    def test_response_headers_substitute_noregex(self):
+        handler = core.HeadersResponseHandler()
+        self.test.location = '/foo/bar/'
+        self.test.prior = self.test
+        self.test.test_data = {'response_headers': {
+            'location': '$LOCATION',
+        }}
+        self.test.response = {'location': '/foo/bar/baz'}
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
+    def test_response_headers_substitute_regex(self):
+        handler = core.HeadersResponseHandler()
+        self.test.location = '/foo/bar/'
+        self.test.prior = self.test
+        self.test.test_data = {'response_headers': {
+            'location': '/^$LOCATION/',
+        }}
+        self.test.response = {'location': '/foo/bar/baz'}
+        self._assert_handler(handler)
+
+    def test_response_headers_substitute_esc_regex(self):
+        handler = core.HeadersResponseHandler()
+        self.test.scheme = 'git+ssh'
+        self.test.test_data = {'response_headers': {
+            'location': '/^$SCHEME://.*/',
+        }}
+        self.test.response = {'location': 'git+ssh://example.test'}
+        self._assert_handler(handler)
+
+    def test_response_headers_noregex_path_match(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '/',
+        }}
+        self.test.response = {'location': '/'}
+        self._assert_handler(handler)
+
+    def test_response_headers_noregex_path_nomatch(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '/',
+        }}
+        self.test.response = {'location': '/foo'}
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
+
+    def test_response_headers_regex_path_match(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '//bar//',
+        }}
+        self.test.response = {'location': '/foo/bar/baz'}
+        self._assert_handler(handler)
+
+    def test_response_headers_regex_path_nomatch(self):
+        handler = core.HeadersResponseHandler()
+        self.test.test_data = {'response_headers': {
+            'location': '//bar//',
+        }}
+        self.test.response = {'location': '/foo/foobar/baz'}
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
 
     def test_response_headers_fail_data(self):
         handler = core.HeadersResponseHandler()
