@@ -29,33 +29,43 @@ declarations, each describing the expected response to a given request:
 Metadata
 ********
 
-.. table::
+.. list-table::
+   :header-rows: 1
 
-   ===========  =================================================  ============
-   Key          Description                                        Notes
-   ===========  =================================================  ============
-   ``name``     The test's name. Must be unique within a file.     **required**
-
-   ``desc``     An arbitrary string describing the test.
-
-   ``verbose``  If ``True`` or ``all`` (synonymous), prints a      defaults to
-                representation of the current request and          ``False``
-                response to ``stdout``, including both headers
-                and body. If set to ``headers`` or ``body``, only
-                the corresponding part of the request and
-                response will be printed. If the output is a TTY,
-                colors will be used. If the body content-type is
-                JSON it will be formatted for improved
-                readability. See
-                :class:`~gabbi.httpclient.VerboseHttp` for
-                details.
-
-   ``skip``     A string message which if set will cause the test  defaults to
-                to be skipped with the provided message.           ``False``
-
-   ``xfail``    Determines whether to expect this test to fail.
-                Note that the test will be run anyway.
-   ===========  =================================================  ============
+   * - Key
+     - Description
+     - Notes
+   * - ``name``
+     - The test's name. Must be unique within a file.
+     - **required**
+   * - ``desc``
+     - An arbitrary string describing the test.
+     -
+   * - ``verbose``
+     - If ``True`` or ``all`` (synonymous), prints a representation of the
+       current request and response to ``stdout``, including both headers and
+       body. If set to ``headers`` or ``body``, only the corresponding part of
+       the request and response will be printed. If the output is a TTY, colors
+       will be used. If the body content-type is JSON it will be formatted for
+       improved readability. See :class:`~gabbi.httpclient.VerboseHttp` for
+       details.
+     - defaults to ``False``
+   * - ``skip``
+     - A string message which if set will cause the test to be skipped with the
+       provided message.
+     - defaults to ``False``
+   * - ``xfail``
+     - Determines whether to expect this test to fail. Note that the test will
+       be run anyway.
+     - defaults to ``False``
+   * - ``use_prior_test``
+     - Determines if this test will be run in sequence (after) the test prior
+       to it in the list of tests within a file. To be concrete, when this is
+       ``True`` the test is dependent on the prior test and if that prior
+       has not yet run, it wil be run, even if only the current test has been
+       selected. Set this to ``False`` to allow selecting a test without
+       dependencies.
+     - defaults to ``True``
 
 .. note:: When tests are generated dynamically, the ``TestCase`` name will
           include the respective test's ``name``, lowercased with spaces

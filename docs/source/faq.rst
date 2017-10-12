@@ -47,6 +47,22 @@ complicated. It is necessary to provide the full name of the test as a list to
     python -m testtools.run --load-list \
         <(echo package.tests.test_api.yamlfile_get_the_widge.test_request)
 
+How do I run just one test, without running prior tests in a sequence?
+----------------------------------------------------------------------
+
+By default, when you select a single test to run, all tests prior to that one
+in a file will be run as well: the file is treated as as sequence of dependent
+tests. If you do not want this you can adjust the ``use_prior_test`` test
+:ref:`metadata <metadata>` in one of three ways:
+
+* Set it in the YAML file for the one test you are concerned with.
+* Set the ``defaults`` for all tests in that file.
+* set ``use_prior_test`` to false when calling :func:`~gabbi.driver.build_tests`
+
+Be aware that doing this breaks a fundamental assumption that gabbi
+makes about how tests work. Any :ref:`substitutions <state-substitution>`
+will fail.
+
 Testing Style
 ~~~~~~~~~~~~~
 

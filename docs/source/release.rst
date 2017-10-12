@@ -221,6 +221,7 @@ gabbi.
 * Mehdi Abaakouk
 * Tom Viner
 * Jason Myers
+* Duc Truong
 * Zane Bitter
 * Ryan Spencer
 * Kim Raymoure
