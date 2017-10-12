@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.36.0
+------
+
+* ``use_prior_test`` is added to test :ref:`metadata`.
+* Extensive cleanups in regular expression handling when constructing
+  tests from YAML.
+
 1.35.0
 ------
 
