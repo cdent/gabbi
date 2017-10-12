@@ -1,6 +1,11 @@
+defaults:
+  use_prior_test: True
 
 tests:
     - name: one
       url: /
     - name: two
       url: http://example.com/moo
+    - name: use_prior_false
+      url: http://example.com/foo
+      use_prior_test: False

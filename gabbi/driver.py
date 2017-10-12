@@ -42,10 +42,11 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
                 response_handlers=None, content_handlers=None,
                 prefix='', require_ssl=False, url=None,
-                inner_fixtures=None, verbose=False):
+                inner_fixtures=None, verbose=False,
+                use_prior_test=True):
     """Read YAML files from a directory to create tests.
 
-    Each YAML file represents an ordered sequence of HTTP requests.
+    Each YAML file represents a list of HTTP requests.
 
     :param path: The directory where yaml files are located.
     :param loader: The TestLoader.
@@ -66,6 +67,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                            individual test request.
     :param verbose: If ``True`` or ``'all'``, make tests verbose by default
                     ``'headers'`` and ``'body'`` are also accepted.
+    :param use_prior_test: If ``True``, uses prior test to create ordered
+                           sequence of tests
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -125,6 +128,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 suite_dict['defaults']['verbose'] = verbose
             else:
                 suite_dict['defaults'] = {'verbose': verbose}
+
+        if not use_prior_test:
+            if 'defaults' in suite_dict:
+                suite_dict['defaults']['use_prior_test'] = use_prior_test
+            else:
+                suite_dict['defaults'] = {'use_prior_test': use_prior_test}
 
         file_suite = suitemaker.test_suite_from_dict(
             loader, test_base_name, suite_dict, path, host, port,

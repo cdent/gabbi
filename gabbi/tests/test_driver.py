@@ -28,13 +28,13 @@ class DriverTest(unittest.TestCase):
         self.loader = unittest.defaultTestLoader
         self.test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
 
-    def test_driver_loads_two_tests(self):
+    def test_driver_loads_three_tests(self):
         suite = driver.build_tests(self.test_dir, self.loader,
                                    host='localhost', port=8001)
         self.assertEqual(1, len(suite._tests),
                          'top level suite contains one suite')
-        self.assertEqual(2, len(suite._tests[0]._tests),
-                         'contained suite contains two tests')
+        self.assertEqual(3, len(suite._tests[0]._tests),
+                         'contained suite contains three tests')
         the_one_test = suite._tests[0]._tests[0]
         self.assertEqual('test_driver_sample_one',
                          the_one_test.__class__.__name__,
@@ -97,3 +97,22 @@ class DriverTest(unittest.TestCase):
         first_test = suite._tests[0]._tests[0]
         full_url = first_test._parse_url(first_test.test_data['url'])
         self.assertEqual('https://example.com:1024/theend/', full_url)
+
+    def test_build_url_use_prior_test(self):
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost',
+                                   use_prior_test=True)
+        for test in suite._tests[0]._tests:
+            if test.test_data['name'] != 'use_prior_false':
+                expected_use_prior = True
+            else:
+                expected_use_prior = False
+
+            self.assertEqual(expected_use_prior,
+                             test.test_data['use_prior_test'])
+
+        suite = driver.build_tests(self.test_dir, self.loader,
+                                   host='localhost',
+                                   use_prior_test=False)
+        for test in suite._tests[0]._tests:
+            self.assertEqual(False, test.test_data['use_prior_test'])
