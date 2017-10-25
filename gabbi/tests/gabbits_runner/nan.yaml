@@ -1,0 +1,8 @@
+tests:
+  - name: test NAN
+    url: /nan
+    method: GET
+    request_headers:
+        content-type: application/json
+    response_json_paths:
+        $.nan: !!python/object:gabbi.tests.util.NanChecker {}

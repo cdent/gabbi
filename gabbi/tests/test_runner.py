@@ -85,6 +85,19 @@ class RunnerTest(unittest.TestCase):
             except SystemExit as err:
                 self.assertFailure(err)
 
+    def test_unsafe_yaml(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
+
+        sys.argv.append('--unsafe-yaml')
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/nan.yaml')
+
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
 

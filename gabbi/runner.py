@@ -89,7 +89,8 @@ def run():
     if not input_files:
         success = run_suite(sys.stdin, handler_objects, host, port,
                             prefix, force_ssl, failfast,
-                            verbosity=verbosity)
+                            verbosity=verbosity,
+                            safe_yaml=args.safe_yaml)
         failure = not success
     else:
         for input_file in input_files:
@@ -99,7 +100,8 @@ def run():
                 success = run_suite(fh, handler_objects, host, port,
                                     prefix, force_ssl, failfast,
                                     data_dir=data_dir,
-                                    verbosity=verbosity, name=name)
+                                    verbosity=verbosity, name=name,
+                                    safe_yaml=args.safe_yaml)
             if not success:
                 failures.append(input_file)
             if not failure:  # once failed, this is considered immutable
@@ -114,9 +116,10 @@ def run():
 
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
-              failfast=False, data_dir='.', verbosity=False, name='input'):
+              failfast=False, data_dir='.', verbosity=False, name='input',
+              safe_yaml=True):
     """Run the tests from the YAML in handle."""
-    data = utils.load_yaml(handle)
+    data = utils.load_yaml(handle, safe=safe_yaml)
     if force_ssl:
         if 'defaults' in data:
             data['defaults']['ssl'] = True
@@ -223,6 +226,14 @@ def _make_argparser():
         dest='verbosity',
         choices=['all', 'body', 'headers'],
         help='Turn on test verbosity for all tests run in this session.'
+    )
+    parser.add_argument(
+        '--unsafe-yaml',
+        dest='safe_yaml',
+        action='store_false',
+        default=True,
+        help='Turn on recognition of Python objects in addition to '
+             'standard YAML tags.'
     )
     return parser
 

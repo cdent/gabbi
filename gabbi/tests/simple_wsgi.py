@@ -112,6 +112,11 @@ class SimpleWsgi(object):
                                     query_data['value'][0]})
             start_response('200 OK', [('Content-Type', 'application/json')])
             return [json_data.encode('utf-8')]
+        elif path_info == '/nan':
+            start_response('200 OK', [('Content-Type', 'application/json')])
+            return [json.dumps({
+                "nan": float('nan')
+            }).encode('utf-8')]
 
         start_response('200 OK', headers)
 
