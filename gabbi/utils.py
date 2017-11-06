@@ -99,19 +99,21 @@ def get_colorizer(stream):
         return lambda x, y: y
 
 
-def load_yaml(handle=None, yaml_file=None):
+def load_yaml(handle=None, yaml_file=None, safe=True):
     """Read and parse any YAML file or filehandle.
 
     Let exceptions flow where they may.
 
     If no file or handle is provided, read from STDIN.
     """
+    load = yaml.safe_load if safe else yaml.load
+
     if yaml_file:
         with io.open(yaml_file, encoding='utf-8') as source:
-            return yaml.safe_load(source.read())
+            return load(source.read())
 
     # This will intentionally raise AttributeError if handle is None.
-    return yaml.safe_load(handle.read())
+    return load(handle.read())
 
 
 def not_binary(content_type):

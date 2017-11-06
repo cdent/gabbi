@@ -12,7 +12,10 @@
 # under the License.
 """Utility methods shared by some tests."""
 
+import math
 import os
+
+import yaml
 
 
 def set_test_environ():
@@ -27,3 +30,13 @@ def set_test_environ():
     os.environ['FALSE'] = 'false'
     os.environ['STRING'] = 'val'
     os.environ['NULL'] = 'null'
+
+
+class NanChecker(yaml.YAMLObject):
+    yaml_tag = u'!NanChecker'
+
+    def __eq__(self, other):
+        try:
+            return math.isnan(other)
+        except TypeError:
+            return False

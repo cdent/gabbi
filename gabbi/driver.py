@@ -43,7 +43,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 response_handlers=None, content_handlers=None,
                 prefix='', require_ssl=False, url=None,
                 inner_fixtures=None, verbose=False,
-                use_prior_test=True):
+                use_prior_test=True, safe_yaml=True):
     """Read YAML files from a directory to create tests.
 
     Each YAML file represents a list of HTTP requests.
@@ -69,6 +69,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                     ``'headers'`` and ``'body'`` are also accepted.
     :param use_prior_test: If ``True``, uses prior test to create ordered
                            sequence of tests
+    :param safe_yaml: If ``True``, recognizes only standard YAML tags and not
+                      Python object
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -112,7 +114,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                 % test_file))
         if intercept:
             host = str(uuid.uuid4())
-        suite_dict = utils.load_yaml(yaml_file=test_file)
+        suite_dict = utils.load_yaml(yaml_file=test_file,
+                                     safe=safe_yaml)
         test_base_name = os.path.splitext(os.path.basename(test_file))[0]
         if all_test_base_name:
             test_base_name = '%s_%s' % (all_test_base_name, test_base_name)
@@ -148,7 +151,8 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       prefix=None, test_loader_name=None,
                       fixture_module=None, response_handlers=None,
                       content_handlers=None, require_ssl=False, url=None,
-                      metafunc=None, use_prior_test=True):
+                      metafunc=None, use_prior_test=True,
+                      safe_yaml=True):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -168,7 +172,8 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         response_handlers=response_handlers,
                         content_handlers=content_handlers,
                         prefix=prefix, require_ssl=require_ssl,
-                        url=url, use_prior_test=use_prior_test)
+                        url=url, use_prior_test=use_prior_test,
+                        safe_yaml=safe_yaml)
 
     test_list = []
     for test in tests:
