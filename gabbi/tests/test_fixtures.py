@@ -21,9 +21,9 @@ from gabbi import fixture
 
 class FakeFixture(fixture.GabbiFixture):
 
-    def __init__(self, mock):
+    def __init__(self, _mock):
         super(FakeFixture, self).__init__()
-        self.mock = mock
+        self.mock = _mock
 
     def start_fixture(self):
         self.mock.start()

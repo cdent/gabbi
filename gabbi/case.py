@@ -23,14 +23,14 @@ import functools
 import os
 import re
 import sys
-from testtools import testcase
 import time
-from unittest import result
+from unittest import result as unitresult
 
 import six
 from six.moves import http_cookies
 from six.moves.urllib import parse as urlparse
 import testtools
+from testtools import testcase
 import wsgi_intercept
 
 from gabbi import __version__
@@ -139,7 +139,7 @@ class HTTPTestCase(testtools.TestCase):
                 self.test_data['use_prior_test']):
             # Use a different result so we don't count this test
             # in the results.
-            self.prior.run(result.TestResult())
+            self.prior.run(unitresult.TestResult())
         self._run_test()
 
     def get_content_handler(self, content_type):

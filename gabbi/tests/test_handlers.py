@@ -35,7 +35,7 @@ class HandlersTest(unittest.TestCase):
         self.test_class = case.HTTPTestCase
         self.test = suitemaker.TestBuilder('mytest', (self.test_class,),
                                            {'test_data': {},
-                                           'content_handlers': []})
+                                            'content_handlers': []})
 
     def test_empty_response_handler(self):
         self.test.test_data = {'url': '$RESPONSE["barnabas"]'}

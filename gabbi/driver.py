@@ -102,8 +102,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     response_handlers = response_handlers or []
     content_handlers = content_handlers or []
     handler_objects = []
-    for handler in (content_handlers + response_handlers
-                    + handlers.RESPONSE_HANDLERS):
+    for handler in (content_handlers + response_handlers +
+                    handlers.RESPONSE_HANDLERS):
         handler_objects.append(handler())
 
     top_suite = suite.TestSuite()
