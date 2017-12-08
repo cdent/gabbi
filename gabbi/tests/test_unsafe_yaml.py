@@ -21,6 +21,8 @@ import os
 import yaml
 
 from gabbi import driver
+# TODO(cdent): this test_* needs to be imported bare or things do not work
+from gabbi.driver import test_pytest  # noqa
 from gabbi.tests import simple_wsgi
 from gabbi.tests import util
 
@@ -31,15 +33,20 @@ TESTS_DIR = 'gabbits_unsafe_yaml'
 yaml.add_constructor(u'!IsNAN', lambda loader, node: util.NanChecker())
 
 
+BUILD_TEST_ARGS = dict(
+    intercept=simple_wsgi.SimpleWsgi,
+    safe_yaml=False
+)
+
+
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
-    # Set and environment variable for one of the tests.
-    util.set_test_environ()
-
-    prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    return driver.build_tests(test_dir, loader, host=None,
-                              intercept=simple_wsgi.SimpleWsgi,
+    return driver.build_tests(test_dir, loader,
                               test_loader_name=__name__,
-                              prefix=prefix,
-                              safe_yaml=False)
+                              **BUILD_TEST_ARGS)
+
+
+def pytest_generate_tests(metafunc):
+    test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
+    driver.py_test_generator(test_dir, metafunc=metafunc, **BUILD_TEST_ARGS)

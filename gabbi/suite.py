@@ -82,7 +82,7 @@ class GabbiSuite(unittest.TestSuite):
 
         return result
 
-    def start(self, result):
+    def start(self, result, tests):
         """Start fixtures when using pytest."""
         fixtures, intercept, host, port, prefix = self._get_intercept()
 
@@ -95,9 +95,9 @@ class GabbiSuite(unittest.TestSuite):
         except unittest.SkipTest as exc:
             # Disable the already collected tests that we now wish
             # to skip.
-            for test in self:
+            for test in tests:
                 test.run = noop
-                result.addSkip(test, str(exc))
+                test.add_marker('skip')
             result.addSkip(self, str(exc))
         if intercept:
             intercept_fixture = interceptor.Urllib3Interceptor(

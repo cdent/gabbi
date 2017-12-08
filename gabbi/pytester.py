@@ -90,7 +90,8 @@ def a_pytest_collection_modifyitems(items, config):
         if cleanname.startswith('start_'):
             test = item.callspec.params['test']
             result = item.callspec.params['result']
-            STARTS[suitename] = (test, result)
+            # TODO(cdent): Consider a named tuple here
+            STARTS[suitename] = (test, result, [])
             deselected.append(item)
         elif cleanname.startswith('stop_'):
             test = item.callspec.params['test']
@@ -98,6 +99,9 @@ def a_pytest_collection_modifyitems(items, config):
             deselected.append(item)
         else:
             remaining.append(item)
+            # Add each kept test to the start fixture
+            # in case we need to skip all the tests.
+            STARTS[suitename][2].append(item)
 
     if deselected:
         items[:] = remaining
@@ -123,8 +127,8 @@ def pytest_runtest_setup(item):
     run its priors after running this.
     """
     if hasattr(item, 'starter'):
-        test, result = item.starter
-        test(result)
+        test, result, tests = item.starter
+        test(result, tests)
 
 
 def pytest_runtest_teardown(item, nextitem):

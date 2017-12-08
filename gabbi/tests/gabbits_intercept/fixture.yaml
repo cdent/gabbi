@@ -1,7 +1,7 @@
 
 fixtures:
-    - TestFixtureOne
-    - TestFixtureTwo
+    - FixtureOne
+    - FixtureTwo
 
 tests:
     - name: just to see
