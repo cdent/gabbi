@@ -19,7 +19,9 @@ import sys
 from unittest import case
 
 from gabbi import driver
-# TODO(cdent): this test_* needs to be imported bare or things do not work
+# TODO(cdent): test_pytest allows pytest to see the tests this module
+# produces. Without it, the generator will not run. It is a todo because
+# needing to do this is annoying and gross.
 from gabbi.driver import test_pytest  # noqa
 from gabbi import fixture
 
