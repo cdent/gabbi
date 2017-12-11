@@ -21,6 +21,10 @@ import sys
 import fixtures
 
 from gabbi import driver
+# TODO(cdent): test_pytest allows pytest to see the tests this module
+# produces. Without it, the generator will not run. It is a todo because
+# needing to do this is annoying and gross.
+from gabbi.driver import test_pytest  # noqa
 from gabbi import fixture
 from gabbi.tests import simple_wsgi
 
@@ -54,10 +58,21 @@ class InnerFixture(fixtures.Fixture):
         assert 1 <= COUNT_INNER <= 3
 
 
+BUILD_TEST_ARGS = dict(
+    intercept=simple_wsgi.SimpleWsgi,
+    fixture_module=sys.modules[__name__],
+    inner_fixtures=[InnerFixture],
+)
+
+
 def load_tests(loader, tests, pattern):
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    return driver.build_tests(test_dir, loader, host=None,
-                              intercept=simple_wsgi.SimpleWsgi,
-                              fixture_module=sys.modules[__name__],
-                              inner_fixtures=[InnerFixture],
-                              test_loader_name=__name__)
+    return driver.build_tests(test_dir, loader,
+                              test_loader_name=__name__,
+                              **BUILD_TEST_ARGS)
+
+
+def pytest_generate_tests(metafunc):
+    test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
+    driver.py_test_generator(test_dir, metafunc=metafunc,
+                             **BUILD_TEST_ARGS)

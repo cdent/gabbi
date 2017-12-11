@@ -7,12 +7,14 @@ shopt -s nocasematch
 [[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=7 || SKIP=2
 shopt -u nocasematch
 
-GREP_FAIL_MATCH='expected failures=12,'
+FAILS=12
+
+GREP_FAIL_MATCH="expected failures=$FAILS,"
 GREP_SKIP_MATCH="skipped=$SKIP,"
 GREP_UXSUC_MATCH='unexpected successes=1'
 # This skip is always 2 because the pytest tests don't
 # run the live tests.
-PYTEST_MATCH='2 skipped, 12 xfailed'
+PYTEST_MATCH="$SKIP skipped, $FAILS xfailed"
 
 python setup.py testr && \
     for match in "${GREP_FAIL_MATCH}" "${GREP_UXSUC_MATCH}" "${GREP_SKIP_MATCH}"; do

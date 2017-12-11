@@ -20,6 +20,10 @@ import os
 import sys
 
 from gabbi import driver
+# TODO(cdent): test_pytest allows pytest to see the tests this module
+# produces. Without it, the generator will not run. It is a todo because
+# needing to do this is annoying and gross.
+from gabbi.driver import test_pytest  # noqa
 from gabbi import fixture
 from gabbi.handlers import base
 from gabbi.tests import simple_wsgi
@@ -29,17 +33,17 @@ from gabbi.tests import util
 TESTS_DIR = 'gabbits_intercept'
 
 
-class TestFixtureOne(fixture.GabbiFixture):
+class FixtureOne(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
     pass
 
 
-class TestFixtureTwo(fixture.GabbiFixture):
+class FixtureTwo(fixture.GabbiFixture):
     """Drive the fixture testing weakly."""
     pass
 
 
-class TestResponseHandler(base.ResponseHandler):
+class StubResponseHandler(base.ResponseHandler):
     """A sample response handler just to test."""
 
     test_key_suffix = 'test'
@@ -62,16 +66,27 @@ class TestResponseHandler(base.ResponseHandler):
 SkipAllFixture = fixture.SkipAllFixture
 
 
+BUILD_TEST_ARGS = dict(
+    intercept=simple_wsgi.SimpleWsgi,
+    fixture_module=sys.modules[__name__],
+    prefix=os.environ.get('GABBI_PREFIX'),
+    response_handlers=[StubResponseHandler]
+)
+
+
 def load_tests(loader, tests, pattern):
     """Provide a TestSuite to the discovery process."""
     # Set and environment variable for one of the tests.
     util.set_test_environ()
 
-    prefix = os.environ.get('GABBI_PREFIX')
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
-    return driver.build_tests(test_dir, loader, host=None,
-                              intercept=simple_wsgi.SimpleWsgi,
+    return driver.build_tests(test_dir, loader,
                               test_loader_name=__name__,
-                              prefix=prefix,
-                              fixture_module=sys.modules[__name__],
-                              response_handlers=[TestResponseHandler])
+                              **BUILD_TEST_ARGS)
+
+
+def pytest_generate_tests(metafunc):
+    util.set_test_environ()
+    test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
+    driver.py_test_generator(test_dir, metafunc=metafunc,
+                             **BUILD_TEST_ARGS)

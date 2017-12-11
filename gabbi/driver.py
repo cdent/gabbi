@@ -152,7 +152,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       fixture_module=None, response_handlers=None,
                       content_handlers=None, require_ssl=False, url=None,
                       metafunc=None, use_prior_test=True,
-                      safe_yaml=True):
+                      inner_fixtures=None, safe_yaml=True):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in

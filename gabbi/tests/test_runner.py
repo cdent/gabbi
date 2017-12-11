@@ -180,7 +180,7 @@ class RunnerTest(unittest.TestCase):
                 self.assertFailure(err)
 
         sys.argv.insert(3, "-r")
-        sys.argv.insert(4, "gabbi.tests.test_intercept:TestResponseHandler")
+        sys.argv.insert(4, "gabbi.tests.test_intercept:StubResponseHandler")
 
         sys.stdin = StringIO("""
         tests:
