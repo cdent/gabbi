@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.38.0
+------
+
+* Remove support for Python 3.3.
+* Make handling of fixture-level skips in pytest actually work.
+
 1.37.0
 ------
 
