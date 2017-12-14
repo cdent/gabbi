@@ -489,12 +489,18 @@ class HTTPTestCase(testtools.TestCase):
 
         method = test['method'].upper()
         headers = test['request_headers']
+
+        replaced_headers = {}
         for name in headers:
             try:
-                headers[name] = self.replace_template(headers[name])
+                replaced_name = self.replace_template(name)
+                replaced_headers[replaced_name] = self.replace_template(
+                    headers[name]
+                )
             except TypeError as exc:
                 raise exception.GabbiFormatError(
                     'malformed headers in test %s: %s' % (test['name'], exc))
+        headers = replaced_headers
 
         if test['data'] != '':
             body = self._test_data_to_string(
