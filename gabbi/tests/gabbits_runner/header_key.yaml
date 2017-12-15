@@ -1,0 +1,6 @@
+tests:
+  - name: expected success
+    GET: /header_key
+    request_headers:
+      $SCHEME: some-scheme
+    status: 200

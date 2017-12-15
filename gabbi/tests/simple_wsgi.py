@@ -117,6 +117,11 @@ class SimpleWsgi(object):
             return [json.dumps({
                 "nan": float('nan')
             }).encode('utf-8')]
+        elif path_info == '/header_key':
+            if environ.get('HTTP_HTTP', False):
+                start_response('200 OK', headers)
+            else:
+                start_response('500 SERVER ERROR', headers)
 
         start_response('200 OK', headers)
 
