@@ -98,6 +98,19 @@ class RunnerTest(unittest.TestCase):
             except SystemExit as err:
                 self.assertSuccess(err)
 
+    def test_header_key_variable_substitution(self):
+        sys.argv = [
+            'gabbi-run', 'http://%s:%s/header_key' % (self.host, self.port)]
+
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/header_key.yaml')
+
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
 

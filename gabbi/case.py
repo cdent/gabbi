@@ -478,6 +478,21 @@ class HTTPTestCase(testtools.TestCase):
             self.response_data = None
         self.output = decoded_output
 
+    def _replace_headers_template(self, test_name, headers):
+        replaced_headers = {}
+
+        for name in headers:
+            try:
+                replaced_name = self.replace_template(name)
+                replaced_headers[replaced_name] = self.replace_template(
+                    headers[name]
+                )
+            except TypeError as exc:
+                raise exception.GabbiFormatError(
+                    'malformed headers in test %s: %s' % (test_name, exc))
+
+        return replaced_headers
+
     def _run_test(self):
         """Make an HTTP request and compare the response with expectations."""
         test = self.test_data
@@ -487,14 +502,15 @@ class HTTPTestCase(testtools.TestCase):
         self.url = base_url
         full_url = self._parse_url(base_url)
 
+        # Replace variables in headers with variable values. This includes both
+        # in the header key and the header value.
+        test['request_headers'] = self._replace_headers_template(
+            test['name'], test['request_headers'])
+        test['response_headers'] = self._replace_headers_template(
+            test['name'], test['response_headers'])
+
         method = test['method'].upper()
         headers = test['request_headers']
-        for name in headers:
-            try:
-                headers[name] = self.replace_template(headers[name])
-            except TypeError as exc:
-                raise exception.GabbiFormatError(
-                    'malformed headers in test %s: %s' % (test['name'], exc))
 
         if test['data'] != '':
             body = self._test_data_to_string(

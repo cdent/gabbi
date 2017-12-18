@@ -283,11 +283,11 @@ All of these variables may be used in all of the following fields:
 * ``url``
 * ``query_parameters``
 * ``data``
-* ``request_headers``
+* ``request_headers`` (in both the key and value)
 * ``response_strings``
 * ``response_json_paths`` (in both the key and value, see
   :ref:`json path substitution <json-subs>` for more info)
-* ``response_headers`` (on the value side of the key value pair)
+* ``response_headers`` (in both the key and value)
 * ``response_forbidden_headers``
 * ``count`` and ``delay`` fields of ``poll``
 
