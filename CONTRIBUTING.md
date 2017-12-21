@@ -31,6 +31,9 @@ If you want to make a pull request, fork the gabbi repository and create
 a new branch that will contain your changes. Name the branch something
 meaningful and related to your change.
 
+See the "Testing and Developing Gabbi" section of the the `README` for
+information on setting up a reasonable working environment.
+
 You should provide verbose commit messages on each of your commits. You
 should not feel obliged to squash your commits into one commit. We want
 to the see the full expression of your process and thinking.

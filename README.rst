@@ -64,16 +64,29 @@ These features mean that it is possible to create tests that are
 useful for both humans (as tools for improving and developing APIs)
 and automated CI systems.
 
-Testing
--------
+Testing and Developing Gabbi
+----------------------------
 
-To run the built in tests (the YAML files are in the directories
-``gabbi/gabbits_*`` and loaded by the file ``gabbi/test_*.py``),
-you can use ``tox``::
+To get started, after cloning the `repository`_, you should install the
+development dependencies::
+
+    $ pip install -r requirements-dev.txt
+
+If you prefer to keep things isolated you can create a virtual
+environment::
+
+    $ virtualenv gabbi-venv
+    $ . gabbi-venv/bin/activate
+    $ pip install -r requirements-dev.txt
+
+Gabbi is set up to be developed and tested using `tox`_ (installed via
+``requirements-dev.txt``). To run the built-in tests (the YAML files
+are in the directories ``gabbi/tests/gabbits_*`` and loaded by the file
+``gabbi/test_*.py``), you call ``tox``::
 
     tox -epep8,py27,py34
 
-Or if you have the dependencies installed (or a warmed up
+If you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
 failure::
 
@@ -86,3 +99,6 @@ after the tox invocation::
 
 If you wish to avoid running tests that connect to internet hosts,
 set ``GABBI_SKIP_NETWORK`` to ``True``.
+
+.. _tox: https://tox.readthedocs.io/
+.. _repository: https://github.com/cdent/gabbi
