@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.39.0
+------
+
+* Allow :ref:`substitutions <state-substitution>` in the key portion
+  of request and response headers, not just the value.
+
 1.38.0
 ------
 
@@ -239,6 +245,7 @@ gabbi.
 * Mehdi Abaakouk
 * Tom Viner
 * Jason Myers
+* Josh Leeb-du Toit
 * Duc Truong
 * Zane Bitter
 * Ryan Spencer
