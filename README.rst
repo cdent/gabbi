@@ -67,24 +67,26 @@ and automated CI systems.
 Testing and Developing Gabbi
 ----------------------------
 
-Gabbi is set up to be developed and tested using `tox`_. If you want
-to test or make changes, you will need to install tox and clone the
-gabbi `github repo`_. One way to do this is by creating a virtualenv
-that contains tox::
+To get started, after cloning the `repository`_, you should install the
+development dependencies::
 
-    virtualenv gabbi-tox
-    . gabbi-tox/bin/activate
-    git clone https://github.com/cdent/gabbi.git
-    cd gabbi
-    pip install -r requirements-dev.txt
+    $ pip install -r requirements-dev.txt
 
-To run the built in tests (the YAML files are in the directories
-``gabbi/gabbits_*`` and loaded by the file ``gabbi/test_*.py``),
-you can use ``tox``::
+If you prefer to keep things isolated you can create a virtual
+environment::
+
+    $ virtualenv gabbi-venv
+    $ . gabbi-venv/bin/activate
+    $ pip install -r requirements-dev.txt
+
+Gabbi is set up to be developed and tested using `tox`_ (installed via
+``requirements-dev.txt``). To run the built-in tests (the YAML files
+are in the directories ``gabbi/tests/gabbits_*`` and loaded by the file
+``gabbi/test_*.py``), you call ``tox``::
 
     tox -epep8,py27,py34
 
-Or if you have the dependencies installed (or a warmed up
+If you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
 failure::
 
@@ -99,4 +101,4 @@ If you wish to avoid running tests that connect to internet hosts,
 set ``GABBI_SKIP_NETWORK`` to ``True``.
 
 .. _tox: https://tox.readthedocs.io/
-.. _github repo: https://github.com/cdent/gabbi
+.. _repository: https://github.com/cdent/gabbi
