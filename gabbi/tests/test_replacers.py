@@ -18,6 +18,7 @@ import os
 import unittest
 
 from gabbi import case
+from gabbi import exception
 
 
 class EnvironReplaceTest(unittest.TestCase):
@@ -56,3 +57,13 @@ class EnvironReplaceTest(unittest.TestCase):
 
         os.environ['moo'] = "True"
         self.assertEqual(True, http_case._environ_replace(message))
+
+
+class TestReplaceHeaders(unittest.TestCase):
+
+    def test_empty_headers(self):
+        """A None value in headers should cause a GabbiFormatError."""
+        http_case = case.HTTPTestCase('test_request')
+        self.assertRaises(
+                exception.GabbiFormatError,
+                http_case._replace_headers_template, 'foo', None)
