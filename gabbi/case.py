@@ -481,15 +481,15 @@ class HTTPTestCase(testtools.TestCase):
     def _replace_headers_template(self, test_name, headers):
         replaced_headers = {}
 
-        for name in headers:
-            try:
+        try:
+            for name in headers:
                 replaced_name = self.replace_template(name)
                 replaced_headers[replaced_name] = self.replace_template(
                     headers[name]
                 )
-            except TypeError as exc:
-                raise exception.GabbiFormatError(
-                    'malformed headers in test %s: %s' % (test_name, exc))
+        except TypeError as exc:
+            raise exception.GabbiFormatError(
+                'malformed headers in test %s: %s' % (test_name, exc))
 
         return replaced_headers
 
