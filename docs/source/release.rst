@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.40.0
+-----
+
+* When the HTTP response begins with a bad status line, have
+  BadStatusLine be raised from urllib3.
+
 1.39.0
 ------
 
