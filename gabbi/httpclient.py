@@ -182,5 +182,5 @@ def get_http(verbose=False, caption=''):
         if verbose == 'headers':
             body = False
         return VerboseHttp(body=body, headers=headers, colorize=colorize,
-                           stream=stream, caption=caption)
-    return Http()
+                           stream=stream, caption=caption, strict=True)
+    return Http(strict=True)
