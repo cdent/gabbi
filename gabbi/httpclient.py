@@ -172,15 +172,10 @@ class VerboseHttp(Http):
 
 def get_http(verbose=False, caption=''):
     """Return an Http class for making requests."""
-    if verbose:
-        body = True
-        headers = True
-        colorize = True
-        stream = sys.stdout
-        if verbose == 'body':
-            headers = False
-        if verbose == 'headers':
-            body = False
-        return VerboseHttp(body=body, headers=headers, colorize=colorize,
-                           stream=stream, caption=caption, strict=True)
-    return Http(strict=True)
+    if not verbose:
+        return Http(strict=True)
+
+    headers = False if verbose == 'body' else True
+    body = False if verbose == 'headers' else True
+    return VerboseHttp(headers=headers, body=body, stream=sys.stdout,
+                       caption=caption, colorize=True, strict=True)
