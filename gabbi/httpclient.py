@@ -10,7 +10,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""Subclass of Http class for verbosity."""
 
 from __future__ import print_function
 
@@ -29,10 +28,10 @@ urllib3.disable_warnings()
 
 
 class Http(urllib3.PoolManager):
-    """A subclass of the urllib3.PoolManager to munge the data.
+    """A subclass of the ``urllib3.PoolManager`` to munge the data.
 
     This transforms the response to look more like what httplib2
-    provided when it was used as the httpclient.
+    provided when it was used as the HTTP client.
     """
 
     def request(self, absolute_uri, method, body, headers, redirect):
@@ -55,21 +54,21 @@ class Http(urllib3.PoolManager):
 
 
 class VerboseHttp(Http):
-    """A subclass of Http that verbosely reports on activity.
+    """A subclass of ``Http`` that verbosely reports on activity.
 
     If the output is a tty or ``GABBI_FORCE_COLOR`` is set in the
     environment, then output will be colorized according to ``COLORMAP``.
 
     Output can include request and response headers, request and
-    response body content (if of a printable content-type), or both.
+    response body content (if of a printable content type), or both.
 
     The color of the output has reasonable defaults. These may be overridden
     by setting the following environment variables
 
-    * GABBI_CAPTION_COLOR
-    * GABBI_HEADER_COLOR
-    * GABBI_REQUEST_COLOR
-    * GABBI_STATUS_COLOR
+    * ``GABBI_CAPTION_COLOR``
+    * ``GABBI_HEADER_COLOR``
+    * ``GABBI_REQUEST_COLOR``
+    * ``GABBI_STATUS_COLOR``
 
     to any of: BLACK RED GREEN YELLOW BLUE MAGENTA CYAN WHITE
     """
@@ -171,7 +170,7 @@ class VerboseHttp(Http):
 
 
 def get_http(verbose=False, caption=''):
-    """Return an Http class for making requests."""
+    """Return an ``Http`` class for making requests."""
     if not verbose:
         return Http(strict=True)
 
