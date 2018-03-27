@@ -102,7 +102,7 @@ class JSONHandler(base.ContentHandler):
             expected = expected[1:-1]
             # match may be a number so stringify
             match = six.text_type(match)
-            test.assertRegexpMatches(
+            test.assertRegex(
                 match, expected,
                 'Expect jsonpath %s to match /%s/, got %s' %
                 (path, expected, match))

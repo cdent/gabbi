@@ -41,7 +41,8 @@ class ResponseHandler(object):
     def __call__(self, test):
         if test.test_data[self._key]:
             self.preprocess(test)
-            if type(self.test_key_value) != type(test.test_data[self._key]):
+            if not isinstance(
+                    test.test_data[self._key], type(self.test_key_value)):
                 raise GabbiFormatError(
                     "%s in '%s' has incorrect type, must be %s"
                     % (self._key, test.test_data['name'],
