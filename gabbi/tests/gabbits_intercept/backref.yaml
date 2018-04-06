@@ -65,6 +65,16 @@ tests:
      x-gabbi-url: $SCHEME://$NETLOC/v2
      content-type: $HEADERS['content-type']
 
+- name: use raw json from response
+  POST: $LAST_URL
+  request_headers:
+      content-type: application/json
+  # the value of '$' here should be {"c": "/v2", "a": "1"}
+  data: $RESPONSE['$']
+  response_json_paths:
+      $.c: /v2
+      $.a: "1"
+
 - name: backref json fail start
   url:  /
   method: POST
