@@ -55,10 +55,10 @@ tests:
       content-type: application/json
   method: POST
   data: |
-      {"a": "$RESPONSE["a"]",
+      {"a": $RESPONSE["a"],
        "c": "$RESPONSE["c"]"}
   response_strings:
-      - '"a": "$RESPONSE["a"]"'
+      - '"a": $RESPONSE["a"]'
       - '"c": "/v2"'
   response_headers:
      location: $SCHEME://$NETLOC$RESPONSE['c']
@@ -69,11 +69,27 @@ tests:
   POST: $LAST_URL
   request_headers:
       content-type: application/json
-  # the value of '$' here should be {"c": "/v2", "a": "1"}
+  # the value of '$' here should be {"c": "/v2", "a": 1}
   data: $RESPONSE['$']
   response_json_paths:
       $.c: /v2
-      $.a: "1"
+      $.a: 1
+
+- name: post a raw int as json
+  POST: /
+  request_headers:
+      content-type: application/json
+  data: 1
+  response_json_paths:
+      $: 1
+
+- name: repost that raw int
+  POST: /
+  request_headers:
+      content-type: application/json
+  data: $RESPONSE['$']
+  response_json_paths:
+      $: 1
 
 - name: backref json fail start
   url:  /

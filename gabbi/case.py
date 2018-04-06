@@ -589,7 +589,7 @@ class HTTPTestCase(testtools.TestCase):
 
         # If the result after template handling is not a string, dump
         # it if there is a suitable dumper.
-        if dumper_class and _is_complex_type(data):
+        if dumper_class and not isinstance(data, six.string_types):
             # If there are errors dumping we want them to raise to the
             # test harness.
             data = dumper_class.dumps(data, test=self)
