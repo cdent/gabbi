@@ -569,7 +569,7 @@ class HTTPTestCase(testtools.TestCase):
         """
         dumper_class = self.get_content_handler(content_type)
         if not _is_complex_type(data):
-            if data.startswith('<@'):
+            if isinstance(data, six.string_types) and data.startswith('<@'):
                 info = self.load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
                     data = six.text_type(info, 'UTF-8')
