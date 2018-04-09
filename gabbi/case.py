@@ -95,6 +95,11 @@ def potentialFailure(func):
     return wrapper
 
 
+def _is_complex_type(data):
+    """If data is a list or dict return True."""
+    return isinstance(data, list) or isinstance(data, dict)
+
+
 class HTTPTestCase(testtools.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
@@ -558,23 +563,37 @@ class HTTPTestCase(testtools.TestCase):
         """Turn the request data into a string.
 
         If the data is not binary, replace template strings.
+
+        If the result of the template handling is not a string,
+        run the result through the dumper.
         """
-        if isinstance(data, str):
-            if data.startswith('<@'):
+        dumper_class = self.get_content_handler(content_type)
+        if not _is_complex_type(data):
+            if isinstance(data, six.string_types) and data.startswith('<@'):
                 info = self.load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
                     data = six.text_type(info, 'UTF-8')
                 else:
+                    # Return early we are binary content
                     return info
         else:
-            dumper_class = self.get_content_handler(content_type)
+            # We have a complex data structure, try to dump it.
             if dumper_class:
                 data = self.replace_template(data)
                 data = dumper_class.dumps(data, test=self)
             else:
                 raise ValueError(
                     'unable to process data to %s' % content_type)
-        return self.replace_template(data)
+
+        data = self.replace_template(data)
+
+        # If the result after template handling is not a string, dump
+        # it if there is a suitable dumper.
+        if dumper_class and not isinstance(data, six.string_types):
+            # If there are errors dumping we want them to raise to the
+            # test harness.
+            data = dumper_class.dumps(data, test=self)
+        return data
 
     def _test_status(self, expected_status, observed_status):
         """Confirm we got the expected status.
