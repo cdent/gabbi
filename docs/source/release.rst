@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.42.0
+------
+
+* Allow listing of tests with no host configured. When host is
+  an empty string, tests can be listed (for discovery), but will
+  be skipped on run.
+
 1.41.0
 ------
 
