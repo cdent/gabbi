@@ -106,8 +106,10 @@ class TestMaker(object):
         # from a different module.
         if self.test_loader_name:
             klass.__module__ = self.test_loader_name
+        check_host = case.testcase.skipIf(not self.host,
+                                          'No host configured')
 
-        tests = self.loader.loadTestsFromTestCase(klass)
+        tests = self.loader.loadTestsFromTestCase(check_host(klass))
         history[test['name']] = tests._tests[0]
         # Return the first (and only) test in the klass.
         return tests._tests[0]
