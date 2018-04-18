@@ -18,6 +18,7 @@ The key piece of code is :meth:`test_suite_from_dict`. It produces a
 """
 
 import copy
+import functools
 
 from gabbi import case
 from gabbi.exception import GabbiFormatError
@@ -85,6 +86,14 @@ class TestMaker(object):
         else:
             history = {}
 
+        test_method_name = 'test_request'
+        test_method = getattr(case.HTTPTestCase, test_method_name)
+
+        @case.testcase.skipIf(not self.host, 'No host configured')
+        @functools.wraps(test_method)
+        def do_test(*args, **kwargs):
+            return test_method(*args, **kwargs)
+
         # Use metaclasses to build a class of the necessary type
         # and name with relevant arguments.
         klass = TestBuilder(test_name, (case.HTTPTestCase,),
@@ -101,15 +110,14 @@ class TestMaker(object):
                              'prefix': self.prefix,
                              'prior': prior_test,
                              'history': history,
+                             test_method_name: do_test,
                              })
         # We've been asked to, make this test class think it comes
         # from a different module.
         if self.test_loader_name:
             klass.__module__ = self.test_loader_name
-        check_host = case.testcase.skipIf(not self.host,
-                                          'No host configured')
 
-        tests = self.loader.loadTestsFromTestCase(check_host(klass))
+        tests = self.loader.loadTestsFromTestCase(klass)
         history[test['name']] = tests._tests[0]
         # Return the first (and only) test in the klass.
         return tests._tests[0]
