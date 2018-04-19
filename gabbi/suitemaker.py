@@ -89,7 +89,7 @@ class TestMaker(object):
         test_method_name = 'test_request'
         test_method = getattr(case.HTTPTestCase, test_method_name)
 
-        @case.testcase.skipIf(not self.host, 'No host configured')
+        @case.testcase.skipIf(self.host == '', 'No host configured')
         @functools.wraps(test_method)
         def do_test(*args, **kwargs):
             return test_method(*args, **kwargs)
