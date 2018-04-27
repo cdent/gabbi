@@ -37,12 +37,12 @@ matrix:
           env: TOXENV=py35
         - python: 3.5
           env: TOXENV=py35-pytest
-        - python: 3.5
-          env: TOXENV=py35-failskip
-        - python: 3.5
-          env: TOXENV=py35-limit
-        - python: 3.5
-          env: TOXENV=py35-prefix
+        - python: 3.6
+          env: TOXENV=py36-failskip
+        - python: 3.6
+          env: TOXENV=py36-limit
+        - python: 3.6
+          env: TOXENV=py36-prefix
         - python: 3.6
           env: TOXENV=py36
         - python: 3.6

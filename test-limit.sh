@@ -7,9 +7,9 @@
 # broke limiting tests and we never knew.
 
 GREP_TEST_MATCH='tests.test_intercept.self_checklimit.test_request ... ok'
-GREP_COUNT_MATCH='Ran 1 '
+GREP_COUNT_MATCH='Ran: 1 '
 
-python setup.py testr --testr-args="checklimit" && \
-    testr last --subunit | subunit2pyunit 2>&1 | \
+stestr run "checklimit" && \
+    stestr last --subunit | subunit2pyunit 2>&1 | \
     grep "${GREP_TEST_MATCH}" && \
-    testr last | grep "${GREP_COUNT_MATCH}"
+    stestr last | grep "${GREP_COUNT_MATCH}"
