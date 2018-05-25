@@ -15,8 +15,9 @@
 
 import unittest
 
-from gabbi import case
 from six.moves import mock
+
+from gabbi import case
 
 
 @mock.patch(
@@ -26,7 +27,9 @@ from six.moves import mock
     create=True,
 )
 class DataFileTest(unittest.TestCase):
-    """Reading from local file is only allowed at or below the
+    """Test reading files in tests.
+
+    Reading from local files is only allowed at or below the
     test_directory level.
     """
 

@@ -56,9 +56,9 @@ class StubResponseHandler(base.ResponseHandler):
         except TypeError:
             pass
 
-    def action(self, test, expected, value=None):
-        expected = expected.replace('COW', '', 1)
-        test.assertIn(expected, test.output)
+    def action(self, test, item, value=None):
+        item = item.replace('COW', '', 1)
+        test.assertIn(item, test.output)
 
 
 # Incorporate the SkipAllFixture into this namespace so it can be used

@@ -31,7 +31,9 @@ class FakeFixture(fixture.GabbiFixture):
 class SuiteTest(unittest.TestCase):
 
     def test_suite_catches_fixture_fail(self):
-        """When a fixture fails in start_fixture it should fail
+        """Verify fixture failure.
+
+        When a fixture fails in start_fixture it should fail
         the first test in the suite and skip the others.
         """
         loader = unittest.defaultTestLoader

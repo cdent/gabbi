@@ -65,5 +65,5 @@ class TestReplaceHeaders(unittest.TestCase):
         """A None value in headers should cause a GabbiFormatError."""
         http_case = case.HTTPTestCase('test_request')
         self.assertRaises(
-                exception.GabbiFormatError,
-                http_case._replace_headers_template, 'foo', None)
+            exception.GabbiFormatError,
+            http_case._replace_headers_template, 'foo', None)

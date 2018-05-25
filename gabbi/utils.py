@@ -15,7 +15,9 @@
 import io
 import os
 
+import colorama
 import six
+from six.moves.urllib import parse as urlparse
 import yaml
 
 
@@ -24,10 +26,6 @@ try:  # Python 3
 except NameError:  # Python 2
     import socket
     ConnectionRefused = socket.error
-
-
-import colorama
-from six.moves.urllib import parse as urlparse
 
 
 def create_url(base_url, host, port=None, prefix='', ssl=False):

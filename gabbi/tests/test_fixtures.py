@@ -13,8 +13,9 @@
 """Use mocks to confirm that fixtures operate as context managers.
 """
 
-from six.moves import mock
 import unittest
+
+from six.moves import mock
 
 from gabbi import fixture
 

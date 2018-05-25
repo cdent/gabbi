@@ -381,7 +381,7 @@ class HTMLResponseHandler(base.ResponseHandler):
     test_key_suffix = 'html'
     test_key_value = {}
 
-    def action(self, test, item, value):
+    def action(self, test, item, value=None):
         doc = test.output
         html = '<{tag}>{content}</{tag}>'.format(tag=item, content=value)
         test.assertTrue(html in doc, "no elements matching '%s'" % html)

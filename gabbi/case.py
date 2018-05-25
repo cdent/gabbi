@@ -274,8 +274,9 @@ class HTTPTestCase(testtools.TestCase):
         return cookie_string
 
     def _headers_replace(self, message, escape_regex=False):
-        """Replace a header indicator in a message with that headers value from
-        the prior request.
+        """Replace a header indicator in a message.
+
+        Replace it with the header's value from the prior request.
         """
         return re.sub(self._replacer_regex('HEADERS'),
                       self._regex_replacer(self._header_replacer,

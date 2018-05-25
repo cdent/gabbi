@@ -153,8 +153,7 @@ def initialize_handlers(response_handlers):
 
 
 def load_response_handlers(import_path):
-    """Load and return custom response handlers from the given Python package
-    or module.
+    """Load and return custom response handlers from the import path.
 
     The import path references either a specific response handler class
     ("package.module:class") or a module that contains one or more response
@@ -178,8 +177,9 @@ def load_response_handlers(import_path):
 
 
 def extract_file_paths(argv):
-    """Extract command-line arguments following the `--` end-of-options
-    delimiter, if any.
+    """Extract file paths from the command-line.
+
+    File path arguments follow a `--` end-of-options delimiter, if any.
     """
     try:  # extract file paths, separated by `--`
         i = argv.index("--")

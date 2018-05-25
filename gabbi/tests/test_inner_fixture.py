@@ -53,7 +53,7 @@ class InnerFixture(fixtures.Fixture):
         global COUNT_INNER
         COUNT_INNER += 1
 
-    def cleanUp(self):
+    def cleanUp(self, raise_first=True):
         super(InnerFixture, self).cleanUp()
         assert 1 <= COUNT_INNER <= 3
 
