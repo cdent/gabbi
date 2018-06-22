@@ -14,6 +14,7 @@
 """
 
 import json
+import os
 import unittest
 
 from gabbi import case
@@ -267,6 +268,39 @@ class HandlersTest(unittest.TestCase):
             self.assertIn('has incorrect type', str(exc))
             self.assertIn("response_json_paths in 'omega test'",
                           str(exc))
+
+    def test_response_json_paths_from_disk_json_path(self):
+        handler = jsonhandler.JSONHandler()
+        lhs = '$.pets[?type = "cat"].sound'
+        rhs = '$.values[0].pets[?type = "cat"].sound'
+        self.test.test_directory = os.path.dirname(__file__)
+        self.test.test_data = {'response_json_paths': {
+            lhs: '<@gabbits_handlers/values.json:' + rhs,
+        }}
+        self.test.response_data = {
+            "pets": [
+                {"type": "cat", "sound": "meow"},
+                {"type": "dog", "sound": "woof"}
+            ]
+        }
+        self._assert_handler(handler)
+
+    def test_response_json_paths_from_disk_json_path_fail(self):
+        handler = jsonhandler.JSONHandler()
+        lhs = '$.pets[?type = "cat"].sound'
+        rhs = '$.values[0].pets[?type = "bad"].sound'
+        self.test.test_directory = os.path.dirname(__file__)
+        self.test.test_data = {'response_json_paths': {
+            lhs: '<@gabbits_handlers/values.json:' + rhs,
+        }}
+        self.test.response_data = {
+            "pets": [
+                {"type": "cat", "sound": "meow"},
+                {"type": "dog", "sound": "woof"}
+            ]
+        }
+        with self.assertRaises(AssertionError):
+            self._assert_handler(handler)
 
     def test_response_headers(self):
         handler = core.HeadersResponseHandler()

@@ -76,29 +76,45 @@ class JSONHandler(base.ContentHandler):
     def action(self, test, path, value=None):
         """Test json_paths against json data."""
         # Do template expansion in the left hand side.
-        path = test.replace_template(path)
+        lhs_path = test.replace_template(path)
+        rhs_path = rhs_match = None
         try:
-            match = self.extract_json_path_value(
-                test.response_data, path)
+            lhs_match = self.extract_json_path_value(
+                test.response_data, lhs_path)
         except AttributeError:
             raise AssertionError('unable to extract JSON from test results')
         except ValueError:
-            raise AssertionError('json path %s cannot match %s' %
-                                 (path, test.response_data))
+            raise AssertionError('left hand side json path %s cannot match '
+                                 '%s' % (path, test.response_data))
 
         # read data from disk if the value starts with '<@'
         if isinstance(value, str) and value.startswith('<@'):
+            # Do template expansion in the rhs if rhs_path is provided.
+            if ':' in value:
+                value, rhs_path = value.split(':')
+                rhs_path = test.replace_template(rhs_path)
             info = test.load_data_file(value.replace('<@', '', 1))
             info = six.text_type(info, 'UTF-8')
             value = self.loads(info)
+            if rhs_path:
+                try:
+                    rhs_match = self.extract_json_path_value(value, rhs_path)
+                except AttributeError:
+                    raise AssertionError('unable to extract JSON from data on '
+                                         'disk')
+                except ValueError:
+                    raise AssertionError('right hand side json path %s cannot '
+                                         'match %s' % (rhs_path, info))
 
         # If expected is a string, check to see if it is a regex.
         is_regex = (isinstance(value, six.string_types) and
                     value.startswith('/') and
                     value.endswith('/') and
                     len(value) > 1)
-        expected = test.replace_template(value, escape_regex=is_regex)
-        if is_regex:
+        expected = (rhs_match or
+                    test.replace_template(value, escape_regex=is_regex))
+        match = lhs_match
+        if is_regex and not rhs_match:
             expected = expected[1:-1]
             # match may be a number so stringify
             match = six.text_type(match)

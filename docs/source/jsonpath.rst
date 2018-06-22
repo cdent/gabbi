@@ -78,6 +78,42 @@ or::
 
 Examples like this can be found in one of gabbi's `own tests`_.
 
+When reading from disk you can apply the same JSONPath by adding a ':' to the
+end of your file name. This allows you to store multiple api responses into
+a json file to reduce file management when constructing your tests
+
+.. highlight:: json
+
+Given JSON data as follows::
+
+    {
+        "values": [{
+            "pets": [{
+                "type": "cat",
+                "sound": "meow"
+            }, {
+                "type": "dog",
+                "sound": "woof"
+            }]
+        }, {
+            "people": [{
+                "name": "chris",
+                "id": 1
+            }, {
+                "name": "justin",
+                "id": 2
+            }]
+        }]
+    }
+
+.. highlight:: yaml
+
+You can write your tests like the following::
+
+    response_json_paths:
+        $.pets: <@pets.json
+        $.pets[?type = "cat"].sound: <@values.json:$.values[0].pets[?type = "cat"].sound
+
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 
