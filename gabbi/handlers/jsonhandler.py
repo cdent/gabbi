@@ -91,8 +91,8 @@ class JSONHandler(base.ContentHandler):
         if isinstance(value, str) and value.startswith('<@'):
             # Do template expansion in the rhs if rhs_path is provided.
             if ':' in value:
-                value, rhs_path = value.split(':')
-                rhs_path = test.replace_template(rhs_path)
+                value, rhs_path = value.split(':$', 1)
+                rhs_path = test.replace_template('$' + rhs_path)
             info = test.load_data_file(value.replace('<@', '', 1))
             info = six.text_type(info, 'UTF-8')
             value = self.loads(info)
