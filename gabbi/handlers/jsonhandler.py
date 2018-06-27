@@ -88,7 +88,7 @@ class JSONHandler(base.ContentHandler):
                                  '%s' % (path, test.response_data))
 
         # read data from disk if the value starts with '<@'
-        if isinstance(value, str) and value.startswith('<@'):
+        if isinstance(value, six.string_types) and value.startswith('<@'):
             # Do template expansion in the rhs if rhs_path is provided.
             if ':' in value:
                 value, rhs_path = value.split(':$', 1)
