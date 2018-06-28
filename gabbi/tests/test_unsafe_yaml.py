@@ -18,21 +18,16 @@ For the sake of exploratory development.
 
 import os
 
-import yaml
-
 from gabbi import driver
 # TODO(cdent): test_pytest allows pytest to see the tests this module
 # produces. Without it, the generator will not run. It is a todo because
 # needing to do this is annoying and gross.
 from gabbi.driver import test_pytest  # noqa
 from gabbi.tests import simple_wsgi
-from gabbi.tests import util
+from gabbi.tests import util  # noqa
 
 
 TESTS_DIR = 'gabbits_unsafe_yaml'
-
-
-yaml.add_constructor(u'!IsNAN', lambda loader, node: util.NanChecker())
 
 
 BUILD_TEST_ARGS = dict(

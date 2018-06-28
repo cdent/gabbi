@@ -16,6 +16,7 @@
 import sys
 import unittest
 from uuid import uuid4
+import yaml
 
 from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
@@ -25,6 +26,8 @@ from gabbi.handlers import base
 from gabbi.handlers.jsonhandler import JSONHandler
 from gabbi import runner
 from gabbi.tests.simple_wsgi import SimpleWsgi
+# To register yaml additions.
+import gabbi.tests.util  # noqa
 
 
 class RunnerTest(unittest.TestCase):
@@ -85,18 +88,47 @@ class RunnerTest(unittest.TestCase):
             except SystemExit as err:
                 self.assertFailure(err)
 
-    def test_unsafe_yaml(self):
+    def test_unsafe_yaml_success(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
 
         sys.argv.append('--unsafe-yaml')
         sys.argv.append('--')
-        sys.argv.append('gabbi/tests/gabbits_runner/nan.yaml')
+        sys.argv.append('gabbi/tests/gabbits_runner/nan-unsafe.yaml')
 
         with self.server():
             try:
                 runner.run()
             except SystemExit as err:
                 self.assertSuccess(err)
+
+    def test_unsafe_yaml_failure(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
+
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/nan-unsafe.yaml')
+
+        self.assertRaises(yaml.constructor.ConstructorError, runner.run)
+
+    def test_safe_yaml_success(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
+
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/nan-safe.yaml')
+
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+
+    def test_safe_yaml_failure(self):
+        sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
+
+        sys.argv.append('--unsafe-yaml')
+        sys.argv.append('--')
+        sys.argv.append('gabbi/tests/gabbits_runner/nan-safe.yaml')
+
+        self.assertRaises(yaml.constructor.ConstructorError, runner.run)
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]

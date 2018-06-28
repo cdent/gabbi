@@ -40,3 +40,5 @@ class NanChecker(yaml.YAMLObject):
             return math.isnan(other)
         except TypeError:
             return False
+
+yaml.add_constructor(u'!IsNAN', lambda loader, node: NanChecker())
