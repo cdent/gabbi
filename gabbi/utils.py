@@ -105,7 +105,12 @@ def load_yaml(handle=None, yaml_file=None, safe=True):
     If no file or handle is provided, read from STDIN.
     """
     # In PyYAML 4.1 safe is the default
-    load = yaml.load if safe else yaml.danger_load
+    try:
+        danger_load = yaml.danger_load
+    except AttributeError:
+        danger_load = yaml.load
+    load = yaml.safe_load if safe else danger_load
+
 
     if yaml_file:
         with io.open(yaml_file, encoding='utf-8') as source:
