@@ -13,13 +13,14 @@ build and run tests with pytest_ with some limitations described below.
 .. note:: It is also possible to run gabbi tests from the command
           line. See :doc:`runner`.
 
-.. note:: By default gabbi will load YAML files using the ``safe_load``
-          function. This means only basic YAML types are allowed in the
-          file. For most use cases this is fine. If you need custom types
-          (for example, to match NaN) it is possible to set the ``safe_yaml``
-          parameter of :meth:`~gabbi.driver.build_tests` to ``False``.
-          If custom types are used, please keep in mind that this can limit
-          the portability of the YAML files to other contexts.
+.. note:: By default gabbi will load YAML files in the default "safe"
+          fashion. This means that arbitrary Python objects cannot be
+          loaded. Custom YAML types which are defined in the process may be
+          used. If for some reason you need unsafe support, you may
+          set the ``safe_yaml`` parameter of
+          :meth:`~gabbi.driver.build_tests` to ``False``.
+          Keep in mind that if custom types are used, this can limit the
+          portability of the YAML files to other contexts.
 
 .. warning:: If test are being run with a runner that supports
              concurrency (such as ``testrepository``) it is critical
