@@ -302,6 +302,22 @@ class HandlersTest(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self._assert_handler(handler)
 
+    def test_response_json_paths_is_yaml(self):
+        handler = jsonhandler.JSONHandler()
+        lhs = '$.pets[?type = "cat"].sound'
+        rhs = '$.values[0].pets[?type = "cat"].sound'
+        self.test.test_directory = os.path.dirname(__file__)
+        self.test.test_data = {'response_json_paths': {
+            lhs: '<@gabbits_handlers/values.yaml:' + rhs,
+        }}
+        self.test.response_data = {
+            "pets": [
+                {"type": "cat", "sound": "meow"},
+                {"type": "dog", "sound": "woof"}
+            ]
+        }
+        self._assert_handler(handler)
+
     def test_response_headers(self):
         handler = core.HeadersResponseHandler()
         self.test.response = {'content-type': 'text/plain'}

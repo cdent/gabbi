@@ -23,3 +23,9 @@ tests:
       data: <@pets.json
       response_json_paths:
           $[?type = "cat"].sound: <@values.json:$.values[0].pets[?type = "cat"].sound
+
+    - name: yaml partial from disk
+      POST: /
+      data: <@pets.json
+      response_json_paths:
+          $: <@subdir/values.yaml:$.values[0]['pets']

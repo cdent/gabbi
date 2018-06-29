@@ -13,6 +13,7 @@
 """JSON-related content handling."""
 
 import json
+import yaml
 
 import six
 
@@ -95,7 +96,10 @@ class JSONHandler(base.ContentHandler):
                 rhs_path = test.replace_template('$' + rhs_path)
             info = test.load_data_file(value.replace('<@', '', 1))
             info = six.text_type(info, 'UTF-8')
-            value = self.loads(info)
+            if value.endswith('yaml'):
+                value = yaml.safe_load(info)
+            else:
+                value = self.loads(info)
             if rhs_path:
                 try:
                     rhs_match = self.extract_json_path_value(value, rhs_path)

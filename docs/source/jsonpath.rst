@@ -64,7 +64,7 @@ lead to difficult to read tests and it also indicates that your
 gabbi tests are being used to test your serializers and data models,
 not just your API interactions.
 
-It is also possible to read raw JSON from disk for either all or
+It is also possible to read raw JSON or YAML from disk for either all or
 some of a JSON response::
 
     response_json_paths:
@@ -76,11 +76,17 @@ or::
         $.pets: <@pets.json
         $.pets[0]: <@cat.json
 
+to use YAML files like the JSON ones above, they must be placed in a
+subdirectory::
+
+    response_json_paths:
+        $: @<subdir/values.yaml
+
 Examples like this can be found in one of gabbi's `own tests`_.
 
 When reading from disk you can apply the same JSONPath by adding a ':' to the
 end of your file name. This allows you to store multiple API responses into
-a JSON file to reduce file management when constructing your tests.
+a JSON or YAML file to reduce file management when constructing your tests.
 
 .. highlight:: json
 
