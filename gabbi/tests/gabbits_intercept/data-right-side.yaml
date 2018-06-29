@@ -1,0 +1,25 @@
+# Test loading expected data from file on disk with JSONPath
+#
+defaults:
+  request_headers:
+      content-type: application/json
+  verbose: True
+
+tests:
+    - name: json encoded value from disk
+      POST: /
+      data: <@data.json
+      response_json_paths:
+          $.foo['bár']: <@data.json:$.foo['bár']
+
+    - name: json parital from disk
+      POST: /
+      data: <@cat.json
+      response_json_paths:
+          $: <@pets.json:$[?type = "cat"]
+
+    - name: json partial both sides
+      POST: /
+      data: <@pets.json
+      response_json_paths:
+          $[?type = "cat"].sound: <@values.json:$.values[0].pets[?type = "cat"].sound
