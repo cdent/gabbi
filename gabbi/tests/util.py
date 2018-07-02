@@ -37,6 +37,6 @@ class NanChecker(yaml.YAMLObject):
 
     def __eq__(self, other):
         try:
-            return math.isnan(other)
-        except TypeError:
+            return math.isnan(float(other))
+        except (TypeError, ValueError):
             return False

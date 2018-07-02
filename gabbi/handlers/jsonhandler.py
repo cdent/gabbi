@@ -55,7 +55,7 @@ class JSONHandler(base.ContentHandler):
 
     @staticmethod
     def loads(data):
-        return json.loads(data)
+        return yaml.safe_load(data)
 
     @staticmethod
     def extract_json_path_value(data, path):
@@ -96,10 +96,7 @@ class JSONHandler(base.ContentHandler):
                 rhs_path = test.replace_template('$' + rhs_path)
             info = test.load_data_file(value.replace('<@', '', 1))
             info = six.text_type(info, 'UTF-8')
-            if value.endswith('yaml'):
-                value = yaml.safe_load(info)
-            else:
-                value = self.loads(info)
+            value = self.loads(info)
             if rhs_path:
                 try:
                     rhs_match = self.extract_json_path_value(value, rhs_path)

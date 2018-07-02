@@ -77,7 +77,7 @@ or::
         $.pets[0]: <@cat.json
 
 to use YAML files like the JSON ones above, they must be placed in a
-subdirectory::
+subdirectory to prevent the test runner from consuming them as test files::
 
     response_json_paths:
         $: @<subdir/values.yaml
