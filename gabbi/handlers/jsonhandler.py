@@ -13,7 +13,6 @@
 """JSON-related content handling."""
 
 import json
-import yaml
 
 import six
 
@@ -55,7 +54,13 @@ class JSONHandler(base.ContentHandler):
 
     @staticmethod
     def loads(data):
-        return yaml.safe_load(data)
+        return json.loads(data)
+
+    @staticmethod
+    def load_data_file(test, file_path):
+        info = test.load_data_file(file_path)
+        info = six.text_type(info, 'UTF-8')
+        return json.loads(info)
 
     @staticmethod
     def extract_json_path_value(data, path):
@@ -94,9 +99,7 @@ class JSONHandler(base.ContentHandler):
             if ':' in value:
                 value, rhs_path = value.split(':$', 1)
                 rhs_path = test.replace_template('$' + rhs_path)
-            info = test.load_data_file(value.replace('<@', '', 1))
-            info = six.text_type(info, 'UTF-8')
-            value = self.loads(info)
+            value = self.load_data_file(test, value.replace('<@', '', 1))
             if rhs_path:
                 try:
                     rhs_match = self.extract_json_path_value(value, rhs_path)
@@ -105,7 +108,7 @@ class JSONHandler(base.ContentHandler):
                                          'disk')
                 except ValueError:
                     raise AssertionError('right hand side json path %s cannot '
-                                         'match %s' % (rhs_path, info))
+                                         'match %s' % (rhs_path, value))
 
         # If expected is a string, check to see if it is a regex.
         is_regex = (isinstance(value, six.string_types) and

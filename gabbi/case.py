@@ -190,9 +190,12 @@ class HTTPTestCase(testtools.TestCase):
 
     def _assert_response(self):
         """Compare the response with expected data."""
+        handlers = self.response_handlers
+        content_handler = self.get_content_handler(self.content_type)
+        if content_handler:
+            handlers.append(content_handler)
         self._test_status(self.test_data['status'], self.response['status'])
-
-        for handler in self.response_handlers:
+        for handler in handlers:
             handler(self)
 
     def _clean_query_value(self, value):

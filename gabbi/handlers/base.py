@@ -12,7 +12,6 @@
 # under the License.
 """Base classes for response and content handlers."""
 
-
 from gabbi.exception import GabbiFormatError
 
 
@@ -112,3 +111,8 @@ class ContentHandler(ResponseHandler):
     def loads(data):
         """Create structured (Python) data from a stream."""
         return data
+
+    @staticmethod
+    def load_data_file(test, file_path):
+        """Create structured (Python) data from a file."""
+        return test.load_data_file(file_path)

@@ -6,20 +6,26 @@ defaults:
   verbose: True
 
 tests:
+    - name: yaml encoded value from disk
+      POST: /
+      data: <@data.json
+      response_json_paths:
+          $.foo['bár']: <@subdir/data.yaml:$.foo['bár']
+
     - name: json encoded value from disk
       POST: /
       data: <@data.json
       response_json_paths:
           $.foo['bár']: <@data.json:$.foo['bár']
 
-    - name: json parital from disk
+    - name: yaml parital from disk
       POST: /
       data: <@cat.json
       response_json_paths:
-          $: <@pets.json:$[?type = "cat"]
+          $: <@subdir/pets.yaml:$[?type = "cat"]
 
-    - name: json partial both sides
+    - name: yaml partial both sides
       POST: /
       data: <@pets.json
       response_json_paths:
-          $[?type = "cat"].sound: <@values.json:$.values[0].pets[?type = "cat"].sound
+          $[?type = "cat"].sound: <@subdir/values.yaml:$.values[0].pets[?type = "cat"].sound

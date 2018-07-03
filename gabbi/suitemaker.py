@@ -219,10 +219,10 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
     default_test_dict = copy.deepcopy(case.HTTPTestCase.base_test)
     for handler in handlers:
         default_test_dict.update(handler.test_base)
-        if handler.response_handler:
-            response_handlers.append(handler.response_handler)
         if handler.content_handler:
             content_handlers.append(handler.content_handler)
+        elif handler.response_handler:
+            response_handlers.append(handler.response_handler)
 
     local_defaults = _validate_defaults(suite_dict.get('defaults', {}))
     test_update(default_test_dict, local_defaults)
