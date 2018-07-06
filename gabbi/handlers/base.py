@@ -29,8 +29,11 @@ class ResponseHandler(object):
     ``action`` is called with the test case and a single list item. If
     ``test_key_value`` is a dict then ``action`` is called with the test case
     and a key and value pair.
+    ``add_response_handling`` set to False to store the handler only as a
+    content handler.
     """
 
+    add_response_handling = True
     test_key_suffix = ''
     test_key_value = []
 
@@ -73,7 +76,8 @@ class ResponseHandler(object):
         if self.test_key_suffix:
             self._key = 'response_%s' % self.test_key_suffix
             self.test_base = {self._key: self.test_key_value}
-            self.response_handler = self
+            if self.add_response_handling:
+                self.response_handler = self
         if hasattr(self, 'accepts'):
             self.content_handler = self
 
@@ -114,5 +118,5 @@ class ContentHandler(ResponseHandler):
 
     @staticmethod
     def load_data_file(test, file_path):
-        """Create structured (Python) data from a file."""
+        """Return the string content of the file specified by the file_path."""
         return test.load_data_file(file_path)

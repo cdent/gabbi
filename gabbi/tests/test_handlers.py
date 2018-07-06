@@ -21,7 +21,7 @@ from gabbi import case
 from gabbi.exception import GabbiFormatError
 from gabbi.handlers import core
 from gabbi.handlers import jsonhandler
-from gabbi.handlers import yamlhandler
+from gabbi.handlers import yaml_disk_loading_jsonhandler
 from gabbi import suitemaker
 
 
@@ -304,7 +304,7 @@ class HandlersTest(unittest.TestCase):
             self._assert_handler(handler)
 
     def test_response_json_paths_yamlhandler(self):
-        handler = yamlhandler.YAMLHandler()
+        handler = yaml_disk_loading_jsonhandler.YAMLDiskLoadingJSONHandler()
         lhs = '$.pets[?type = "cat"].sound'
         rhs = '$.values[0].pets[?type = "cat"].sound'
         self.test.test_directory = os.path.dirname(__file__)

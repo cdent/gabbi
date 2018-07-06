@@ -22,11 +22,12 @@ string into a data structure in ``response_data`` that is used when
 evaluating ``response_json_paths`` entries in a test or doing
 JSONPath-based ``$RESPONSE[]`` substitutions.
 
-A YAML content handler has been added to extend the JSON handler.
-It works the same way as the JSON handler except for when evaluating
-``response_json_paths``, data that is read from disk can be either JSON or
-YAML. This handler is not enabled by default and must be added as shown
-in the :ref:`Extensions` section in order to be used in the tests.
+A YAMLDiskLoadingJSONHandler has been added to extend the JSON handler.
+It works the same way as the JSON handler except for when evaluating the
+``response_json_paths`` handle, data that is read from disk can be either in
+JSON or YAML format. The YAMLDiskLoadingJSONHandler is not enabled by default
+and must be added as shown in the :ref:`Extensions` section in order to be
+used in the tests.
 
 Further content handlers can be added as extensions. Test authors
 may need these extensions for their own suites, or enterprising
@@ -63,12 +64,14 @@ If pytest is being used::
     driver.py_test_generator(test_dir, intercept=simple_wsgi.SimpleWsgi,
                              content_handlers=[MyContenHandler])
 
-Gabbi provides an additional custom handler named YAMLHandler. An example of
-how it can be used is found in the `YAMLHandler tests`_
+Gabbi provides an additional custom handler named YAMLDiskLoadingJSONHandler.
+This can be used for loading JSON and YAML files from disk when evaluating the
+``response_json_paths`` handle.
 
-.. warning:: When there are multiple handlers listed that accept the
-             same content-type, the one that is earliest in the list
-             will be used.
+.. warning:: YAMLDiskLoadingJSONHandler shares the same content-type as
+             the default JSONHandler. When there are multiple handlers
+             listed that accept the same content-type, the one that is
+             earliest in the list will be used.
 
 With ``gabbi-run``, custom handlers can be loaded via the
 ``--response-handler`` option -- see
@@ -86,7 +89,6 @@ Creating a content handler requires subclassing
 These methods are described below, but inspecting
 :class:`~gabbi.handlers.jsonhandler.JSONHandler` will be instructive in
 highlighting required arguments and techniques.
-
 
 To provide a ``response_<something>`` response-body evaluator a subclass
 must define:
@@ -136,9 +138,11 @@ If ``accepts`` is defined two additional static methods should be defined:
   to access the current test case and provides a load_data_file method
   which should be used because it verifies the data is loaded within the test
   diectory and returns the file source as a string. The ``load_data_file``
-  method was introduced to re-use the JSONHandler in order to support YAML
-  files through the implementation of an additional custom handler, see
-  :class:`~gabbi.handlers.yamlhandler.YAMLHandler` for details.
+  method was introduced to re-use the JSONHandler in order to support loading
+  YAML files from disk through the implementation of an additional custom
+  handler, see
+  :class:`~gabbi.handlers.yaml_disk_loading_jsonhandler.YAMLDiskLoadingJSONHandler`
+  for details.
 
 
 Finally if a ``replacer`` class method is defined, then when a
@@ -149,4 +153,4 @@ passed the ``response_data`` of the prior test and the argument within the
 Please see the `JSONHandler source`_ for additional detail.
 
 .. _JSONHandler source: https://github.com/cdent/gabbi/blob/master/gabbi/handlers/jsonhandler.py
-.. _YAMLHandler tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/test_yaml_handler.py
+.. _YAMLDiskLoadingJSONHandler tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/test_yaml_disk_loading_jsonhandler.py

@@ -105,6 +105,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     for handler in (content_handlers + response_handlers +
                     handlers.RESPONSE_HANDLERS):
         handler_objects.append(handler())
+
     top_suite = suite.TestSuite()
     for test_file in glob.iglob('%s/*.yaml' % path):
         if '_' in os.path.basename(test_file):

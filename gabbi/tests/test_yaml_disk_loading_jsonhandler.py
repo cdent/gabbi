@@ -23,7 +23,7 @@ from gabbi import driver
 # produces. Without it, the generator will not run. It is a todo because
 # needing to do this is annoying and gross.
 from gabbi.driver import test_pytest  # noqa
-from gabbi.handlers import yamlhandler
+from gabbi.handlers import yaml_disk_loading_jsonhandler
 from gabbi.tests import simple_wsgi
 
 
@@ -31,7 +31,7 @@ TESTS_DIR = 'gabbits_handlers'
 
 BUILD_TEST_ARGS = dict(
     intercept=simple_wsgi.SimpleWsgi,
-    content_handlers=[yamlhandler.YAMLHandler]
+    content_handlers=[yaml_disk_loading_jsonhandler.YAMLDiskLoadingJSONHandler]
 )
 
 

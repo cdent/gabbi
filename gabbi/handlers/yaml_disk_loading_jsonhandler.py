@@ -19,19 +19,21 @@ import six
 from gabbi.handlers import jsonhandler
 
 
-class YAMLHandler(jsonhandler.JSONHandler):
-    """A ContentHandler for JSON with YAML data disk loading
+class YAMLDiskLoadingJSONHandler(jsonhandler.JSONHandler):
+    """A ContentHandler for JSON responses that loads YAML from disk
 
     * Structured test ``data`` is turned into JSON when request
       content-type is JSON.
     * Response bodies that are JSON strings are made into Python
       data on the test ``response_data`` attribute when the response
-      content-type is JSON using the yaml.safe_load method.
+      content-type is JSON.
     * A ``response_json_paths`` response handler is added. Data read
       from disk during this handle will be loaded with the yaml.safe_load
-      method to support both JSON and YAML data sources.
+      method to support both JSON and YAML data sources from disk.
     * JSONPaths in $RESPONSE substitutions are supported.
     """
+
+    add_response_handling = False
 
     @staticmethod
     def load_data_file(test, file_path):
