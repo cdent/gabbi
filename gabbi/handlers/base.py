@@ -112,3 +112,8 @@ class ContentHandler(ResponseHandler):
     def loads(data):
         """Create structured (Python) data from a stream."""
         return data
+
+    @staticmethod
+    def load_data_file(test, file_path):
+        """Return the string content of the file specified by the file_path."""
+        return test.load_data_file(file_path)
