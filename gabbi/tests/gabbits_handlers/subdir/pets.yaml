@@ -1,0 +1,4 @@
+- type: cat
+  sound: meow
+- type: dog
+  sound: woof

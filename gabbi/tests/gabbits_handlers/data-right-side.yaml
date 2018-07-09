@@ -1,0 +1,29 @@
+# Test loading expected data from file on disk with JSONPath
+#
+defaults:
+  method: POST
+  url: /somewhere
+  request_headers:
+      content-type: application/json
+  verbose: True
+
+tests:
+    - name: yaml encoded value from disk
+      data: <@data.json
+      response_json_paths:
+          $.foo['bár']: <@subdir/data.yaml:$.foo['bár']
+
+    - name: json encoded value from disk
+      data: <@data.json
+      response_json_paths:
+          $.foo['bár']: <@data.json:$.foo['bár']
+
+    - name: yaml parital from disk
+      data: <@cat.json
+      response_json_paths:
+          $: <@subdir/pets.yaml:$[?type = "cat"]
+
+    - name: yaml partial both sides
+      data: <@pets.json
+      response_json_paths:
+          $[?type = "cat"].sound: <@subdir/values.yaml:$.values[0].pets[?type = "cat"].sound
