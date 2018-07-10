@@ -153,4 +153,3 @@ passed the ``response_data`` of the prior test and the argument within the
 Please see the `JSONHandler source`_ for additional detail.
 
 .. _JSONHandler source: https://github.com/cdent/gabbi/blob/master/gabbi/handlers/jsonhandler.py
-.. _YAMLDiskLoadingJSONHandler tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/test_yaml_disk_loading_jsonhandler.py

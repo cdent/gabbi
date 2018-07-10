@@ -33,8 +33,6 @@ class YAMLDiskLoadingJSONHandler(jsonhandler.JSONHandler):
     * JSONPaths in $RESPONSE substitutions are supported.
     """
 
-    add_response_handling = False
-
     @staticmethod
     def load_data_file(test, file_path):
         info = test.load_data_file(file_path)

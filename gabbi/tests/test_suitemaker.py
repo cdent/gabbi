@@ -14,6 +14,8 @@
 import unittest
 
 from gabbi import exception
+from gabbi import handlers
+from gabbi.handlers import yaml_disk_loading_jsonhandler as ydlj_handler
 from gabbi import suitemaker
 
 
@@ -118,3 +120,42 @@ class SuiteMakerTest(unittest.TestCase):
             "invalid key in test: 'response_html'",
             str(failure.exception)
         )
+
+    def test_response_handlers_same_test_key_yaml_last(self):
+        test_yaml = {'tests': [{
+            'name': '...',
+            'GET': '/',
+            'response_json_paths': {
+                'foo': 'hello',
+                'bar': 'world',
+            }
+        }]}
+        handler_objects = []
+        ydlj_handler_object = ydlj_handler.YAMLDiskLoadingJSONHandler()
+        for handler in handlers.RESPONSE_HANDLERS:
+            handler_objects.append(handler())
+        handler_objects.append(ydlj_handler_object)
+        file_suite = suitemaker.test_suite_from_dict(
+            self.loader, 'foo', test_yaml, '.', 'localhost', 80, None, None,
+            handlers=handler_objects)
+        response_handlers = file_suite._tests[0].response_handlers
+        self.assertNotIn(ydlj_handler_object, response_handlers)
+
+    def test_response_handlers_same_test_key_yaml_first(self):
+        test_yaml = {'tests': [{
+            'name': '...',
+            'GET': '/',
+            'response_json_paths': {
+                'foo': 'hello',
+                'bar': 'world',
+            }
+        }]}
+        ydlj_handler_object = ydlj_handler.YAMLDiskLoadingJSONHandler()
+        handler_objects = [ydlj_handler_object]
+        for handler in handlers.RESPONSE_HANDLERS:
+            handler_objects.append(handler())
+        file_suite = suitemaker.test_suite_from_dict(
+            self.loader, 'foo', test_yaml, '.', 'localhost', 80, None, None,
+            handlers=handler_objects)
+        response_handlers = file_suite._tests[0].response_handlers
+        self.assertIn(ydlj_handler_object, response_handlers)

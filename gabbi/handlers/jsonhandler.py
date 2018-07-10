@@ -32,7 +32,6 @@ class JSONHandler(base.ContentHandler):
     * JSONPaths in $RESPONSE substitutions are supported.
     """
 
-    add_reponse_handling = False
     test_key_suffix = 'json_paths'
     test_key_value = {}
 
