@@ -221,10 +221,9 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
     for handler in handlers:
         default_test_dict.update(handler.test_base)
         if handler.response_handler:
-            key = 'response_%s' % handler.test_key_suffix
-            if key not in seen_keys:
+            if handler.test_key_suffix not in seen_keys:
                 response_handlers.append(handler.response_handler)
-                seen_keys.add(key)
+                seen_keys.add(handler.test_key_suffix)
         if handler.content_handler:
             content_handlers.append(handler.content_handler)
 
