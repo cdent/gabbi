@@ -1,0 +1,12 @@
+values:
+- pets:
+  - type: cat
+    sound: meow
+  - type: dog
+    sound: woof
+- people:
+  - name: chris
+    id: 1
+  - name: justin
+    id: 2
+

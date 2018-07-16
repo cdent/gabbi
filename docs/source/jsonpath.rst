@@ -78,9 +78,21 @@ or::
 
 Examples like this can be found in one of gabbi's `own tests`_.
 
+If it is desired to load YAML files like the JSON ones above, two things must
+be done:
+
+#. The YAMLDiskLoadingJSONHandler custom content handler must be passed to the
+   driver through the content_handlers argument. See :ref:`Extensions` on how
+   to do this.
+#. The YAML files to load must be placed in a subdirectory to prevent the test
+   runner from consuming them as test files to run::
+
+    response_json_paths:
+        $: @<subdir/values.yaml
+
 When reading from disk you can apply the same JSONPath by adding a ':' to the
 end of your file name. This allows you to store multiple API responses into
-a JSON file to reduce file management when constructing your tests.
+a single file to reduce file management when constructing your tests.
 
 .. highlight:: json
 
@@ -118,6 +130,8 @@ Although placing more than one API response into a single JSON file may seem
 convenient, keep in mind there is a tradeoff in readability that should not
 be overlooked before implementing this technique.
 
+Examples like this can be found in one of gabbi's `yaml-from-disk tests`_.
+
 There are more JSONPath examples in :doc:`example` and in the
 `jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
 
@@ -149,3 +163,4 @@ to quote the result of the substitution.
 .. _jsonpath_rw: http://jsonpath-rw.readthedocs.io/en/latest/
 .. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.io/en/latest/
 .. _own tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_intercept/data.yaml
+.. _yaml-from-disk tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_handlers/yaml-from-disk.yaml

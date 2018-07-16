@@ -22,6 +22,13 @@ string into a data structure in ``response_data`` that is used when
 evaluating ``response_json_paths`` entries in a test or doing
 JSONPath-based ``$RESPONSE[]`` substitutions.
 
+A YAMLDiskLoadingJSONHandler has been added to extend the JSON handler.
+It works the same way as the JSON handler except for when evaluating the
+``response_json_paths`` handle, data that is read from disk can be either in
+JSON or YAML format. The YAMLDiskLoadingJSONHandler is not enabled by default
+and must be added as shown in the :ref:`Extensions` section in order to be
+used in the tests.
+
 Further content handlers can be added as extensions. Test authors
 may need these extensions for their own suites, or enterprising
 developers may wish to create and distribute extensions for others
@@ -30,6 +37,8 @@ to use.
 .. note:: One extension that is likely to be useful is a content handler
           that turns ``data`` into url-encoded form data suitable
           for POST and turns an HTML response into a DOM object.
+
+.. _Extensions:
 
 Extensions
 ----------
@@ -55,9 +64,14 @@ If pytest is being used::
     driver.py_test_generator(test_dir, intercept=simple_wsgi.SimpleWsgi,
                              content_handlers=[MyContenHandler])
 
-.. warning:: When there are multiple handlers listed that accept the
-             same content-type, the one that is earliest in the list
-             will be used.
+Gabbi provides an additional custom handler named YAMLDiskLoadingJSONHandler.
+This can be used for loading JSON and YAML files from disk when evaluating the
+``response_json_paths`` handle.
+
+.. warning:: YAMLDiskLoadingJSONHandler shares the same content-type as
+             the default JSONHandler. When there are multiple handlers
+             listed that accept the same content-type, the one that is
+             earliest in the list will be used.
 
 With ``gabbi-run``, custom handlers can be loaded via the
 ``--response-handler`` option -- see
@@ -118,6 +132,18 @@ If ``accepts`` is defined two additional static methods should be defined:
   attribute on the test, where it can be used in the evaluations
   described above (in the  ``action`` method) or in ``$RESPONSE`` handling.
   An example usage here would be to turn HTML into a DOM.
+* ``load_data_file``: Load data from disk into a Python data structure. Gabbi
+  will call this method when ``response_<something>`` contains an item where
+  the right hand side value starts with ``<@``. The ``test`` param allows you
+  to access the current test case and provides a load_data_file method
+  which should be used because it verifies the data is loaded within the test
+  diectory and returns the file source as a string. The ``load_data_file``
+  method was introduced to re-use the JSONHandler in order to support loading
+  YAML files from disk through the implementation of an additional custom
+  handler, see
+  :class:`~gabbi.handlers.yaml_disk_loading_jsonhandler.YAMLDiskLoadingJSONHandler`
+  for details.
+
 
 Finally if a ``replacer`` class method is defined, then when a
 ``$RESPONSE`` substitution is encountered, ``replacer`` will be

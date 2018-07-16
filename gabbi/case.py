@@ -191,7 +191,6 @@ class HTTPTestCase(testtools.TestCase):
     def _assert_response(self):
         """Compare the response with expected data."""
         self._test_status(self.test_data['status'], self.response['status'])
-
         for handler in self.response_handlers:
             handler(self)
 
