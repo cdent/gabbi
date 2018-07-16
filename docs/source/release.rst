@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.44.0
+------
+
+* Provide the
+  :class:`~gabbi.handlers.yaml_disk_loading_jsonhandler.YAMLDiskLoadingJSONHandler`
+  class that allows test result data for ``response_json_path``
+  checks to be loaded from YAML-on-disk.
+
 1.43.0
 ------
 
@@ -27,7 +35,7 @@ the `commit logs`_ on GitHub.
   solely strings.
 
 1.40.0
------
+------
 
 * When the HTTP response begins with a bad status line, have
   BadStatusLine be raised from urllib3.
@@ -282,6 +290,7 @@ gabbi.
 * Michael McCune
 * Imran Hayder
 * Julien Danjou
+* Trevor McCasland
 * Danek Duvall
 * Marc Abramowitz
 

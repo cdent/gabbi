@@ -65,6 +65,14 @@ gabbi Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`handlers.yaml_disk_loading_jsonhandler` Module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gabbi.handlers.yaml_disk_loading_jsonhandler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`suite` Module
 -------------------
 
