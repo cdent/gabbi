@@ -9,15 +9,14 @@ shopt -u nocasematch
 
 FAILS=12
 
-GREP_FAIL_MATCH="expected failures=$FAILS,"
+GREP_FAIL_MATCH="expected failures=$FAILS"
 GREP_SKIP_MATCH="skipped=$SKIP,"
-GREP_UXSUC_MATCH='unexpected successes=1'
 # This skip is always 2 because the pytest tests don't
 # run the live tests.
 PYTEST_MATCH="$SKIP skipped, $FAILS xfailed"
 
 stestr run && \
-    for match in "${GREP_FAIL_MATCH}" "${GREP_UXSUC_MATCH}" "${GREP_SKIP_MATCH}"; do
+    for match in "${GREP_FAIL_MATCH}" "${GREP_SKIP_MATCH}"; do
         stestr last --subunit | subunit2pyunit 2>&1 | \
             grep "${match}"
     done
