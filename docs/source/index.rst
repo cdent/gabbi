@@ -25,24 +25,24 @@ Gabbi
 .. highlight:: yaml
 
 Gabbi is a tool for running HTTP tests where requests and responses
-are expressed as declarations in a collection of YAML files. The
-simplest test looks like this::
+are expressed as declarations in YAML files::
 
     tests:
-    - name: A test
-      GET: /api/resources/id
+    - name: retrieve items
+      GET: /items
 
 See the rest of these docs for more details on the many features and
 formats for setting request headers and bodies and evaluating responses.
+
+Tests can be run from the command line with :doc:`gabbi-run <runner>` or
+programmatically using either py.test or
+:ref:`unittest <test_loaders>`-style test runners.
 
 The name is derived from "gabby": excessively talkative. In a test
 environment having visibility of what a test is actually doing is a
 good thing. This is especially true when the goal of a test is to
 test the HTTP, not the testing infrastructure. Gabbi tries to put
 the HTTP interaction in the foreground of testing.
-
-Tests can be run using :ref:`unittest <test_loaders>` style test
-runners or py.test or from the command line with a :doc:`gabbi-run <runner>` script.
 
 If you want to get straight to creating tests look at
 :doc:`example`, the test files in the `source distribution`_
