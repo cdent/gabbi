@@ -1,3 +1,5 @@
+.. _jsonpath:
+
 JSONPath
 ========
 

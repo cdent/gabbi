@@ -16,7 +16,7 @@ the `commit logs`_ on GitHub.
 1.43.0
 ------
 
-* Use :ref:`JSONPath` to select a portion of data-on-disk in
+* Use :ref:`jsonpath` to select a portion of data-on-disk in
   ``response_json_path`` checks.
 * Restrict PyYAML to ``<4.0``.
 

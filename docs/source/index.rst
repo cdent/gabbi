@@ -37,7 +37,7 @@ formats for setting request headers and bodies and evaluating responses.
 Tests can be run from the command line with :doc:`gabbi-run <runner>` or
 programmatically using either py.test or
 :ref:`unittest <test_loaders>`-style test runners. See
-`installation instructions`_ below.
+:ref:`installation instructions <installation>` below.
 
 The name is derived from "gabby": excessively talkative. In a test
 environment having visibility of what a test is actually doing is a
@@ -50,7 +50,6 @@ If you want to get straight to creating tests look at
 and :doc:`format`. A `gabbi-demo`_ repository provides a tutorial
 of using gabbi to build an API, via the commit history of the repo.
 
-.. _installation instructions: #installation
 .. _source distribution: https://github.com/cdent/gabbi
 .. _gabbi-demo: https://github.com/cdent/gabbi-demo
 
@@ -102,6 +101,8 @@ HTTP can be tested. A :doc:`runner` makes it possible to simply
 create YAML files and point them at a running server.
 
 .. _JSONPath: http://goessner.net/articles/JsonPath/
+
+.. _installation:
 
 Installation
 ------------
