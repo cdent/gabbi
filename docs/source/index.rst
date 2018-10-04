@@ -36,7 +36,8 @@ formats for setting request headers and bodies and evaluating responses.
 
 Tests can be run from the command line with :doc:`gabbi-run <runner>` or
 programmatically using either py.test or
-:ref:`unittest <test_loaders>`-style test runners.
+:ref:`unittest <test_loaders>`-style test runners. See
+:ref:`installation instructions <installation>` below.
 
 The name is derived from "gabby": excessively talkative. In a test
 environment having visibility of what a test is actually doing is a
@@ -100,3 +101,38 @@ HTTP can be tested. A :doc:`runner` makes it possible to simply
 create YAML files and point them at a running server.
 
 .. _JSONPath: http://goessner.net/articles/JsonPath/
+
+.. _installation:
+
+Installation
+------------
+
+As a Python package, gabbi is typically installed via pip::
+
+    pip install gabbi
+
+(both Python 2 and Python 3 are supported)
+
+You might want to create a virtual environment; an isolated context for
+Python packages, keeping gabbi cleany separated from the rest of your
+system.
+
+Python 3 comes with a built-in tool to create virtual environments::
+
+    python3 -m venv venv
+    . venv/bin/activate
+
+    pip install gabbi
+
+Alternatively, with Python 2 we can use `virtualenv`_::
+
+    pip install virtualenv
+    virtualenv venv
+    . venv/bin/activate
+
+    pip install gabbi
+
+This way we can later use ``deactivate`` and safely remove the ``venv``
+directory, thus erasing any trace of gabbi from the system.
+
+.. _virtualenv: https://virtualenv.pypa.io
