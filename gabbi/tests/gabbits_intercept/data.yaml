@@ -72,3 +72,21 @@ tests:
       response_json_paths:
           $.pets: <@pets.json
           $.pets[0]: <@cat.json
+
+    - name: post data for next
+      POST: /
+      request_headers:
+          content-type: application/json
+      data:
+          pets:
+              type: cat
+
+    - name: post data from prior response
+      POST: /
+      request_headers:
+          content-type: application/json
+      data:
+          pets:
+              type: $RESPONSE['$.pets.type']
+      response_json_paths:
+          $.pets.type: cat
