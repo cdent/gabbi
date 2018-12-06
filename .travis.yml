@@ -26,7 +26,8 @@ matrix:
         - env: TOXENV=pep8
         - env: TOXENV=py27-pytest
         - env: TOXENV=gnocchi
-        - env: TOXENV=placement
+        - python: 3.7
+          env: TOXENV=placement
         - python: 3.4
           env: TOXENV=py34
         - python: pypy
