@@ -28,6 +28,7 @@ matrix:
         - env: TOXENV=gnocchi
         - python: 3.7
           env: TOXENV=placement
+          dist: xenial
         - python: 3.4
           env: TOXENV=py34
         - python: pypy
