@@ -13,6 +13,7 @@
 """Test History Replacer.
 """
 
+import sys
 import unittest
 
 from gabbi import case
@@ -120,7 +121,10 @@ class HistoryTest(unittest.TestCase):
 
         cookie = self.test('test_request').replace_template(
             self.test.test_data, escape_regex=True)
-        self.assertEqual(r'/test\=cookie\?/', cookie)
+        if sys.version_info[:2] >= (3, 7):
+            self.assertEqual('/test=cookie\?/', cookie)
+        else:
+            self.assertEqual('/test\=cookie\?/', cookie)
 
     def test_cookie_replace_history(self):
         self.test.test_data = '$HISTORY["mytest"].$COOKIE'
