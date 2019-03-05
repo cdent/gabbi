@@ -104,14 +104,14 @@ def load_yaml(handle=None, yaml_file=None, safe=True):
 
     If no file or handle is provided, read from STDIN.
     """
-    load = yaml.safe_load if safe else yaml.load
+    loader = yaml.SafeLoader if safe else yaml.Loader
 
     if yaml_file:
         with io.open(yaml_file, encoding='utf-8') as source:
-            return load(source.read())
+            return yaml.load(source.read(), Loader=loader)
 
     # This will intentionally raise AttributeError if handle is None.
-    return load(handle.read())
+    return yaml.load(handle.read(), Loader=loader)
 
 
 def not_binary(content_type):
