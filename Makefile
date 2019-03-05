@@ -39,4 +39,5 @@ dist: test
 release: clean test cleanagain tagv pypi
 
 pypi:
-	python3 setup.py sdist bdist_wheel upload --sign
+	python3 setup.py sdist bdist_wheel
+	twine upload -s dist/*

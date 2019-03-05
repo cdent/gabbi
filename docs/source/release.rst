@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.45.0
+------
+
+* Adjust loading of YAML to be ready for new release of PyYAML.
+
 1.44.0
 ------
 
