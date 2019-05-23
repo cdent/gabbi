@@ -68,7 +68,8 @@ def run():
 
         gabbi-run http://example.com -- /path/to/x.yaml /path/to/y.yaml
 
-    Output is formatted as unittest summary information.
+    Output is formatted as unittest summary information. Use `-q` or
+    `--quiet` to silence that output.
     """
     parser = _make_argparser()
 
@@ -80,6 +81,7 @@ def run():
 
     handler_objects = initialize_handlers(args.response_handlers)
 
+    quiet = args.quiet
     verbosity = args.verbosity
     failfast = args.failfast
     failure = False
@@ -90,7 +92,7 @@ def run():
         success = run_suite(sys.stdin, handler_objects, host, port,
                             prefix, force_ssl, failfast,
                             verbosity=verbosity,
-                            safe_yaml=args.safe_yaml)
+                            safe_yaml=args.safe_yaml, quiet=quiet)
         failure = not success
     else:
         for input_file in input_files:
@@ -101,7 +103,8 @@ def run():
                                     prefix, force_ssl, failfast,
                                     data_dir=data_dir,
                                     verbosity=verbosity, name=name,
-                                    safe_yaml=args.safe_yaml)
+                                    safe_yaml=args.safe_yaml,
+                                    quiet=quiet)
             if not success:
                 failures.append(input_file)
             if not failure:  # once failed, this is considered immutable
@@ -117,7 +120,7 @@ def run():
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
               failfast=False, data_dir='.', verbosity=False, name='input',
-              safe_yaml=True):
+              safe_yaml=True, quiet=False):
     """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle, safe=safe_yaml)
     if force_ssl:
@@ -136,8 +139,14 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
         loader, name, data, data_dir, host, port, None, None, prefix=prefix,
         handlers=handler_objects, test_loader_name='gabbi-runner')
 
+    # The default runner stream is stderr.
+    stream = sys.stderr
+    if quiet:
+        # We want to swallow the output that the runner is
+        # producing.
+        stream = open(os.devnull, 'w')
     result = ConciseTestRunner(
-        verbosity=2, failfast=failfast).run(test_suite)
+        stream=stream, verbosity=2, failfast=failfast).run(test_suite)
     return result.wasSuccessful()
 
 
@@ -212,6 +221,11 @@ def _make_argparser():
         '-x', '--failfast',
         action='store_true',
         help='Exit on first failure'
+    )
+    parser.add_argument(
+        '-q', '--quiet',
+        action='store_true',
+        help='Produce no test runner output'
     )
     parser.add_argument(
         '-r', '--response-handler',

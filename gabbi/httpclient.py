@@ -16,6 +16,7 @@ from __future__ import print_function
 import os
 import sys
 
+import certifi
 import urllib3
 
 from gabbi.handlers import jsonhandler
@@ -172,9 +173,10 @@ class VerboseHttp(Http):
 def get_http(verbose=False, caption=''):
     """Return an ``Http`` class for making requests."""
     if not verbose:
-        return Http(strict=True)
+        return Http(strict=True, ca_certs=certifi.where())
 
     headers = False if verbose == 'body' else True
     body = False if verbose == 'headers' else True
     return VerboseHttp(headers=headers, body=body, stream=sys.stdout,
-                       caption=caption, colorize=True, strict=True)
+                       caption=caption, colorize=True, strict=True,
+                       ca_certs=certifi.where())

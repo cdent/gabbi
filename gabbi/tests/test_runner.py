@@ -352,6 +352,31 @@ class RunnerTest(unittest.TestCase):
         self.assertIn('{\n  "cat": "poppy"\n}', output)
         self.assertIn('application/json', output)
 
+    def test_quiet_is_quiet(self):
+        """Confirm -q shuts down output."""
+        sys.argv = [
+            'gabbi-run', '-q', 'http://%s:%s/foo' % (self.host, self.port)]
+
+        sys.stdin = StringIO("""
+        tests:
+        - name: expected success
+          GET: /baz
+          status: 200
+          response_headers:
+            x-gabbi-url: http://%s:%s/foo/baz
+        """ % (self.host, self.port))
+        with self.server():
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
+        sys.stdout.seek(0)
+        sys.stderr.seek(0)
+        stdoutput = sys.stdout.read()
+        stderror = sys.stderr.read()
+        self.assertEqual('', stdoutput)
+        self.assertEqual('', stderror)
+
     def assertSuccess(self, exitError):
         errors = exitError.args[0]
         if errors:
