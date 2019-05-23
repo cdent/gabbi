@@ -58,3 +58,5 @@ exit after the first test failure.
 
 Use ``-v`` or ``--verbose`` with a value of ``all``, ``headers`` or ``body``
 to turn on :ref:`verbosity <metadata>` for all tests being run.
+
+Use ``-q`` or ``--quiet`` to silence test runner output.
