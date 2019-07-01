@@ -1,5 +1,5 @@
 pbr
-pytest
+pytest<5.0.0
 six
 PyYAML
 urllib3>=1.11.0

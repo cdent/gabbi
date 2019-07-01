@@ -247,7 +247,7 @@ class HandlersTest(unittest.TestCase):
         handler = jsonhandler.JSONHandler()
         self.test.content_type = "application/json"
         self.test.test_data = {'response_json_paths': {
-            '$.objects[0].name': '/\d+/',
+            '$.objects[0].name': r'/\d+/',
         }}
         self.test.response_data = {
             'objects': [{'name': 99,
