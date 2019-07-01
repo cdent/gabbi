@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.48.0
+------
+
+* Support ``pytest 5.0.0`` in Python ``>=3.5``. For earlier versions of Python,
+  ``pytest<5.0.0`` will be used; the pytest project is dropping support for
+  older versions of Python.
+
 1.47.0
 ------
 
