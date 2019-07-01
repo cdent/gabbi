@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.47.0
+------
+
+* Use ``pytest<5.0.0`` until gabbi has solutions for the changes in ``5.0.0``.
+
 1.46.0
 ------
 
