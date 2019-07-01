@@ -122,9 +122,9 @@ class HistoryTest(unittest.TestCase):
         cookie = self.test('test_request').replace_template(
             self.test.test_data, escape_regex=True)
         if sys.version_info[:2] >= (3, 7):
-            self.assertEqual('/test=cookie\?/', cookie)
+            self.assertEqual(r'/test=cookie\?/', cookie)
         else:
-            self.assertEqual('/test\=cookie\?/', cookie)
+            self.assertEqual(r'/test\=cookie\?/', cookie)
 
     def test_cookie_replace_history(self):
         self.test.test_data = '$HISTORY["mytest"].$COOKIE'
