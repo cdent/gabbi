@@ -159,8 +159,12 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
     a way that pytest can handle.
     """
 
-    import pytest
-    pluginmanager = pytest.config.pluginmanager
+    if metafunc:
+        pluginmanager = metafunc.config.pluginmanager
+    else:
+        import pytest
+        pluginmanager = pytest.config.pluginmanager
+
     pluginmanager.import_plugin('gabbi.pytester')
 
     loader = unittest.TestLoader()
