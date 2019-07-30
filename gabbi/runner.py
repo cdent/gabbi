@@ -84,6 +84,8 @@ def run():
     quiet = args.quiet
     verbosity = args.verbosity
     failfast = args.failfast
+    cert_validate = args.cert_validate \
+        if args.cert_validate is not None else True
     failure = False
     # Keep track of file names that have failures.
     failures = []
@@ -92,7 +94,8 @@ def run():
         success = run_suite(sys.stdin, handler_objects, host, port,
                             prefix, force_ssl, failfast,
                             verbosity=verbosity,
-                            safe_yaml=args.safe_yaml, quiet=quiet, cert_validate=args.cert_validate)
+                            safe_yaml=args.safe_yaml, quiet=quiet,
+                            cert_validate=cert_validate)
         failure = not success
     else:
         for input_file in input_files:
@@ -104,7 +107,8 @@ def run():
                                     data_dir=data_dir,
                                     verbosity=verbosity, name=name,
                                     safe_yaml=args.safe_yaml,
-                                    quiet=quiet, cert_validate=args.cert_validate)
+                                    quiet=quiet,
+                                    cert_validate=cert_validate)
             if not success:
                 failures.append(input_file)
             if not failure:  # once failed, this is considered immutable
