@@ -136,7 +136,7 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
             data['defaults']['verbose'] = verbosity
         else:
             data['defaults'] = {'verbose': verbosity}
-    if cert_validate is not None:
+    if cert_validate is not None and not cert_validate:
         if 'defaults' in data:
             data['defaults']['cert_validate'] = cert_validate
         else:
