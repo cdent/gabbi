@@ -84,8 +84,7 @@ def run():
     quiet = args.quiet
     verbosity = args.verbosity
     failfast = args.failfast
-    cert_validate = args.cert_validate \
-        if args.cert_validate is not None else True
+    cert_validate = args.cert_validate
     failure = False
     # Keep track of file names that have failures.
     failures = []
@@ -137,7 +136,7 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
             data['defaults']['verbose'] = verbosity
         else:
             data['defaults'] = {'verbose': verbosity}
-    if any((cert_validate == opt for opt in [True, False])):
+    if not cert_validate:
         if 'defaults' in data:
             data['defaults']['cert_validate'] = cert_validate
         else:
