@@ -41,7 +41,7 @@ from gabbi import utils
 def build_tests(path, loader, host=None, port=8001, intercept=None,
                 test_loader_name=None, fixture_module=None,
                 response_handlers=None, content_handlers=None,
-                prefix='', require_ssl=False, url=None,
+                prefix='', require_ssl=False, cert_validate=True, url=None,
                 inner_fixtures=None, verbose=False,
                 use_prior_test=True, safe_yaml=True):
     """Read YAML files from a directory to create tests.
@@ -71,6 +71,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                            sequence of tests
     :param safe_yaml: If ``True``, recognizes only standard YAML tags and not
                       Python object
+    :param cert_validate: If ``False`` disables SSL certificate validation
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -132,6 +133,12 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
             else:
                 suite_dict['defaults'] = {'verbose': verbose}
 
+        if any((cert_validate == opt for opt in [True, False])):
+            if 'defaults' in suite_dict:
+                suite_dict['defaults']['cert_validate'] = cert_validate
+            else:
+                suite_dict['defaults'] = {'cert_validate': cert_validate}
+
         if not use_prior_test:
             if 'defaults' in suite_dict:
                 suite_dict['defaults']['use_prior_test'] = use_prior_test
@@ -152,7 +159,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                       fixture_module=None, response_handlers=None,
                       content_handlers=None, require_ssl=False, url=None,
                       metafunc=None, use_prior_test=True,
-                      inner_fixtures=None, safe_yaml=True):
+                      inner_fixtures=None, safe_yaml=True, cert_validate=True):
     """Generate tests cases for py.test
 
     This uses build_tests to create TestCases and then yields them in
@@ -177,7 +184,7 @@ def py_test_generator(test_dir, host=None, port=8001, intercept=None,
                         content_handlers=content_handlers,
                         prefix=prefix, require_ssl=require_ssl,
                         url=url, use_prior_test=use_prior_test,
-                        safe_yaml=safe_yaml)
+                        safe_yaml=safe_yaml, cert_validate=cert_validate)
 
     test_list = []
     for test in tests:

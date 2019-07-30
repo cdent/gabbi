@@ -22,7 +22,6 @@ import urllib3
 from gabbi.handlers import jsonhandler
 from gabbi import utils
 
-
 # Disable SSL warnings otherwise tests which process stderr will get
 # extra information.
 urllib3.disable_warnings()
@@ -170,13 +169,15 @@ class VerboseHttp(Http):
         print(message, file=stream)
 
 
-def get_http(verbose=False, caption=''):
+def get_http(verbose=False, caption='', cert_validate=True):
     """Return an ``Http`` class for making requests."""
+    cert_validation = {'cert_reqs': 'CERT_NONE'} if not cert_validate else {}
+
     if not verbose:
-        return Http(strict=True, ca_certs=certifi.where())
+        return Http(strict=True, ca_certs=certifi.where(), **cert_validation)
 
     headers = False if verbose == 'body' else True
     body = False if verbose == 'headers' else True
     return VerboseHttp(headers=headers, body=body, stream=sys.stdout,
                        caption=caption, colorize=True, strict=True,
-                       ca_certs=certifi.where())
+                       ca_certs=certifi.where(), **cert_validation)
