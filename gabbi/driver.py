@@ -71,7 +71,9 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
                            sequence of tests
     :param safe_yaml: If ``True``, recognizes only standard YAML tags and not
                       Python object
-    :param cert_validate: If ``False`` disables SSL certificate validation
+    :param cert_validate: If ``False`` ssl server certificate will be ignored,
+                        further it will not be validated if provided
+                        (set cert_reqs=CERT_NONE to the Http object)
     :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
@@ -133,11 +135,11 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
             else:
                 suite_dict['defaults'] = {'verbose': verbose}
 
-        if any((cert_validate == opt for opt in [True, False])):
+        if not cert_validate:
             if 'defaults' in suite_dict:
-                suite_dict['defaults']['cert_validate'] = cert_validate
+                suite_dict['defaults']['cert_validate'] = False
             else:
-                suite_dict['defaults'] = {'cert_validate': cert_validate}
+                suite_dict['defaults'] = {'cert_validate': False}
 
         if not use_prior_test:
             if 'defaults' in suite_dict:

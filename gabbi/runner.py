@@ -136,11 +136,11 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
             data['defaults']['verbose'] = verbosity
         else:
             data['defaults'] = {'verbose': verbosity}
-    if cert_validate is not None and not cert_validate:
+    if not cert_validate:
         if 'defaults' in data:
-            data['defaults']['cert_validate'] = cert_validate
+            data['defaults']['cert_validate'] = False
         else:
-            data['defaults'] = {'cert_validate': cert_validate}
+            data['defaults'] = {'cert_validate': False}
 
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
@@ -250,11 +250,11 @@ def _make_argparser():
         help='Turn on test verbosity for all tests run in this session.'
     )
     parser.add_argument(
-        '--no-cert-validate',
+        '--ignore-cert',
         dest='cert_validate',
         action='store_false',
         default=True,
-        help='Turn off ssl verification.'
+        help='Turn off ssl certificate validation.'
     )
     parser.add_argument(
         '--unsafe-yaml',
