@@ -66,6 +66,13 @@ Metadata
        selected. Set this to ``False`` to allow selecting a test without
        dependencies.
      - defaults to ``True``
+   * - ``cert_validate``
+     - States whether the underlying HTTP client should attempt to validate SSL
+       certificates. In many test environment certificates will be self-signed
+       so changing this may be requried. It can also be changed when
+       :doc:`loader` or using :doc:`gabbi-run <runner>`.
+     - defaults to ``True``
+
 
 .. note:: When tests are generated dynamically, the ``TestCase`` name will
           include the respective test's ``name``, lowercased with spaces

@@ -52,6 +52,9 @@ wrapped in ``[`` and ``]``.
 
 If ``https`` is used in the target, then the tests in the provided
 YAML will default to ``ssl: True``.
+j
+Use ``-k`` or ``--insecure`` to **not** validate certificates when making
+``https`` connections.
 
 If a ``-x`` or ``--failfast`` argument is provided then ``gabbi-run`` will
 exit after the first test failure.
