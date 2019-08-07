@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+1.49.0
+------
+
+* Add support for not validating certificates in ``https`` requests. Controlled
+  by the ``cert_validate`` attribute in individual tests and
+  :meth:`~gabbi.driver.build_tests` and the ``-k`` or ``--insecure`` argument to
+  :doc:`gabbi-run <runner>`.
+
 1.48.0
 ------
 
