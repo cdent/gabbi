@@ -80,7 +80,8 @@ class TestMaker(object):
         self._validate_keys(test, test_name)
 
         http_class = httpclient.get_http(verbose=test['verbose'],
-                                         caption=test['name'])
+                                         caption=test['name'],
+                                         cert_validate=test['cert_validate'])
         if prior_test:
             history = prior_test.history
         else:

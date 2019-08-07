@@ -58,6 +58,7 @@ BASE_TEST = {
     'name': '',
     'desc': '',
     'verbose': False,
+    'cert_validate': True,
     'ssl': False,
     'redirects': False,
     'method': 'GET',

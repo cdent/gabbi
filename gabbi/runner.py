@@ -84,6 +84,7 @@ def run():
     quiet = args.quiet
     verbosity = args.verbosity
     failfast = args.failfast
+    cert_validate = args.cert_validate
     failure = False
     # Keep track of file names that have failures.
     failures = []
@@ -92,7 +93,8 @@ def run():
         success = run_suite(sys.stdin, handler_objects, host, port,
                             prefix, force_ssl, failfast,
                             verbosity=verbosity,
-                            safe_yaml=args.safe_yaml, quiet=quiet)
+                            safe_yaml=args.safe_yaml, quiet=quiet,
+                            cert_validate=cert_validate)
         failure = not success
     else:
         for input_file in input_files:
@@ -104,7 +106,8 @@ def run():
                                     data_dir=data_dir,
                                     verbosity=verbosity, name=name,
                                     safe_yaml=args.safe_yaml,
-                                    quiet=quiet)
+                                    quiet=quiet,
+                                    cert_validate=cert_validate)
             if not success:
                 failures.append(input_file)
             if not failure:  # once failed, this is considered immutable
@@ -120,7 +123,7 @@ def run():
 
 def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
               failfast=False, data_dir='.', verbosity=False, name='input',
-              safe_yaml=True, quiet=False):
+              safe_yaml=True, quiet=False, cert_validate=True):
     """Run the tests from the YAML in handle."""
     data = utils.load_yaml(handle, safe=safe_yaml)
     if force_ssl:
@@ -133,6 +136,11 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
             data['defaults']['verbose'] = verbosity
         else:
             data['defaults'] = {'verbose': verbosity}
+    if not cert_validate:
+        if 'defaults' in data:
+            data['defaults']['cert_validate'] = False
+        else:
+            data['defaults'] = {'cert_validate': False}
 
     loader = unittest.defaultTestLoader
     test_suite = suitemaker.test_suite_from_dict(
@@ -240,6 +248,13 @@ def _make_argparser():
         dest='verbosity',
         choices=['all', 'body', 'headers'],
         help='Turn on test verbosity for all tests run in this session.'
+    )
+    parser.add_argument(
+        '--ignore-cert',
+        dest='cert_validate',
+        action='store_false',
+        default=True,
+        help='Turn off ssl certificate validation.'
     )
     parser.add_argument(
         '--unsafe-yaml',
