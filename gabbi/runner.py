@@ -250,7 +250,7 @@ def _make_argparser():
         help='Turn on test verbosity for all tests run in this session.'
     )
     parser.add_argument(
-        '--ignore-cert',
+        '-k', '--insecure',
         dest='cert_validate',
         action='store_false',
         default=True,
