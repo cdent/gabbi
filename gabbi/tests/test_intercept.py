@@ -43,6 +43,19 @@ class FixtureTwo(fixture.GabbiFixture):
     pass
 
 
+class EnvironFixture(fixture.GabbiFixture):
+    """Set some stuff in the environment."""
+    # In the shell environment, environment variables are
+    # always strings, so make that explicit here.
+    os.environ['INT'] = "1"
+    os.environ['FLOAT'] = "1.5"
+    # For making sure something that looks like a number stays
+    # a string?
+    os.environ['STR'] = "2"
+    os.environ['TBOOL'] = "True"
+    os.environ['FBOOL'] = "False"
+
+
 class StubResponseHandler(base.ResponseHandler):
     """A sample response handler just to test."""
 

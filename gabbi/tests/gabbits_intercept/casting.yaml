@@ -1,0 +1,37 @@
+# Various tests to get casting in replacers working as
+# expected.
+
+
+fixtures:
+    - EnvironFixture
+
+defaults:
+    verbose: True
+    request_headers:
+        content-type: application/json
+        accept: application/json
+
+tests:
+    - name: default casts
+      desc: anything that looks like a number or bool becomes one
+      POST: /
+      data:
+          int: $ENVIRON['INT']
+          float: $ENVIRON['FLOAT']
+          string: $ENVIRON['STR']
+          tbool: $ENVIRON['TBOOL']
+          fbool: $ENVIRON['FBOOL']
+      response_json_paths:
+          int: 1
+          float: 1.5
+          string: 2
+          tbool: true
+          fbool: false
+
+    - name: cast to string
+      POST: /
+      data:
+          string: $ENVIRON:str['STR']
+      response_json_paths:
+          string: "2"
+
