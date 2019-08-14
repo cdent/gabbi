@@ -7,7 +7,7 @@ shopt -s nocasematch
 [[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=7 || SKIP=2
 shopt -u nocasematch
 
-FAILS=13
+FAILS=15
 
 GREP_FAIL_MATCH="expected failures=$FAILS"
 GREP_SKIP_MATCH="skipped=$SKIP,"
