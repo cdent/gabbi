@@ -432,9 +432,8 @@ class HTTPTestCase(unittest.TestCase):
         case = HTTPTestCase._history_regex
         return (
             r"%s\$%s(:(?P<cast>\w+))?"
-            r"\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % (
-            case, key))
-
+            r"\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]"
+            % (case, key))
 
     @staticmethod
     def _simple_replacer_regex(key):
