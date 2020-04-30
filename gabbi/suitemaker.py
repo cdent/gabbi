@@ -19,6 +19,7 @@ The key piece of code is :meth:`test_suite_from_dict`. It produces a
 
 import copy
 import functools
+import unittest
 
 from gabbi import case
 from gabbi.exception import GabbiFormatError
@@ -90,7 +91,7 @@ class TestMaker(object):
         test_method_name = 'test_request'
         test_method = getattr(case.HTTPTestCase, test_method_name)
 
-        @case.testcase.skipIf(self.host == '', 'No host configured')
+        @unittest.skipIf(self.host == '', 'No host configured')
         @functools.wraps(test_method)
         def do_test(*args, **kwargs):
             return test_method(*args, **kwargs)

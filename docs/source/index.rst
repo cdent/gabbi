@@ -111,8 +111,6 @@ As a Python package, gabbi is typically installed via pip::
 
     pip install gabbi
 
-(both Python 2 and Python 3 are supported)
-
 You might want to create a virtual environment; an isolated context for
 Python packages, keeping gabbi cleany separated from the rest of your
 system.
@@ -120,14 +118,6 @@ system.
 Python 3 comes with a built-in tool to create virtual environments::
 
     python3 -m venv venv
-    . venv/bin/activate
-
-    pip install gabbi
-
-Alternatively, with Python 2 we can use `virtualenv`_::
-
-    pip install virtualenv
-    virtualenv venv
     . venv/bin/activate
 
     pip install gabbi

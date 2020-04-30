@@ -18,8 +18,6 @@ An "outer" fixture runs once per test suite. An "inner" is per test request.
 import os
 import sys
 
-import fixtures
-
 from gabbi import driver
 # TODO(cdent): test_pytest allows pytest to see the tests this module
 # produces. Without it, the generator will not run. It is a todo because
@@ -45,16 +43,14 @@ class OuterFixture(fixture.GabbiFixture):
         assert COUNT_OUTER == 1
 
 
-class InnerFixture(fixtures.Fixture):
+class InnerFixture(object):
     """Test that setUp is called 3 times."""
 
     def setUp(self):
-        super(InnerFixture, self).setUp()
         global COUNT_INNER
         COUNT_INNER += 1
 
-    def cleanUp(self, raise_first=True):
-        super(InnerFixture, self).cleanUp()
+    def cleanUp(self):
         assert 1 <= COUNT_INNER <= 3
 
 
