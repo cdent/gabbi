@@ -5,6 +5,17 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.0.0
+-----
+
+* Drop support for Python 2. If you need Python 2 support, use an older version.
+* Stop using ``testtools`` and ``fixtures``. These two modules present several
+  difficulties and their maintenance situation suggests those difficulties
+  will not be resolved. Since Python 2 support is being removed, the need for
+  the modules can be removed as well without losing functionality. "Inner
+  fixtures" that use the ``fixtures.Fixture`` interface should continue to
+  work.
+
 1.49.0
 ------
 

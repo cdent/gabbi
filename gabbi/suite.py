@@ -71,7 +71,7 @@ class GabbiSuite(unittest.TestSuite):
         # the entire suite is skipped, and the result stream told
         # we're done. If there are no tests (an empty suite) the
         # exception is re-raised.
-        except Exception as exc:
+        except Exception:
             if self._tests:
                 result.addError(self._tests[0], sys.exc_info())
                 for test in self._tests:

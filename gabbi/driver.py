@@ -65,6 +65,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param require_ssl: If ``True``, make all tests default to using SSL.
     :param inner_fixtures: A list of ``Fixtures`` to use with each
                            individual test request.
+    :type inner_fixtures: List of classes with setUp and cleanUp methods to
+                          be used as fixtures.
     :param verbose: If ``True`` or ``'all'``, make tests verbose by default
                     ``'headers'`` and ``'body'`` are also accepted.
     :param use_prior_test: If ``True``, uses prior test to create ordered
@@ -74,7 +76,6 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param cert_validate: If ``False`` ssl server certificate will be ignored,
                         further it will not be validated if provided
                         (set cert_reqs=CERT_NONE to the Http object)
-    :type inner_fixtures: List of fixtures.Fixture classes.
     :rtype: TestSuite containing multiple TestSuites (one for each YAML file).
     """
 

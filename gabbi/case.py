@@ -10,7 +10,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-"""A single HTTP request represented as a subclass of ``testtools.TestCase``
+"""A single HTTP request represented as a subclass of ``unittest.TestCase``
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
@@ -24,13 +24,12 @@ import os
 import re
 import sys
 import time
+import unittest
 from unittest import result as unitresult
 
 import six
 from six.moves import http_cookies
 from six.moves.urllib import parse as urlparse
-import testtools
-from testtools import testcase
 import wsgi_intercept
 
 from gabbi import __version__
@@ -82,15 +81,9 @@ def potentialFailure(func):
             try:
                 func(self)
             except Exception:
-                if hasattr(testcase, '_ExpectedFailure'):
-                    raise testcase._ExpectedFailure(sys.exc_info())
-                else:
-                    self._addExpectedFailure(self.result, sys.exc_info())
+                self._addExpectedFailure(self.result, sys.exc_info())
             else:
-                if hasattr(self, '_addUnexpectedSuccess'):
-                    self._addUnexpectedSuccess(self.result)
-                else:
-                    raise testcase._UnexpectedSuccess
+                self._addUnexpectedSuccess(self.result)
         else:
             func(self)
     return wrapper
@@ -101,7 +94,7 @@ def _is_complex_type(data):
     return isinstance(data, list) or isinstance(data, dict)
 
 
-class HTTPTestCase(testtools.TestCase):
+class HTTPTestCase(unittest.TestCase):
     """Encapsulate a single HTTP request as a TestCase.
 
     If the test is a member of a sequence of requests, ensure that prior
@@ -114,15 +107,23 @@ class HTTPTestCase(testtools.TestCase):
     base_test = copy.copy(BASE_TEST)
 
     def setUp(self):
+        self._fixture_cleanups = []
         if not self.has_run:
             super(HTTPTestCase, self).setUp()
             for fixture in self.inner_fixtures:
-                self.useFixture(fixture())
+                f = fixture()
+                f.setUp()
+                # add fixture to front of list so we unwind them FILO in
+                # tearDown
+                self._fixture_cleanups.insert(0, f)
 
     def tearDown(self):
         if not self.has_run:
             super(HTTPTestCase, self).tearDown()
         self.has_run = True
+        # Clean up an inner fixtures.
+        for fixture in self._fixture_cleanups:
+            fixture.cleanUp()
 
     def run(self, result=None):
         """Store the current result handler on this test."""

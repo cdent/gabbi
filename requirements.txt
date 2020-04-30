@@ -7,4 +7,3 @@ certifi
 jsonpath-rw-ext>=1.0.0
 wsgi-intercept>=1.8.1
 colorama
-testtools
