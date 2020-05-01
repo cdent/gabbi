@@ -221,7 +221,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
     default_test_dict = copy.deepcopy(case.HTTPTestCase.base_test)
     seen_keys = set()
     for handler in handlers:
-        default_test_dict.update(handler.test_base)
+        default_test_dict.update(copy.deepcopy(handler.test_base))
         if handler.response_handler:
             if handler.test_key_suffix not in seen_keys:
                 response_handlers.append(handler.response_handler)
