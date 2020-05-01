@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.0.1
+-----
+
+* Correct management of response handler default fields.
+
 2.0.0
 -----
 
