@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.0.2
+-----
+
+* Properly declare that gabbi 2.x is Python 3 only.
+
 2.0.1
 -----
 
