@@ -1,0 +1,7 @@
+# Testing for https://github.com/cdent/gabbi/issues/282
+
+
+tests:
+    - name: confirm notempty
+      verbose: true
+      GET: /notempty

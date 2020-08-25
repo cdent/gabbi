@@ -128,6 +128,15 @@ class SimpleWsgi(object):
 
             query_output = json.dumps(query_data)
             return [query_output.encode('utf-8')]
+        elif path_info == '/notempty':
+            # This block is used to experiment with verbosity handling.
+            # See: https://github.com/cdent/gabbi/issues/282
+            content_type = query_data.get('content-type', [None])[0]
+            headers = []
+            if content_type:
+                headers.append(('Content-type', content_type))
+            start_response('200 OK', headers)
+            return ['notempty'.encode('utf-8')]
 
         start_response('200 OK', headers)
 

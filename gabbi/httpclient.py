@@ -17,6 +17,7 @@ import os
 import sys
 
 import certifi
+import six
 import urllib3
 
 from gabbi.handlers import jsonhandler
@@ -138,9 +139,13 @@ class VerboseHttp(Http):
 
     def _print_body(self, headers, content):
         """Output body if not binary."""
-        content_type = utils.extract_content_type(headers)[0]
+        # Use text/plain as the default so that when there is not content-type
+        # we can still see the output.
+        content_type = utils.extract_content_type(headers, 'text/plain')[0]
         if self._show_body and utils.not_binary(content_type):
             content = utils.decode_response_content(headers, content)
+            if isinstance(content, six.binary_type):
+                content = content.decode('utf-8')
             # TODO(cdent): Using the JSONHandler here instead of
             # just the json module to make it clear that eventually
             # we could pretty print any printable output by using a
@@ -148,10 +153,15 @@ class VerboseHttp(Http):
             # because it would be pointless (no other interesting
             # handlers) and this approach may be entirely wrong.
             if content and jsonhandler.JSONHandler.accepts(content_type):
-                data = jsonhandler.JSONHandler.loads(content)
-                content = jsonhandler.JSONHandler.dumps(data, pretty=True)
+                try:
+                    data = jsonhandler.JSONHandler.loads(content)
+                    content = jsonhandler.JSONHandler.dumps(data, pretty=True)
+                except ValueError:
+                    # It it didn't decode for some reason treat it as a string.
+                    pass
             self._verbose_output('')
-            self._verbose_output(content)
+            if content:
+                self._verbose_output(content)
 
     def _print_header(self, name, value, prefix='', stream=None):
         """Output one single header."""
