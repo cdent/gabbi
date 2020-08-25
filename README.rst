@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/cdent/gabbi.svg?branch=master
+.. image:: https://travis-ci.org/cdent/gabbi.svg?branch=main
     :target: https://travis-ci.org/cdent/gabbi
 .. image:: https://readthedocs.org/projects/gabbi/badge/?version=latest
     :target: https://gabbi.readthedocs.io/en/latest/

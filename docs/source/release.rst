@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.0.4
+-----
+
+* If no content-type is provided with a response and verbose is on for
+  responses, display the response body as if it were text.
+
 2.0.3
 -----
 

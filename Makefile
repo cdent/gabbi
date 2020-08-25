@@ -15,7 +15,7 @@ tagv:
 	git tag -s \
 		-m `python -c 'import gabbi; print gabbi.__version__'` \
 		`python -c 'import gabbi; print gabbi.__version__'`
-	git push origin master --tags
+	git push origin main --tags
 
 cleanagain:
 	find . -name "*.pyc" |xargs rm || true
