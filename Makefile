@@ -1,6 +1,8 @@
 # simple Makefile for some common tasks
 .PHONY: clean test dist release pypi tagv docs
 
+gabbi-version := $(shell python -c 'import gabbi; print gabbi.__version__')
+
 clean:
 	find . -name "*.pyc" |xargs rm || true
 	rm -r dist || true
@@ -12,9 +14,7 @@ clean:
 	rm -r gabbi.egg-info || true
 
 tagv:
-	git tag -s \
-		-m `python -c 'import gabbi; print gabbi.__version__'` \
-		`python -c 'import gabbi; print gabbi.__version__'`
+	git tag -s -m ${gabbi-version} ${gabbi-version}
 	git push origin main --tags
 
 cleanagain:
@@ -41,3 +41,6 @@ release: clean test cleanagain tagv pypi
 pypi:
 	python3 setup.py sdist bdist_wheel
 	twine upload -s dist/*
+
+docker:
+	docker build --build-arg GABBI_VERSION=${gabbi-version} -t gabbi:${gabbi-version} .
