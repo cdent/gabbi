@@ -1,0 +1,42 @@
+name: tests
+on: push
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                include:
+                - python: 3.x
+                  toxenv: pep8
+                - python: 3.7
+                  toxenv: placement
+                - python: 3.5
+                  toxenv: py35
+                - python: 3.6
+                  toxenv: py36
+                - python: 3.7
+                  toxenv: py37
+                - python: 3.8
+                  toxenv: py38
+                - python: 3.5
+                  toxenv: py35-pytest
+                - python: 3.6
+                  toxenv: py36-pytest
+                - python: 3.7
+                  toxenv: py37-pytest
+                - python: 3.7
+                  toxenv: py37-failskip
+                - python: 3.7
+                  toxenv: py37-limit
+                - python: 3.7
+                  toxenv: py37-prefix
+        name: ${{ matrix.toxenv }} on Python ${{ matrix.python }}
+        steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-python@v2
+          with:
+              python-version: ${{ matrix.python }}
+        - run: pip install tox
+        - run: tox
+          env:
+              TOXENV: ${{ matrix.toxenv }}

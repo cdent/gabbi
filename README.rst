@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/cdent/gabbi.svg?branch=main
-    :target: https://travis-ci.org/cdent/gabbi
+.. image:: https://github.com/cdent/gabbi/workflows/tests/badge.svg
+    :target: https://github.com/cdent/gabbi/actions
 .. image:: https://readthedocs.org/projects/gabbi/badge/?version=latest
     :target: https://gabbi.readthedocs.io/en/latest/
     :alt: Documentation Status
