@@ -24,4 +24,4 @@ class CustomResponseHandler(base.ResponseHandler):
     test_key_value = []
 
     def action(self, test, item, value=None):
-        test.assertTrue(item in test.output)
+        test.assertIn(item, test.output)
