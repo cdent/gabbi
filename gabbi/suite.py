@@ -82,8 +82,9 @@ class GabbiSuite(unittest.TestSuite):
 
         return result
 
-    def start(self, result, tests):
+    def start(self, result, tests=None):
         """Start fixtures when using pytest."""
+        tests = tests or []
         fixtures, intercept, host, port, prefix = self._get_intercept()
 
         self.used_fixtures = []
