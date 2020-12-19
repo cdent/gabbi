@@ -10,8 +10,6 @@ jobs:
                   toxenv: pep8
                 - python: 3.7
                   toxenv: placement
-                - python: 3.5
-                  toxenv: py35
                 - python: 3.6
                   toxenv: py36
                 - python: 3.7
@@ -20,18 +18,22 @@ jobs:
                   toxenv: py38
                 - python: 3.9
                   toxenv: py39
-                - python: 3.5
-                  toxenv: py35-pytest
+                - python: pypy3
+                  toxenv: pypy3
                 - python: 3.6
                   toxenv: py36-pytest
                 - python: 3.7
                   toxenv: py37-pytest
-                - python: 3.7
-                  toxenv: py37-failskip
-                - python: 3.7
-                  toxenv: py37-limit
-                - python: 3.7
-                  toxenv: py37-prefix
+                - python: 3.8
+                  toxenv: py38-pytest
+                - python: 3.9
+                  toxenv: py39-pytest
+                - python: 3.8
+                  toxenv: py38-failskip
+                - python: 3.8
+                  toxenv: py38-limit
+                - python: 3.8
+                  toxenv: py38-prefix
         name: ${{ matrix.toxenv }} on Python ${{ matrix.python }}
         steps:
         - uses: actions/checkout@v2
