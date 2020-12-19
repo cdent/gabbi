@@ -18,6 +18,8 @@ jobs:
                   toxenv: py37
                 - python: 3.8
                   toxenv: py38
+                - python: 3.9
+                  toxenv: py39
                 - python: 3.5
                   toxenv: py35-pytest
                 - python: 3.6
