@@ -5,6 +5,14 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.1.0
+-----
+
+* Remove support for Python 3.5. Ensure testing support for 3.8,
+  3.9, and pypy3.
+* Adapt to new behavior in ``urllib.parse``.
+* Correct fixture start when using pytest.
+
 2.0.4
 -----
 
