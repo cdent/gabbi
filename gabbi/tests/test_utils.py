@@ -202,14 +202,14 @@ class UtilsHostInfoFromTarget(unittest.TestCase):
 
     def _test_hostport(self, url_or_host, expected_host,
                        provided_prefix=None, expected_port=None,
-                       expected_prefix=None, expected_ssl=False):
+                       expected_prefix='', expected_ssl=False):
         host, port, prefix, ssl = utils.host_info_from_target(
             url_or_host, provided_prefix)
 
         # normalize hosts, they are case insensitive
         self.assertEqual(expected_host.lower(), host.lower())
         # port can be a string or int depending on the inputs
-        self.assertEqual(expected_port, port)
+        self.assertEqual(str(expected_port), str(port))
         self.assertEqual(expected_prefix, prefix)
         self.assertEqual(expected_ssl, ssl)
 
