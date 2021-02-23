@@ -287,6 +287,7 @@ Any Previous Test
 
 All of these variables may be used in all of the following fields:
 
+* ``skip``
 * ``url``
 * ``query_parameters``
 * ``data``
