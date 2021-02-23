@@ -125,6 +125,9 @@ class HTTPTestCase(unittest.TestCase):
         for fixture in self._fixture_cleanups:
             fixture.cleanUp()
 
+    def shortDescription(self):
+        return self.test_base_name + ': ' + self.test_data['name']
+
     def run(self, result=None):
         """Store the current result handler on this test."""
         self.result = result
@@ -139,8 +142,9 @@ class HTTPTestCase(unittest.TestCase):
         if self.has_run:
             return
 
-        if self.test_data['skip']:
-            self.skipTest(self.test_data['skip'])
+        skip = self.replace_template(self.test_data['skip'])
+        if skip:
+            self.skipTest(skip)
 
         if (self.prior and not self.prior.has_run and
                 self.test_data['use_prior_test']):

@@ -112,6 +112,7 @@ class TestMaker(object):
                              'prefix': self.prefix,
                              'prior': prior_test,
                              'history': history,
+                             'test_base_name': self.test_base_name,
                              test_method_name: do_test,
                              })
         # We've been asked to, make this test class think it comes
