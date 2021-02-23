@@ -5,6 +5,13 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.2.0
+-----
+
+* Allow substitutions in `skip` for more flexible skipping, notablly with
+  ``$ENVIRON``.
+* Better test name output when running with unittest and verbose.
+
 2.1.0
 -----
 
