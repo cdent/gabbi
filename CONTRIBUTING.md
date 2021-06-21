@@ -2,7 +2,7 @@
 Gabbi gets better because of the contributions from the people who use
 it. These contributions come in many forms:
 
-* Joining the #gabbi channel on Freenode IRC at freenode.net and
+* Joining the #gabbi channel on OFTC IRC at irc.oftc.net and
   having a chat.
 * Improvements to make the documentation more complete, more correct
   and typo free.
