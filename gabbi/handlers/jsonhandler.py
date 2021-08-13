@@ -13,11 +13,15 @@
 """JSON-related content handling."""
 
 import json
+import re
 
 import six
 
 from gabbi.handlers import base
 from gabbi import json_parser
+
+
+CONTENT_TYPE = re.compile('^application/json[^a-zA-Z0-9]*$')
 
 
 class JSONHandler(base.ContentHandler):
@@ -39,7 +43,7 @@ class JSONHandler(base.ContentHandler):
     def accepts(content_type):
         content_type = content_type.split(';', 1)[0].strip()
         return (content_type.endswith('+json') or
-                content_type.startswith('application/json'))
+                CONTENT_TYPE.match(content_type))
 
     @classmethod
     def replacer(cls, response_data, match):
