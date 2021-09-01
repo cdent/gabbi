@@ -109,7 +109,11 @@ class ContentHandler(ResponseHandler):
 
     @staticmethod
     def loads(data):
-        """Create structured (Python) data from a stream."""
+        """Create structured (Python) data from a stream.
+
+        If there is a failure decoding then the handler should
+        repackage the error as a gabbi.exception.GabbiDataLoadError.
+        """
         return data
 
     @staticmethod

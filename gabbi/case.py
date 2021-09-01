@@ -70,6 +70,7 @@ BASE_TEST = {
     'skip': '',
     'poll': {},
     'use_prior_test': True,
+    'disable_response_handler': False
 }
 
 
@@ -482,9 +483,15 @@ class HTTPTestCase(unittest.TestCase):
         decoded_output = utils.decode_response_content(response, content)
         self.content_type = response.get('content-type', '').lower()
         loader_class = self.get_content_handler(self.content_type)
-        if decoded_output and loader_class:
+        if (decoded_output and loader_class
+                and not self.test_data['disable_response_handler']):
             # save structured response data
-            self.response_data = loader_class.loads(decoded_output)
+            try:
+                self.response_data = loader_class.loads(decoded_output)
+            except exception.GabbiDataLoadError as exc:
+                raise AssertionError(
+                    'unable to load data as %s' % self.content_type) from exc
+
         else:
             self.response_data = None
         self.output = decoded_output
