@@ -13,6 +13,11 @@
 """Gabbi specific exceptions."""
 
 
+class GabbiDataLoadError(ValueError):
+    """An exception to alert when data streams cannot be loaded."""
+    pass
+
+
 class GabbiFormatError(ValueError):
     """An exception to encapsulate poorly formed test data."""
     pass

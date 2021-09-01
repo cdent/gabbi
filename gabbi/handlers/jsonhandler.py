@@ -16,6 +16,7 @@ import json
 
 import six
 
+from gabbi.exception import GabbiDataLoadError
 from gabbi.handlers import base
 from gabbi import json_parser
 
@@ -54,7 +55,10 @@ class JSONHandler(base.ContentHandler):
 
     @staticmethod
     def loads(data):
-        return json.loads(data)
+        try:
+            return json.loads(data)
+        except ValueError as exc:
+            raise GabbiDataLoadError('unable to parse data') from exc
 
     @staticmethod
     def load_data_file(test, file_path):

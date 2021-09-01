@@ -1,0 +1,22 @@
+# Test that disabling the response handler despite an accept match
+# works as required.
+
+tests:
+
+- name: get some not json fail
+  desc: This will cause an error, presented as a test failure
+  xfail: True
+  GET: /notjson
+  response_headers:
+    content-type: application/json
+  response_strings:
+    - not valid json
+
+- name: get some not json gloss
+  desc: this will not error because we do not parse
+  GET: /notjson
+  response_headers:
+    content-type: application/json
+  disable_response_handler: True
+  response_strings:
+    - not valid json

@@ -92,6 +92,10 @@ class SimpleWsgi(object):
                         </body>
                     </html>
                     """]
+        # Provide response that claims to be json but is not.
+        elif path_info.startswith('/notjson'):
+            start_response('200 OK', [('Content-Type', 'application/json')])
+            return [b'not valid json']
         elif path_info.startswith('/poller'):
             if CURRENT_POLL == 0:
                 CURRENT_POLL = int(query_data.get('count', [5])[0])
