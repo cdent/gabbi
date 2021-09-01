@@ -28,12 +28,12 @@ jobs:
                   toxenv: py38-pytest
                 - python: 3.9
                   toxenv: py39-pytest
-                - python: 3.8
-                  toxenv: py38-failskip
-                - python: 3.8
-                  toxenv: py38-limit
-                - python: 3.8
-                  toxenv: py38-prefix
+                - python: 3.9
+                  toxenv: py39-failskip
+                - python: 3.9
+                  toxenv: py39-limit
+                - python: 3.9
+                  toxenv: py39-prefix
         name: ${{ matrix.toxenv }} on Python ${{ matrix.python }}
         steps:
         - uses: actions/checkout@v2
