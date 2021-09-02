@@ -472,6 +472,7 @@ class TestJSONHandlerAccept(unittest.TestCase):
             ("text/plain", False),
             ("application/jsonlines", False),
             ("application/json;stream=true", False),
+            ("application/json;streamable=pony", True),
             ("application/stream+json", True),
             ("application/xml", False),
             ("application/json-seq", False),

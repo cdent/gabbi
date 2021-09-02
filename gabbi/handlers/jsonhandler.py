@@ -45,7 +45,7 @@ class JSONHandler(base.ContentHandler):
         content_type = content_type.strip()
         return (content_type.endswith('+json') or
                 content_type == 'application/json'
-                and 'stream' not in parameters)
+                and 'stream=' not in parameters)
 
     @classmethod
     def replacer(cls, response_data, match):
