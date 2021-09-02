@@ -595,8 +595,12 @@ class HTTPTestCase(unittest.TestCase):
                 data = self.replace_template(data)
                 data = dumper_class.dumps(data, test=self)
             else:
-                raise ValueError(
-                    'unable to process data to %s' % content_type)
+                if content_type:
+                    raise ValueError(
+                        'unable to process data to %s' % content_type)
+                else:
+                    raise ValueError(
+                        'no content-type available for processing data')
 
         data = self.replace_template(data)
 
