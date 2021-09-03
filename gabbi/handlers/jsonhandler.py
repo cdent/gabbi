@@ -38,9 +38,14 @@ class JSONHandler(base.ContentHandler):
 
     @staticmethod
     def accepts(content_type):
-        content_type = content_type.split(';', 1)[0].strip()
+        content_type = content_type.lower()
+        parameters = ''
+        if ';' in content_type:
+            content_type, parameters = content_type.split(';', 1)
+        content_type = content_type.strip()
         return (content_type.endswith('+json') or
-                content_type.startswith('application/json'))
+                content_type == 'application/json'
+                and 'stream=' not in parameters)
 
     @classmethod
     def replacer(cls, response_data, match):

@@ -444,3 +444,40 @@ class HandlersTest(unittest.TestCase):
         # method and then run its tests to confirm.
         test = self.test('test_request')
         handler(test)
+
+
+class TestJSONHandlerAccept(unittest.TestCase):
+    """Test that the json handler accepts function.
+
+    We need to confirm that it returns True and False at the right
+    times. This is somewhat tricky as there are a fair number of
+    MIME-types that include the string "JSON" but aren't, as a
+    whole document, capable of being decoded.
+    """
+
+    def _test_content_type(self, content_type, expected):
+        if expected:
+            self.assertTrue(
+                jsonhandler.JSONHandler.accepts(content_type),
+                "expected %s to be accepted but it was not!" % content_type)
+        else:
+            self.assertFalse(
+                jsonhandler.JSONHandler.accepts(content_type),
+                "expected %s to not be accepted but it was!" % content_type)
+
+    def test_many_content_types(self):
+        cases = [
+            ("application/json", True),
+            ("application/JSON", True),
+            ("text/plain", False),
+            ("application/jsonlines", False),
+            ("application/json;stream=true", False),
+            ("application/json;streamable=pony", True),
+            ("application/stream+json", True),
+            ("application/xml", False),
+            ("application/json-seq", False),
+            ("application/json-home", False),
+        ]
+        for test in cases:
+            with self.subTest(test[0]):
+                self._test_content_type(*test)
