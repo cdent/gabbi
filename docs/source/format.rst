@@ -289,6 +289,27 @@ Any Previous Test
   difficult for humans to read. Take care to optimize for the
   maintainers that will come after you, not yourself.
 
+Casting
+*******
+
+For ``$ENVIRON`` and ``$RESPONSE`` it is possible to attempt to cast the value
+to another type: ``int``, ``float``, ``str``, or ``bool``. If the cast fails
+an exception will be raised and the test will fail.
+
+This functionality only works when the magical variable is the whole value of
+a YAML entry. If the variable is intermixed with other data, an exception will
+be raised and the test will fail.
+
+The format for a cast is to append a ``:`` and the cast type after the
+type of the magical variable. For example::
+
+    $RESPONSE:int['$.some_string_value']
+
+.. warning:: Prior to the introduction of this feature, ``$ENVIRON`` would
+             already do some automatic casting of numbers to ints and floats
+             and the strings ``True`` and ``False`` to booleans. This continues
+             to be the case, but only if no cast is provided.
+
 .. note:: Where a single-quote character, ``'``, is shown in the variables
           above you may also use a double-quote character, ``"``, but in any
           given expression the same character must be used at both ends.
