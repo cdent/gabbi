@@ -52,6 +52,14 @@ REPLACERS = [
     'RESPONSE',
 ]
 
+# The list of approved type casts and associated functions
+APPROVED_CASTS = {
+    'int': int,
+    'float': float,
+    'str': str,
+    'bool': bool
+}
+
 # Basic test template determining both valid keys and default values
 BASE_TEST = {
     'name': '',
@@ -140,6 +148,7 @@ class HTTPTestCase(unittest.TestCase):
 
         If there is a prior test in the sequence, run it first.
         """
+        self.cast = None
         if self.has_run:
             return
 
@@ -221,6 +230,17 @@ class HTTPTestCase(unittest.TestCase):
         else:
             return replacer
 
+    def _cast_value(self, value, message):
+        """Cast a replacement value the cast is in APPROVED_CASTS."""
+        # Turn off the casting flag, to reset state
+        cast = self.cast
+        self.cast = None
+        if cast in APPROVED_CASTS:
+            return APPROVED_CASTS[cast](value)
+        else:
+            raise RuntimeError('Invalid cast <%s> used in: %s' % (
+                cast, message))
+
     def _environ_replace(self, message, escape_regex=False):
         """Replace an indicator in a message with the environment value.
 
@@ -231,29 +251,33 @@ class HTTPTestCase(unittest.TestCase):
                        self._regex_replacer(self._environ_replacer,
                                             escape_regex),
                        message)
-        try:
-            if '.' in value:
-                value = float(value)
-            else:
-                value = int(value)
+        if self.cast:
+            return self._cast_value(value, message)
+        else:
+            try:
+                if '.' in value:
+                    value = float(value)
+                else:
+                    value = int(value)
+                return value
+            except ValueError:
+                pass
+            if value.lower() == "false":
+                return False
+            if value.lower() == "true":
+                return True
+            if value.lower() == "null":
+                return None
             return value
-        except ValueError:
-            pass
-        if value.lower() == "false":
-            return False
-        if value.lower() == "true":
-            return True
-        if value.lower() == "null":
-            return None
-        return value
 
-    @staticmethod
-    def _environ_replacer(match):
+    def _environ_replacer(self, match):
         """Replace a regex match with an environment value.
 
-        Let KeyError raise if variable not present.
+        Let KeyError raise if variable not present. Capture
+        the 'cast' if any.
         """
         environ_name = match.group('arg')
+        self.cast = match.group('cast')
         return os.environ[environ_name]
 
     def _cookie_replace(self, message, escape_regex=False):
@@ -406,8 +430,10 @@ class HTTPTestCase(unittest.TestCase):
     def _replacer_regex(key):
         """Compose a regular expression for test template variables."""
         case = HTTPTestCase._history_regex
-        return r"%s\$%s\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]" % (
-            case, key)
+        return (
+            r"%s\$%s(:(?P<cast>\w+))?"
+            r"\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]"
+            % (case, key))
 
     @staticmethod
     def _simple_replacer_regex(key):
@@ -434,6 +460,11 @@ class HTTPTestCase(unittest.TestCase):
         """Replace a regex match with the value from a previous response."""
         response_path = match.group('arg')
         case = match.group('case')
+        self.cast = match.group('cast')
+        if not preserve and self.cast:
+            raise RuntimeError(
+                'Unable to process cast <%s> within message: %s'
+                % (self.cast, match.string))
         if case:
             referred_case = self.history[case]
         else:
@@ -446,6 +477,8 @@ class HTTPTestCase(unittest.TestCase):
         result = replacer_class.replacer(
             referred_case.response_data, response_path)
         if preserve:
+            if self.cast:
+                return self._cast_value(result, match.string)
             return result
         else:
             return six.text_type(result)

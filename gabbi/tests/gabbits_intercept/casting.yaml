@@ -1,0 +1,90 @@
+# Various tests to get casting in replacers working as
+# expected.
+
+
+fixtures:
+    - EnvironFixture
+
+defaults:
+    verbose: True
+    request_headers:
+        content-type: application/json
+        accept: application/json
+
+tests:
+    - name: default casts
+      desc: anything that looks like a number or bool becomes one
+      POST: /
+      data:
+          int: $ENVIRON['INT']
+          float: $ENVIRON['FLOAT']
+          string: $ENVIRON['STR']
+          tbool: $ENVIRON['TBOOL']
+          fbool: $ENVIRON['FBOOL']
+      response_json_paths:
+          int: 1
+          float: 1.5
+          string: 2
+          tbool: true
+          fbool: false
+
+    - name: cast to string
+      POST: /
+      data:
+          string: $ENVIRON:str['STR']
+      response_json_paths:
+          string: "2"
+
+    - name: cast to int internal
+      desc: This will fail because the cast is across the entire message "foo ... bar"
+      xfail: true
+      POST: /
+      data:
+          int: foo $ENVIRON:int['INT'] bar
+      response_json_paths:
+          string: "foo 1 bar"
+
+    - name: json set up
+      POST: /
+      data:
+          int: $ENVIRON['INT']
+          float: $ENVIRON['FLOAT']
+          string: $ENVIRON:str['STR']
+          tbool: $ENVIRON['TBOOL']
+          fbool: $ENVIRON['FBOOL']
+      response_json_paths:
+          int: 1
+          float: 1.5
+          string: "2"
+          tbool: true
+          fbool: false
+
+    - name: send casted json
+      POST: /
+      data:
+          casted: $RESPONSE:int['$.string']
+      response_json_paths:
+          casted: 2
+
+    - name: historic casted json
+      POST: /
+      data:
+          casted: $HISTORY['json set up'].$RESPONSE:int['$.string']
+      response_json_paths:
+          casted: 2
+
+    - name: internal json fail
+      xfail: True
+      desc: This produces an expected run time error because casting here is not useful
+      POST: /
+      data:
+          casted: in this $HISTORY['json set up'].$RESPONSE:int['$.string'] is errors
+      response_json_paths:
+          casted: in this 2 is errors
+
+    - name: internal json fine
+      POST: /
+      data:
+          casted: in this $HISTORY['json set up'].$RESPONSE['$.string'] is not errors
+      response_json_paths:
+          casted: in this 2 is not errors
