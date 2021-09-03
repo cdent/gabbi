@@ -5,6 +5,19 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.3.0
+-----
+* For the ``$ENVIRON`` and ``$RESPONSE`` :ref:`substitutions <state-substitution>`
+  it is now possible to :ref:`cast <casting>` the value to a type of ``int``,
+  ``float``, ``str``, or ``bool``.
+* The ``JSONHandler`` is now more strict about how it detects that a body
+  content is JSON, avoiding some errors where the content-type header suggests
+  JSON but the content cannot be decoded as such.
+* Better error message when content cannot be decoded.
+* Addition of the ``disable_response_handler`` test setting for those cases
+  when the test author has no control over the content-type header and it is
+  wrong.
+
 2.2.0
 -----
 

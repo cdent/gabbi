@@ -289,6 +289,8 @@ Any Previous Test
   difficult for humans to read. Take care to optimize for the
   maintainers that will come after you, not yourself.
 
+.. _casting:
+
 Casting
 *******
 
