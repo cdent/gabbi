@@ -125,4 +125,11 @@ Python 3 comes with a built-in tool to create virtual environments::
 This way we can later use ``deactivate`` and safely remove the ``venv``
 directory, thus erasing any trace of gabbi from the system.
 
+If you prefer to not install gabbi, or perhaps want to use it in a dynamic
+fashion in a CI setting, there is an official container image hosted at
+`docker hub`_ as ``cdent/gabbi``. It allows running :doc:`gabbi-run <runner>`
+with any arguments you might need, providing tests on STDIN of via a mounted
+volume.
+
+.. _docker hub: https://hub.docker.com/repository/docker/cdent/gabbi
 .. _virtualenv: https://virtualenv.pypa.io
