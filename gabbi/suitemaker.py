@@ -80,10 +80,11 @@ class TestMaker(object):
         self._set_test_method_and_url(test, test_name)
         self._validate_keys(test, test_name)
 
+        # Set server hostname in http request if host header is set.
         if 'request_headers' in test and 'host' in test['request_headers']:
-            hostname=test['request_headers']['host']
+            hostname = test['request_headers']['host']
         else:
-            hostname=None
+            hostname = None
 
         http_class = httpclient.get_http(verbose=test['verbose'],
                                          caption=test['name'],

@@ -5,6 +5,16 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.5.0
+-----
+* Support SNI in https requests when ``host`` request header is set.
+
+2.4.0
+-----
+* Publish a docker container that runs :doc:`gabbi-run <runner>` with each
+  tagged release.
+
+
 2.3.0
 -----
 * For the ``$ENVIRON`` and ``$RESPONSE`` :ref:`substitutions <state-substitution>`
