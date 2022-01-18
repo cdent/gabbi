@@ -1,0 +1,32 @@
+# Test, against httpbin.org that SNI and host header handling behaves.
+
+fixtures:
+  - LiveSkipFixture
+
+
+tests:
+
+- name: ssl no host
+  url: https://httpbin.org/
+
+- name: ssl with host
+  url: https://httpbin.org/
+  request_headers:
+    host: httpbin.org
+
+- name: ssl wrong host
+  desc: This is expected to fail with an error from urllib
+  xfail: true
+  url: https://httpbin.org/
+  request_headers:
+    host: bin.org
+
+- name: host without ssl
+  url: http://httpbin.org
+  request_headers:
+    host: httpbin.org
+
+- name: wrong host without ssl
+  url: http://httpbin.org
+  request_headers:
+    host: bin.org
