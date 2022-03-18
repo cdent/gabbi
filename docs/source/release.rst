@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.6.0
+-----
+* Fix naming of tests when using pytest. This changes means that setting
+  ``test_loader_name`` is now **required** when using pytest.
+
 2.5.0
 -----
 * Support SNI in https requests when ``host`` request header is set.
