@@ -23,6 +23,7 @@ def test_gabbits():
     # Pass "require_ssl=True" as an argument to force all tests
     # to use SSL in requests.
     test_generator = driver.py_test_generator(
+        test_loader_name=__name__,
         test_dir, intercept=wsgiapp.app,
         fixture_module=fixtures)
 

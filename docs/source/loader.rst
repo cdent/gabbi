@@ -82,6 +82,9 @@ generate tests which pytest would collect. This style of tests is
 deprecated as of ``pytest>=3.0`` so a new style using pytest
 fixtures has been developed.
 
+.. warning:: The pytest loader now requires that ``test_loader_name`` be set
+             when :meth:`gabbi.driver.py_test_generator` is called.
+
 pytest >= 3.0
 -------------
 

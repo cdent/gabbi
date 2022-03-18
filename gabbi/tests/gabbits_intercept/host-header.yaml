@@ -1,0 +1,18 @@
+# Test, against wsgi-intercept, that SNI and host header handling behaves.
+
+tests:
+
+- name: ssl no host
+  ssl: true
+  url: /
+
+- name: ssl with host
+  ssl: true
+  url: /
+  request_headers:
+    host: httpbin.org
+
+- name: host without ssl
+  url: /
+  request_headers:
+    host: httpbin.org
