@@ -43,9 +43,11 @@ def get_suitename(name):
     This is fragile. It assumes there are no underscores in
     suite names, which is not always true.
     """
-    if name.startswith('start_') or name.startswith('stop_'):
-        _, name = name.split('_', 1)
-    return name.split('_', 2)[1]
+    prefix, rest = name.split(':', 1)
+    if prefix.startswith('start_') or prefix.startswith('stop_'):
+        prefix = prefix.split('_', 1)[1]
+    suite = rest.split('_', 1)[0]
+    return prefix + ':' + suite
 
 
 def c_pytest_collection_modifyitems(items, config):
@@ -54,11 +56,10 @@ def c_pytest_collection_modifyitems(items, config):
     latest_item = None
     for item in items:
         cleanname = get_cleanname(item)
-        if not cleanname.startswith(
-                ('stop_driver_', 'start_driver_', 'driver_')):
+        if ':' not in cleanname:
             continue
         prefix, testname = cleanname.split('_', 1)
-        suitename, _ = testname.split('_', 1)
+        suitename = get_suitename(cleanname)
         if prefix == 'start' or prefix == 'stop':
             continue
         if latest_suite != suitename:
@@ -82,8 +83,7 @@ def a_pytest_collection_modifyitems(items, config):
     deselected = []
     for item in items:
         cleanname = get_cleanname(item)
-        if not cleanname.startswith(
-                ('stop_driver_', 'start_driver_', 'driver_')):
+        if ':' not in cleanname:
             remaining.append(item)
             continue
         suitename = get_suitename(cleanname)

@@ -102,4 +102,5 @@ def pytest_generate_tests(metafunc):
     util.set_test_environ()
     test_dir = os.path.join(os.path.dirname(__file__), TESTS_DIR)
     driver.py_test_generator(test_dir, metafunc=metafunc,
+                             test_loader_name=__name__,
                              **BUILD_TEST_ARGS)

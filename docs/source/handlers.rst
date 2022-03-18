@@ -62,6 +62,7 @@ of :class:`~gabbi.handlers.base.ContentHandler` to
 If pytest is being used::
 
     driver.py_test_generator(test_dir, intercept=simple_wsgi.SimpleWsgi,
+                             test_loader_name=__name__,
                              content_handlers=[MyContenHandler])
 
 Gabbi provides an additional custom handler named YAMLDiskLoadingJSONHandler.
