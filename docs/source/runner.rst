@@ -63,3 +63,13 @@ Use ``-v`` or ``--verbose`` with a value of ``all``, ``headers`` or ``body``
 to turn on :ref:`verbosity <metadata>` for all tests being run.
 
 Use ``-q`` or ``--quiet`` to silence test runner output.
+
+Use ``-r`` or ``--response-handler`` to load a custom response or content
+handler for use with tests.
+
+Use ``-l`` to load response handlers relative to the current working directory.
+
+For example, to load a handler named ``HTMLHandler`` from the ``handlers.html``
+module relative to the current directory:
+
+    gabbi-run -l -r handlers.html:HTMLHandler http://example.com < my.yaml

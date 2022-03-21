@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.7.0
+-----
+
+* Add ``-l`` argument to :doc:`gabbi-run <runner>` to allow loading content
+  and response handlers relative to the local directory.
+
 2.6.0
 -----
 * Fix naming of tests when using pytest. This changes means that setting

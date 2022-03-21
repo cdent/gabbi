@@ -70,6 +70,17 @@ def run():
 
     Output is formatted as unittest summary information. Use `-q` or
     `--quiet` to silence that output.
+
+    Use ``-r`` or ``--response-handler`` to load a custom response or content
+    handler for use with tests.
+
+    Use ``-l`` to load response handlers relative to the current working
+    directory.
+
+    For example, to load a handler named ``HTMLHandler`` from the
+    ``handlers.html`` module relative to the current directory:
+
+        gabbi-run -l -r handlers.html:HTMLHandler http://example.com < my.yaml
     """
     parser = _make_argparser()
 
