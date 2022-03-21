@@ -79,7 +79,8 @@ def run():
     host, port, prefix, force_ssl = utils.host_info_from_target(
         args.target, args.prefix)
 
-    handler_objects = initialize_handlers(args.response_handlers)
+    handler_objects = initialize_handlers(
+        args.response_handlers, args.local_handlers)
 
     quiet = args.quiet
     verbosity = args.verbosity
@@ -158,7 +159,14 @@ def run_suite(handle, handler_objects, host, port, prefix, force_ssl=False,
     return result.wasSuccessful()
 
 
-def initialize_handlers(response_handlers):
+def initialize_handlers(response_handlers, local_handlers):
+    # Save PyPath
+    pypath = sys.path
+
+    # Check if a relative import was provided
+    if local_handlers:
+        # Allow relative imports
+        sys.path.insert(0, '.')
     custom_response_handlers = []
     handler_objects = []
     for import_path in response_handlers or []:
@@ -166,6 +174,9 @@ def initialize_handlers(response_handlers):
             custom_response_handlers.append(handler)
     for handler in handlers.RESPONSE_HANDLERS + custom_response_handlers:
         handler_objects.append(handler())
+
+    # Restore PyPath
+    sys.path = pypath
     return handler_objects
 
 
@@ -242,6 +253,13 @@ def _make_argparser():
         action='append',
         help='Custom response handler. Should be an import path of the '
              'form package.module or package.module:class.'
+    )
+    parser.add_argument(
+        '-l', '--local-handlers',
+        default=False,
+        dest='local_handlers',
+        action='store_true',
+        help='Response handlers may be relative to the current directory.'
     )
     parser.add_argument(
         '-v', '--verbose',
