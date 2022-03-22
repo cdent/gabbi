@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.7.1
+-----
+
+* Clear the PoolManager after each test to avoid running out of socket file
+  descriptors.
+
 2.7.0
 -----
 
@@ -400,6 +406,7 @@ gabbi.
 * Trevor McCasland
 * Danek Duvall
 * Marc Abramowitz
+* Scott Wallace
 
 .. _commit logs: https://github.com/cdent/gabbi/commits
 .. _issues: https://github.com/cdent/gabbi/issues

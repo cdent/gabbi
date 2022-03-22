@@ -52,6 +52,8 @@ class Http(urllib3.PoolManager):
         headers['status'] = str(status)
         headers['reason'] = reason
 
+        # Shut down open PoolManagers whose connections have completed to
+        # save on socket file descriptors.
         self.clear()
         return headers, content
 
