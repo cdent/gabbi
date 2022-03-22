@@ -51,6 +51,8 @@ class Http(urllib3.PoolManager):
         headers = response.headers
         headers['status'] = str(status)
         headers['reason'] = reason
+
+        self.clear()
         return headers, content
 
 
