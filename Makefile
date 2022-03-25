@@ -31,7 +31,7 @@ docs:
 	cd docs ; $(MAKE) html
 
 test:
-	tox --skip-missing-interpreters
+	tox --skip-missing-interpreters -p 8
 
 dist: test
 	python3 setup.py sdist bdist_wheel
