@@ -12,6 +12,12 @@ tests:
   request_headers:
     host: httpbin.org
 
+- name: ssl with capitalised host
+  ssl: true
+  url: /
+  request_headers:
+    Host: httpbin.org
+
 - name: host without ssl
   url: /
   request_headers:
