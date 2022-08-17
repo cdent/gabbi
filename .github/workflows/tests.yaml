@@ -11,7 +11,7 @@ jobs:
                 include:
                 - python: 3.x
                   toxenv: pep8
-                - python: 3.7
+                - python: 3.9
                   toxenv: placement
                 - python: 3.6
                   toxenv: py36
