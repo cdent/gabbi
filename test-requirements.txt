@@ -1,5 +1,5 @@
 mock ; python_version < '3.3'
-stestr
+stestr>4.0.0
 coverage
 pytest-cov
 hacking
