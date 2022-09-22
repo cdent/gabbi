@@ -78,7 +78,8 @@ BASE_TEST = {
     'skip': '',
     'poll': {},
     'use_prior_test': True,
-    'disable_response_handler': False
+    'disable_response_handler': False,
+    'timeout': 30,
 }
 
 
@@ -483,7 +484,15 @@ class HTTPTestCase(unittest.TestCase):
         else:
             return six.text_type(result)
 
-    def _run_request(self, url, method, headers, body, redirect=False):
+    def _run_request(
+        self,
+        url,
+        method,
+        headers,
+        body,
+        redirect=False,
+        timeout=30,
+    ):
         """Run the http request and decode output.
 
         The call to make the request will catch a WSGIAppError from
@@ -500,7 +509,8 @@ class HTTPTestCase(unittest.TestCase):
                 method=method,
                 headers=headers,
                 body=body,
-                redirect=redirect
+                redirect=redirect,
+                timeout=timeout,
             )
         except wsgi_intercept.WSGIAppError as exc:
             # Extract and re-raise the wrapped exception.
@@ -582,8 +592,14 @@ class HTTPTestCase(unittest.TestCase):
             failure = None
             while count:
                 try:
-                    self._run_request(full_url, method, headers, body,
-                                      redirect=test['redirects'])
+                    self._run_request(
+                        full_url,
+                        method,
+                        headers,
+                        body,
+                        redirect=test['redirects'],
+                        timeout=test['timeout'],
+                    )
                     self._assert_response()
                     failure = None
                     break
@@ -596,8 +612,14 @@ class HTTPTestCase(unittest.TestCase):
             if failure:
                 raise failure
         else:
-            self._run_request(full_url, method, headers, body,
-                              redirect=test['redirects'])
+            self._run_request(
+                full_url,
+                method,
+                headers,
+                body,
+                redirect=test['redirects'],
+                timeout=test['timeout'],
+            )
             self._assert_response()
 
     def _scheme_replace(self, message, escape_regex=False):
