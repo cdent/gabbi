@@ -72,6 +72,9 @@ Metadata
        so changing this may be requried. It can also be changed when
        :doc:`loader` or using :doc:`gabbi-run <runner>`.
      - defaults to ``True``
+   * - ``timeout``
+     - Sets a timeout (in seconds) for the HTTP request.
+     - defaults to ``30`` seconds
    * - ``disable_response_handler``
      - If ``True``, means that the response body will not be processed to
        Python data. This can be necessary if a response claims a

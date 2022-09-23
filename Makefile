@@ -1,7 +1,7 @@
 # simple Makefile for some common tasks
 .PHONY: clean test dist release pypi tagv docs
 
-gabbi-version := $(shell python -c 'import gabbi; print gabbi.__version__')
+gabbi-version := $(shell python -c 'import gabbi; print(gabbi.__version__)')
 
 clean:
 	find . -name "*.pyc" |xargs rm || true

@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.8.0
+-----
+
+* Add timeout parameter per test, defaulting to 30 seconds.
+* Ensure stestr > 4.0.0 in test-requirements.txt
+
 2.7.2
 -----
 
