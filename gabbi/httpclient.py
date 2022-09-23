@@ -35,13 +35,19 @@ class Http(urllib3.PoolManager):
     provided when it was used as the HTTP client.
     """
 
-    def request(self, absolute_uri, method, body, headers, redirect):
+    def request(self, absolute_uri, method, body, headers, redirect, timeout):
         if redirect:
             retry = urllib3.util.Retry(raise_on_redirect=False, redirect=5)
         else:
             retry = urllib3.util.Retry(total=False, redirect=False)
         response = super(Http, self).request(
-            method, absolute_uri, body=body, headers=headers, retries=retry)
+            method,
+            absolute_uri,
+            body=body,
+            headers=headers,
+            retries=retry,
+            timeout=timeout,
+        )
 
         # Transform response into something akin to httplib2
         # response object.
@@ -105,7 +111,7 @@ class VerboseHttp(Http):
             self.colorize = utils.get_colorizer(self._stream)
         super(VerboseHttp, self).__init__(**kwargs)
 
-    def request(self, absolute_uri, method, body, headers, redirect):
+    def request(self, absolute_uri, method, body, headers, redirect, timeout):
         """Display request parameters before requesting."""
 
         self._verbose_output('#### %s ####' % self.caption,
@@ -118,7 +124,7 @@ class VerboseHttp(Http):
         self._print_body(headers, body)
 
         response, content = super(VerboseHttp, self).request(
-            absolute_uri, method, body, headers, redirect)
+            absolute_uri, method, body, headers, redirect, timeout)
 
         # Blank line for division
         self._verbose_output('')
@@ -183,7 +189,13 @@ class VerboseHttp(Http):
         print(message, file=stream)
 
 
-def get_http(verbose=False, caption='', cert_validate=True, hostname=None):
+def get_http(
+    verbose=False,
+    caption='',
+    cert_validate=True,
+    hostname=None,
+    timeout=30,
+):
     """Return an ``Http`` class for making requests."""
     cert_validation = {'cert_reqs': 'CERT_NONE'} if not cert_validate else {}
 
@@ -192,6 +204,7 @@ def get_http(verbose=False, caption='', cert_validate=True, hostname=None):
             strict=True,
             ca_certs=certifi.where(),
             server_hostname=hostname,
+            timeout=timeout,
             **cert_validation
         )
 
@@ -207,5 +220,6 @@ def get_http(verbose=False, caption='', cert_validate=True, hostname=None):
         strict=True,
         ca_certs=certifi.where(),
         server_hostname=hostname,
+        timeout=timeout,
         **cert_validation
     )

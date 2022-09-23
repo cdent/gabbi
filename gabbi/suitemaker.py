@@ -89,7 +89,8 @@ class TestMaker(object):
         http_class = httpclient.get_http(verbose=test['verbose'],
                                          caption=test['name'],
                                          cert_validate=test['cert_validate'],
-                                         hostname=hostname)
+                                         hostname=hostname,
+                                         timeout=int(test["timeout"]))
         if prior_test:
             history = prior_test.history
         else:
