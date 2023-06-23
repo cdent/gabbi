@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 # Run the tests and confirm that the stuff we expect to skip or fail
 # does.
 
