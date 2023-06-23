@@ -4,15 +4,12 @@
 
 # this would be somewhat less complex in bash4..
 shopt -s nocasematch
-[[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=7 || SKIP=2
+[[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=12 || SKIP=2
+[[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && FAILS=15 || FAILS=16
 shopt -u nocasematch
-
-FAILS=16
 
 GREP_FAIL_MATCH="expected failures=$FAILS"
 GREP_SKIP_MATCH="skipped=$SKIP,"
-# This skip is always 2 because the pytest tests don't
-# run the live tests.
 PYTEST_MATCH="$SKIP skipped, $FAILS xfailed"
 
 stestr run && \
