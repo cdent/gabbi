@@ -13,8 +13,6 @@ jobs:
                   toxenv: pep8
                 - python: 3.9
                   toxenv: placement
-                - python: 3.6
-                  toxenv: py36
                 - python: 3.7
                   toxenv: py37
                 - python: 3.8
@@ -23,10 +21,10 @@ jobs:
                   toxenv: py39
                 - python: "3.10"
                   toxenv: py310
-                - python: pypy3
+                - python: "3.11"
+                  toxenv: py311
+                - python: pypy-3.8
                   toxenv: pypy3
-                - python: 3.6
-                  toxenv: py36-pytest
                 - python: 3.7
                   toxenv: py37-pytest
                 - python: 3.8
