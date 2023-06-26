@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.9.0
+-----
+
+* Pin to urllib3 <2.0.0 to avoid issues with changes in constructors.
+
 2.8.0
 -----
 
