@@ -95,4 +95,4 @@ def nest(fixtures):
             except Exception:
                 exc = sys.exc_info()
         if exc != (None, None, None):
-            raise (exc[0], exc[1], exc[2])
+            raise exc[0]
