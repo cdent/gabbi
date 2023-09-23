@@ -13,9 +13,8 @@
 """Test loading data from files with <@.
 """
 
+import mock
 import unittest
-
-from six.moves import mock
 
 from gabbi import case
 

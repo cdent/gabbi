@@ -15,9 +15,9 @@
 
 import sys
 import unittest
+from io import StringIO
 from uuid import uuid4
 
-from six import StringIO
 from wsgi_intercept.interceptor import Urllib3Interceptor
 
 from gabbi import exception

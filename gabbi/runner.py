@@ -12,8 +12,6 @@
 # under the License.
 """Implementation of a command-line runner for gabbi files (AKA suites)."""
 
-from __future__ import print_function
-
 import argparse
 from importlib import import_module
 import os

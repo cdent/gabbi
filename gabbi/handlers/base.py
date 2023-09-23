@@ -15,7 +15,7 @@
 from gabbi.exception import GabbiFormatError
 
 
-class ResponseHandler(object):
+class ResponseHandler:
     """Add functionality for making assertions about an HTTP response.
 
     A subclass may implement two methods: ``action`` and ``preprocess``.
