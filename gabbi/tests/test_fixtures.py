@@ -13,7 +13,7 @@
 """Use mocks to confirm that fixtures operate as context managers.
 """
 
-import mock
+from unittest import mock
 import unittest
 
 from gabbi import fixture

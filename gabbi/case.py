@@ -20,13 +20,13 @@ made using urllib3. Assertions are made against the response.
 from collections import OrderedDict
 import copy
 import functools
-import http.cookies
 import os
 import re
 import sys
 import time
 import unittest
-import urllib. parse as urlparse
+import urllib.parse as urlparse
+from http import cookies
 from unittest import result as unitresult
 
 import wsgi_intercept
@@ -297,10 +297,10 @@ class HTTPTestCase(unittest.TestCase):
             referred_case = self.history[case]
         else:
             referred_case = self.prior
-        response_cookies = referred_case.response['set-cookie']
-        cookies = http.cookies.SimpleCookie()
-        cookies.load(response_cookies)
-        cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
+        response_cookie = referred_case.response['set-cookie']
+        cookie = cookies.SimpleCookie()
+        cookie.load(response_cookie)
+        cookie_string = cookie.output(attrs=[], header='', sep=',').strip()
         return cookie_string
 
     def _headers_replace(self, message, escape_regex=False):
