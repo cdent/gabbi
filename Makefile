@@ -40,7 +40,7 @@ release: clean test cleanagain tagv pypi
 
 pypi:
 	python3 setup.py sdist bdist_wheel
-	twine upload -s dist/*
+	twine upload dist/*
 
 docker:
 	docker build --build-arg GABBI_VERSION=${gabbi-version} -t gabbi:${gabbi-version} .
