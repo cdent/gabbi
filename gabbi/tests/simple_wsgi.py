@@ -16,15 +16,14 @@ reflect posted data and otherwise confirm headers and queries.
 """
 
 import json
-
-from six.moves.urllib import parse as urlparse
+import urllib.parse as urlparse
 
 
 CURRENT_POLL = 0
 METHODS = ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
 
 
-class SimpleWsgi(object):
+class SimpleWsgi:
     """A simple wsgi application to use in tests."""
 
     def __call__(self, environ, start_response):

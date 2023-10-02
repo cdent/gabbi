@@ -20,16 +20,15 @@ made using urllib3. Assertions are made against the response.
 from collections import OrderedDict
 import copy
 import functools
+from http import cookies
 import os
 import re
 import sys
 import time
 import unittest
 from unittest import result as unitresult
+import urllib.parse as urlparse
 
-import six
-from six.moves import http_cookies
-from six.moves.urllib import parse as urlparse
 import wsgi_intercept
 
 from gabbi import __version__
@@ -298,10 +297,10 @@ class HTTPTestCase(unittest.TestCase):
             referred_case = self.history[case]
         else:
             referred_case = self.prior
-        response_cookies = referred_case.response['set-cookie']
-        cookies = http_cookies.SimpleCookie()
-        cookies.load(response_cookies)
-        cookie_string = cookies.output(attrs=[], header='', sep=',').strip()
+        response_cookie = referred_case.response['set-cookie']
+        cookie = cookies.SimpleCookie()
+        cookie.load(response_cookie)
+        cookie_string = cookie.output(attrs=[], header='', sep=',').strip()
         return cookie_string
 
     def _headers_replace(self, message, escape_regex=False):
@@ -482,7 +481,7 @@ class HTTPTestCase(unittest.TestCase):
                 return self._cast_value(result, match.string)
             return result
         else:
-            return six.text_type(result)
+            return str(result)
 
     def _run_request(
         self,
@@ -514,8 +513,8 @@ class HTTPTestCase(unittest.TestCase):
             )
         except wsgi_intercept.WSGIAppError as exc:
             # Extract and re-raise the wrapped exception.
-            six.reraise(exc.exception_type, exc.exception_value,
-                        exc.traceback)
+            raise (exc.exception_type, exc.exception_value,
+                   exc.traceback)
 
         # Set headers and location attributes for follow on requests
         self.response = response
@@ -582,7 +581,7 @@ class HTTPTestCase(unittest.TestCase):
 
         # ensure body is bytes, encoding as UTF-8 because that's
         # what we do here
-        if isinstance(body, six.text_type):
+        if isinstance(body, str):
             body = body.encode('UTF-8')
 
         if test['poll']:
@@ -637,10 +636,10 @@ class HTTPTestCase(unittest.TestCase):
         """
         dumper_class = self.get_content_handler(content_type)
         if not _is_complex_type(data):
-            if isinstance(data, six.string_types) and data.startswith('<@'):
+            if isinstance(data, str) and data.startswith('<@'):
                 info = self.load_data_file(data.replace('<@', '', 1))
                 if utils.not_binary(content_type):
-                    data = six.text_type(info, 'UTF-8')
+                    data = str(info, 'UTF-8')
                 else:
                     # Return early we are binary content
                     return info
@@ -661,7 +660,7 @@ class HTTPTestCase(unittest.TestCase):
 
         # If the result after template handling is not a string, dump
         # it if there is a suitable dumper.
-        if dumper_class and not isinstance(data, six.string_types):
+        if dumper_class and not isinstance(data, str):
             # If there are errors dumping we want them to raise to the
             # test harness.
             data = dumper_class.dumps(data, test=self)

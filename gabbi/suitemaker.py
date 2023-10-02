@@ -27,7 +27,7 @@ from gabbi import httpclient
 from gabbi import suite
 
 
-class TestMaker(object):
+class TestMaker:
     """A class for encapsulating test invariants.
 
     All of the tests in a single gabbi file have invariants which are

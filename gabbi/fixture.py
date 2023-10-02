@@ -16,15 +16,13 @@ import contextlib
 import sys
 from unittest import case
 
-import six
-
 
 class GabbiFixtureError(Exception):
     """Generic exception for GabbiFixture."""
     pass
 
 
-class GabbiFixture(object):
+class GabbiFixture:
     """A context manager that operates as a fixture.
 
     Subclasses must implement ``start_fixture`` and ``stop_fixture``, each
@@ -97,4 +95,4 @@ def nest(fixtures):
             except Exception:
                 exc = sys.exc_info()
         if exc != (None, None, None):
-            six.reraise(exc[0], exc[1], exc[2])
+            raise exc[1].with_traceback(exc[2])

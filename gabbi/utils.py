@@ -14,18 +14,12 @@
 
 import io
 import os
+import urllib.parse as urlparse
 
 import colorama
-import six
-from six.moves.urllib import parse as urlparse
 import yaml
 
-
-try:  # Python 3
-    ConnectionRefused = ConnectionRefusedError
-except NameError:  # Python 2
-    import socket
-    ConnectionRefused = socket.error
+ConnectionRefused = ConnectionRefusedError
 
 
 def create_url(base_url, host, port=None, prefix='', ssl=False):
@@ -72,7 +66,7 @@ def decode_response_content(header_dict, content):
     """Decode content to a proper string."""
     content_type, charset = extract_content_type(header_dict)
 
-    if not_binary(content_type) and isinstance(content, six.binary_type):
+    if not_binary(content_type) and isinstance(content, bytes):
         return content.decode(charset)
     else:
         return content

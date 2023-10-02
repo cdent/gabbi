@@ -14,8 +14,7 @@
 """
 
 import unittest
-
-from six.moves import mock
+from unittest import mock
 
 from gabbi import fixture
 

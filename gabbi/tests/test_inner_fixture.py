@@ -43,7 +43,7 @@ class OuterFixture(fixture.GabbiFixture):
         assert COUNT_OUTER == 1
 
 
-class InnerFixture(object):
+class InnerFixture:
     """Test that setUp is called 3 times."""
 
     def setUp(self):

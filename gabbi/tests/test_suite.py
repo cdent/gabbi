@@ -20,6 +20,7 @@ from gabbi import fixture
 from gabbi import suitemaker
 
 VALUE_ERROR = 'value error sentinel'
+FIXTURE_METHOD = 'start_fixture'
 
 
 class FakeFixture(fixture.GabbiFixture):
@@ -54,3 +55,4 @@ class SuiteTest(unittest.TestCase):
 
         self.assertIn('foo_alpha', str(errored_test))
         self.assertIn(VALUE_ERROR, trace)
+        self.assertIn(FIXTURE_METHOD, trace)

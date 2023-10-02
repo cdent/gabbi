@@ -14,8 +14,6 @@
 
 import json
 
-import six
-
 from gabbi.exception import GabbiDataLoadError
 from gabbi.handlers import base
 from gabbi import json_parser
@@ -68,7 +66,7 @@ class JSONHandler(base.ContentHandler):
     @staticmethod
     def load_data_file(test, file_path):
         info = test.load_data_file(file_path)
-        info = six.text_type(info, 'UTF-8')
+        info = str(info, 'UTF-8')
         return json.loads(info)
 
     @staticmethod
@@ -103,7 +101,7 @@ class JSONHandler(base.ContentHandler):
                                  '%s' % (path, test.response_data))
 
         # read data from disk if the value starts with '<@'
-        if isinstance(value, six.string_types) and value.startswith('<@'):
+        if isinstance(value, str) and value.startswith('<@'):
             # Do template expansion in the rhs if rhs_path is provided.
             if ':' in value:
                 value, rhs_path = value.split(':$', 1)
@@ -120,7 +118,7 @@ class JSONHandler(base.ContentHandler):
                                          'match %s' % (rhs_path, value))
 
         # If expected is a string, check to see if it is a regex.
-        is_regex = (isinstance(value, six.string_types) and
+        is_regex = (isinstance(value, str) and
                     value.startswith('/') and
                     value.endswith('/') and
                     len(value) > 1)
@@ -130,7 +128,7 @@ class JSONHandler(base.ContentHandler):
         if is_regex and not rhs_match:
             expected = expected[1:-1]
             # match may be a number so stringify
-            match = six.text_type(match)
+            match = str(match)
             test.assertRegex(
                 match, expected,
                 'Expect jsonpath %s to match /%s/, got %s' %

@@ -14,8 +14,6 @@
 
 import yaml
 
-import six
-
 from gabbi.handlers import jsonhandler
 
 
@@ -36,5 +34,5 @@ class YAMLDiskLoadingJSONHandler(jsonhandler.JSONHandler):
     @staticmethod
     def load_data_file(test, file_path):
         info = test.load_data_file(file_path)
-        info = six.text_type(info, 'UTF-8')
+        info = str(info, 'UTF-8')
         return yaml.safe_load(info)

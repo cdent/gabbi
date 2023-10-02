@@ -11,13 +11,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from __future__ import print_function
-
 import os
 import sys
 
 import certifi
-import six
 import urllib3
 
 from gabbi.handlers import jsonhandler
@@ -154,7 +151,7 @@ class VerboseHttp(Http):
         content_type = utils.extract_content_type(headers, 'text/plain')[0]
         if self._show_body and utils.not_binary(content_type):
             content = utils.decode_response_content(headers, content)
-            if isinstance(content, six.binary_type):
+            if isinstance(content, bytes):
                 content = content.decode('utf-8')
             # TODO(cdent): Using the JSONHandler here instead of
             # just the json module to make it clear that eventually
