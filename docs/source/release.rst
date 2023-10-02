@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+2.10.0
+------
+
+Remove use of six. Thanks to Alexandre Detiste.
+
 2.9.0
 -----
 
@@ -423,6 +428,7 @@ gabbi.
 * Danek Duvall
 * Marc Abramowitz
 * Scott Wallace
+* Alexandre Detiste
 
 .. _commit logs: https://github.com/cdent/gabbi/commits
 .. _issues: https://github.com/cdent/gabbi/issues
