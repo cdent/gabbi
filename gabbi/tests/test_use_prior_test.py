@@ -15,7 +15,7 @@
 
 import copy
 import unittest
-import unittest.mock
+from unittest import mock
 
 from gabbi import case
 

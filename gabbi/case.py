@@ -26,8 +26,8 @@ import re
 import sys
 import time
 import unittest
-import urllib.parse as urlparse
 from unittest import result as unitresult
+import urllib.parse as urlparse
 
 import wsgi_intercept
 
