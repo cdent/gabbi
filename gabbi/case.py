@@ -20,13 +20,13 @@ made using urllib3. Assertions are made against the response.
 from collections import OrderedDict
 import copy
 import functools
+from http import cookies
 import os
 import re
 import sys
 import time
 import unittest
 import urllib.parse as urlparse
-from http import cookies
 from unittest import result as unitresult
 
 import wsgi_intercept
@@ -514,7 +514,7 @@ class HTTPTestCase(unittest.TestCase):
         except wsgi_intercept.WSGIAppError as exc:
             # Extract and re-raise the wrapped exception.
             raise (exc.exception_type, exc.exception_value,
-                        exc.traceback)
+                   exc.traceback)
 
         # Set headers and location attributes for follow on requests
         self.response = response

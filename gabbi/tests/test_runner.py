@@ -13,9 +13,9 @@
 """Test that the CLI works as expected
 """
 
+from io import StringIO
 import sys
 import unittest
-from io import StringIO
 from uuid import uuid4
 
 from wsgi_intercept.interceptor import Urllib3Interceptor

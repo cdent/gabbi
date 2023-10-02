@@ -14,8 +14,8 @@
 """
 
 import copy
-import mock
 import unittest
+import unittest.mock
 
 from gabbi import case
 

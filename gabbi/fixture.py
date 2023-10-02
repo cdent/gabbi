@@ -84,7 +84,7 @@ def nest(fixtures):
             contexts.append(enter_func())
             exits.append(exit_func)
         yield contexts
-    except Exception as e:
+    except Exception:
         exc = sys.exc_info()
     finally:
         while exits:
