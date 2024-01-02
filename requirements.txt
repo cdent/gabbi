@@ -4,5 +4,5 @@ PyYAML
 urllib3>=1.26.9,<2.0.0
 certifi
 jsonpath-rw-ext>=1.0.0
-wsgi-intercept>=1.9.3
+wsgi-intercept>=1.13.0
 colorama

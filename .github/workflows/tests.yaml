@@ -21,6 +21,8 @@ jobs:
                   toxenv: py310
                 - python: "3.11"
                   toxenv: py311
+                - python: "3.12"
+                  toxenv: py312
                 - python: pypy-3.8
                   toxenv: pypy3
                 - python: 3.7
@@ -31,6 +33,10 @@ jobs:
                   toxenv: py39-pytest
                 - python: "3.10"
                   toxenv: py310-pytest
+                - python: "3.11"
+                  toxenv: py311-pytest
+                - python: "3.12"
+                  toxenv: py312-pytest
                 - python: 3.9
                   toxenv: py39-failskip
                 - python: 3.9
