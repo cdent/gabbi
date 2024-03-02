@@ -1,4 +1,4 @@
-# Confirm regex handling in response and json path headers
+# Confirm regex handling in response headers, strings and json path handlers
 tests:
 - name: regex header test
   url: /cow?alpha=1
@@ -19,3 +19,30 @@ tests:
     $.alpha: /ow$/
     $.beta: /(?!cow).*/
     $.gamma: /\d+/
+
+- name: regex string test json
+  PUT: /cow
+  request_headers:
+    content-type: application/json
+  data:
+    alpha: cow
+    beta: pig
+    gamma: 1
+  response_strings:
+    - '/"alpha": "cow",/'
+
+- name: regex string test multiline
+  GET: /presenter
+  response_strings:
+    - '/Hello World/'
+    - '/dolor sit/'
+
+- name: regex string test splat
+  GET: /presenter
+  response_strings:
+    - '/dolor.*amet/'
+
+- name: regex string test mix
+  GET: /presenter
+  response_strings:
+    - '/[Hh]el{2}o [Ww]orld/'
