@@ -181,6 +181,11 @@ Response Expectations
    ``response_strings``            A list of string fragments expected
                                    to be present in the response body.
 
+                                   If the value is wrapped in ``/.../``
+                                   the response body will be searched
+                                   for the value as a regular
+                                   expression.
+
    ``response_json_paths``         A dictionary of JSONPath rules paired
                                    with expected matches. Using this
                                    rule requires that the content being
