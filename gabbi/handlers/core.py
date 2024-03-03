@@ -22,9 +22,7 @@ class StringResponseHandler(base.ResponseHandler):
     test_key_value = []
 
     def action(self, test, expected, value=None):
-        is_regex = (expected.startswith('/') and
-                    expected.endswith('/') and
-                    len(expected) > 1)
+        is_regex = self.is_regex(expected)
         expected = test.replace_template(expected, escape_regex=is_regex)
 
         if is_regex:
@@ -68,9 +66,7 @@ class HeadersResponseHandler(base.ResponseHandler):
         response = test.response
 
         header_value = str(value)
-        is_regex = (header_value.startswith('/') and
-                    header_value.endswith('/') and
-                    len(header_value) > 1)
+        is_regex = self.is_regex(header_value)
         header_value = test.replace_template(header_value,
                                              escape_regex=is_regex)
 

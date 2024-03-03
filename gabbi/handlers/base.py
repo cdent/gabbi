@@ -66,6 +66,15 @@ class ResponseHandler:
         """
         pass
 
+    def is_regex(self, value):
+        """Check if the value is formatted to looks like a regular expression.
+
+        Meaning it starts and ends with "/".
+        """
+        return (
+            value.startswith('/') and value.endswith('/') and len(value) > 1
+        )
+
     def _register(self):
         """Register this handler on the provided test class."""
         self.response_handler = None
