@@ -118,10 +118,7 @@ class JSONHandler(base.ContentHandler):
                                          'match %s' % (rhs_path, value))
 
         # If expected is a string, check to see if it is a regex.
-        is_regex = (isinstance(value, str) and
-                    value.startswith('/') and
-                    value.endswith('/') and
-                    len(value) > 1)
+        is_regex = isinstance(value, str) and self.is_regex(value)
         expected = (rhs_match or
                     test.replace_template(value, escape_regex=is_regex))
         match = lhs_match

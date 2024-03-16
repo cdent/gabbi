@@ -22,8 +22,18 @@ class StringResponseHandler(base.ResponseHandler):
     test_key_value = []
 
     def action(self, test, expected, value=None):
-        expected = test.replace_template(expected)
-        test.assert_in_or_print_output(expected, test.output)
+        is_regex = self.is_regex(expected)
+        expected = test.replace_template(expected, escape_regex=is_regex)
+
+        if is_regex:
+            # Trim off /
+            expected = expected[1:-1]
+            test.assertRegex(
+                test.output, expected,
+                'Expect resonse body %s to match /%s/' %
+                (test.output, expected))
+        else:
+            test.assert_in_or_print_output(expected, test.output)
 
 
 class ForbiddenHeadersResponseHandler(base.ResponseHandler):
@@ -56,9 +66,7 @@ class HeadersResponseHandler(base.ResponseHandler):
         response = test.response
 
         header_value = str(value)
-        is_regex = (header_value.startswith('/') and
-                    header_value.endswith('/') and
-                    len(header_value) > 1)
+        is_regex = self.is_regex(header_value)
         header_value = test.replace_template(header_value,
                                              escape_regex=is_regex)
 
