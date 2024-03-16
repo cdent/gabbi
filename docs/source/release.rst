@@ -5,6 +5,15 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+3.0.0
+-----
+
+* Add support for regular expressions in ``response_strings`` values.
+
+This is being done as a major release because it has a chance of breaking
+existing tests that use response_strings values that look like regular
+expressions but are not.
+
 2.11.0
 -----
 
