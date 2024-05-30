@@ -1,7 +1,7 @@
 pbr
 pytest
 PyYAML
-urllib3>=1.26.9,<2.0.0
+urllib3>=1.26.9
 certifi
 jsonpath-rw-ext>=1.0.0
 wsgi-intercept>=1.13.0
