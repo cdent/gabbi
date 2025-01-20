@@ -20,7 +20,7 @@ looks like this::
 See the docs_ for more details on the many features and formats for
 setting request headers and bodies and evaluating responses.
 
-Gabbi is tested with Python 3.7, 3.8, 3.9, 3.10, 3.11, 3.12 and pypy3.
+Gabbi is tested with Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13 and pypy3.
 
 Tests can be run using `unittest`_ style test runners, `pytest`_
 or from the command line with a `gabbi-run`_ script.
@@ -84,7 +84,7 @@ Gabbi is set up to be developed and tested using `tox`_ (installed via
 are in the directories ``gabbi/tests/gabbits_*`` and loaded by the file
 ``gabbi/test_*.py``), you call ``tox``::
 
-    tox -epep8,py37
+    tox -epep8,py311
 
 If you have the dependencies installed (or a warmed up
 virtualenv) you can run the tests by hand and exit on the first
@@ -95,7 +95,7 @@ failure::
 Testing can be limited to individual modules by specifying them
 after the tox invocation::
 
-    tox -epep8,py37 -- test_driver test_handlers
+    tox -epep8,py311 -- test_driver test_handlers
 
 If you wish to avoid running tests that connect to internet hosts,
 set ``GABBI_SKIP_NETWORK`` to ``True``.
