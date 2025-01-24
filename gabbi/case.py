@@ -513,8 +513,8 @@ class HTTPTestCase(unittest.TestCase):
             )
         except wsgi_intercept.WSGIAppError as exc:
             # Extract and re-raise the wrapped exception.
-            raise (exc.exception_type, exc.exception_value,
-                   exc.traceback)
+            raise exc.exception_type(exc.exception_value).with_traceback(
+                   exc.traceback) from None
 
         # Set headers and location attributes for follow on requests
         self.response = response
