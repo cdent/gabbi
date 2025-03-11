@@ -25,6 +25,22 @@ from gabbi import utils
 urllib3.disable_warnings()
 
 
+def http_version_int_to_str(http_version: int) -> str:
+    """Emulate the urllib3 v2.x HTTP "version_string".
+
+    Args:
+        http_version (int): HTTP version
+
+    Returns:
+        str: version string "HTTP/?"
+
+    """
+    major = int(http_version / 10)
+    minor = int(http_version % 10)
+
+    return f'HTTP/{major}.{minor}'
+
+
 class Http(urllib3.PoolManager):
     """A subclass of the ``urllib3.PoolManager`` to munge the data.
 
@@ -51,9 +67,11 @@ class Http(urllib3.PoolManager):
         content = response.data
         status = response.status
         reason = response.reason
+        http_version_string = http_version_int_to_str(response.version)
         headers = response.headers
         headers['status'] = str(status)
         headers['reason'] = reason
+        headers['http_version_string'] = http_version_string
 
         # Shut down open PoolManagers whose connections have completed to
         # save on socket file descriptors.
@@ -87,6 +105,7 @@ class VerboseHttp(Http):
     HEADER_BLACKLIST = [
         'status',
         'reason',
+        'http_version_string',
     ]
 
     REQUEST_PREFIX = '>'

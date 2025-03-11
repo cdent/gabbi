@@ -1,0 +1,7 @@
+# Test, against wsgi-intercept, that the HTTP version can be asserted.
+tests:
+
+- name: http version "header"
+  url: /
+  response_headers:
+    http_version_string: /HTTP\/[0-9]\.[0-9]/
