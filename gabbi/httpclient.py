@@ -11,53 +11,53 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 import os
 import sys
 
-import certifi
-import urllib3
+import httpx
 
 from gabbi.handlers import jsonhandler
 from gabbi import utils
 
-# Disable SSL warnings otherwise tests which process stderr will get
-# extra information.
-urllib3.disable_warnings()
+logging.getLogger('httpx').setLevel(logging.WARNING)
 
 
-class Http(urllib3.PoolManager):
-    """A subclass of the ``urllib3.PoolManager`` to munge the data.
+class Http:
+    """A class to munge the HTTP response.
 
     This transforms the response to look more like what httplib2
     provided when it was used as the HTTP client.
     """
 
+    def __init__(self, **kwargs):
+        self.extensions = {}
+        if 'server_hostname' in kwargs:
+            self.extensions['sni_hostname'] = kwargs['server_hostname']
+        self.client = httpx.Client(verify=kwargs.get('cert_validate', True))
+
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
-        if redirect:
-            retry = urllib3.util.Retry(raise_on_redirect=False, redirect=5)
-        else:
-            retry = urllib3.util.Retry(total=False, redirect=False)
-        response = super(Http, self).request(
-            method,
-            absolute_uri,
-            body=body,
+        response = self.client.request(
+            method=method,
+            url=absolute_uri,
             headers=headers,
-            retries=retry,
+            content=body,
             timeout=timeout,
+            follow_redirects=redirect,
+            extensions=self.extensions,
         )
 
         # Transform response into something akin to httplib2
         # response object.
-        content = response.data
-        status = response.status
-        reason = response.reason
+        content = response.content
+        status = response.status_code
+        reason = response.reason_phrase
+        http_version = response.http_version
         headers = response.headers
         headers['status'] = str(status)
-        headers['reason'] = reason
+        headers['reason'] = str(reason)
+        headers['http_protocol_version'] = str(http_version)
 
-        # Shut down open PoolManagers whose connections have completed to
-        # save on socket file descriptors.
-        self.clear()
         return headers, content
 
 
@@ -87,6 +87,7 @@ class VerboseHttp(Http):
     HEADER_BLACKLIST = [
         'status',
         'reason',
+        'http_protocol_version',
     ]
 
     REQUEST_PREFIX = '>'
@@ -106,27 +107,26 @@ class VerboseHttp(Http):
         self._stream = kwargs.pop('stream')
         if self._use_color:
             self.colorize = utils.get_colorizer(self._stream)
-        super(VerboseHttp, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
         """Display request parameters before requesting."""
 
-        self._verbose_output('#### %s ####' % self.caption,
+        self._verbose_output(f'#### {self.caption} ####',
                              color=self.COLORMAP['caption'])
-        self._verbose_output('%s %s' % (method, absolute_uri),
+        self._verbose_output(f'{method} {absolute_uri}',
                              prefix=self.REQUEST_PREFIX,
                              color=self.COLORMAP['request'])
 
         self._print_headers(headers, prefix=self.REQUEST_PREFIX)
         self._print_body(headers, body)
 
-        response, content = super(VerboseHttp, self).request(
+        response, content = super().request(
             absolute_uri, method, body, headers, redirect, timeout)
 
         # Blank line for division
         self._verbose_output('')
-        self._verbose_output('%s %s' % (response['status'],
-                                        response['reason']),
+        self._verbose_output(f'{response["status"]} {response["reason"]}',
                              prefix=self.RESPONSE_PREFIX,
                              color=self.COLORMAP['status'])
         self._print_headers(response, prefix=self.RESPONSE_PREFIX)
@@ -172,8 +172,8 @@ class VerboseHttp(Http):
 
     def _print_header(self, name, value, prefix='', stream=None):
         """Output one single header."""
-        header = self.colorize(self.COLORMAP['header'], "%s:" % name)
-        self._verbose_output("%s %s" % (header, value), prefix=prefix,
+        header = self.colorize(self.COLORMAP['header'], f'{name}:')
+        self._verbose_output(f'{header} {value}', prefix=prefix,
                              stream=stream)
 
     def _verbose_output(self, message, prefix='', color=None, stream=None):
@@ -194,19 +194,15 @@ def get_http(
     timeout=30,
 ):
     """Return an ``Http`` class for making requests."""
-    cert_validation = {'cert_reqs': 'CERT_NONE'} if not cert_validate else {}
-
     if not verbose:
         return Http(
-            strict=True,
-            ca_certs=certifi.where(),
             server_hostname=hostname,
             timeout=timeout,
-            **cert_validation
+            cert_validate=cert_validate,
         )
 
-    headers = False if verbose == 'body' else True
-    body = False if verbose == 'headers' else True
+    headers = verbose != 'body'
+    body = verbose != 'headers'
 
     return VerboseHttp(
         headers=headers,
@@ -214,9 +210,7 @@ def get_http(
         stream=sys.stdout,
         caption=caption,
         colorize=True,
-        strict=True,
-        ca_certs=certifi.where(),
         server_hostname=hostname,
         timeout=timeout,
-        **cert_validation
+        cert_validate=cert_validate,
     )

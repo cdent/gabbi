@@ -14,7 +14,7 @@
 
 The test case encapsulates the request headers and body and expected
 response headers and body. When the test is run an HTTP request is
-made using urllib3. Assertions are made against the response.
+made using httpx. Assertions are made against the response.
 """
 
 from collections import OrderedDict
@@ -500,7 +500,7 @@ class HTTPTestCase(unittest.TestCase):
         """
 
         if 'user-agent' not in (key.lower() for key in headers):
-            headers['user-agent'] = "gabbi/%s (Python urllib3)" % __version__
+            headers['user-agent'] = "gabbi/%s (Python httpx)" % __version__
 
         try:
             response, content = self.http.request(
