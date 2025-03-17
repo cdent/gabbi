@@ -19,8 +19,6 @@ are suite-level fixtures that operate as context managers.
 import sys
 import unittest
 
-from wsgi_intercept import interceptor
-
 from gabbi import fixture
 
 
@@ -46,16 +44,11 @@ class GabbiSuite(unittest.TestSuite):
         are no fixtures.
         """
 
-        fixtures, intercept, host, port, prefix = self._get_intercept()
+        fixtures, host, port = self._get_fixtures()
 
         try:
             with fixture.nest([fix() for fix in fixtures]):
-                if intercept:
-                    with interceptor.Urllib3Interceptor(
-                            intercept, host, port, prefix):
-                        result = super(GabbiSuite, self).run(result, debug)
-                else:
-                    result = super(GabbiSuite, self).run(result, debug)
+                result = super(GabbiSuite, self).run(result, debug)
         except unittest.SkipTest as exc:
             for test in self._tests:
                 result.addSkip(test, str(exc))
@@ -85,7 +78,7 @@ class GabbiSuite(unittest.TestSuite):
     def start(self, result, tests=None):
         """Start fixtures when using pytest."""
         tests = tests or []
-        fixtures, intercept, host, port, prefix = self._get_intercept()
+        fixtures, host, port = self._get_fixtures()
 
         self.used_fixtures = []
         try:
@@ -100,38 +93,25 @@ class GabbiSuite(unittest.TestSuite):
                 test.run = noop
                 test.add_marker('skip')
             result.addSkip(self, str(exc))
-        if intercept:
-            intercept_fixture = interceptor.Urllib3Interceptor(
-                intercept, host, port, prefix)
-            intercept_fixture.__enter__()
-            self.used_fixtures.append(intercept_fixture)
 
     def stop(self):
         """Stop fixtures when using pytest."""
         for fix in reversed(self.used_fixtures):
             fix.__exit__(None, None, None)
 
-    def _get_intercept(self):
+    def _get_fixtures(self):
         fixtures = [fixture.GabbiFixture]
-        intercept = host = port = prefix = None
+        host = port = None
         try:
             first_test = self._find_first_full_test()
             fixtures = first_test.fixtures
             host = first_test.host
             port = first_test.port
-            prefix = first_test.prefix
-            intercept = first_test.intercept
 
-            # Unbind a passed in WSGI application. During the
-            # metaclass building process intercept becomes bound.
-            try:
-                intercept = intercept.__func__
-            except AttributeError:
-                pass
         except AttributeError:
             pass
 
-        return fixtures, intercept, host, port, prefix
+        return fixtures, host, port
 
     def _find_first_full_test(self):
         """Traverse a sparse test suite to find the first HTTPTestCase.

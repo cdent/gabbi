@@ -29,8 +29,6 @@ import unittest
 from unittest import result as unitresult
 import urllib.parse as urlparse
 
-import wsgi_intercept
-
 from gabbi import __version__
 from gabbi import exception
 from gabbi.handlers import base
@@ -492,29 +490,19 @@ class HTTPTestCase(unittest.TestCase):
         redirect=False,
         timeout=30,
     ):
-        """Run the http request and decode output.
-
-        The call to make the request will catch a WSGIAppError from
-        wsgi_intercept so that the real traceback from a catastrophic
-        error in the intercepted app can be examined.
-        """
+        """Run the http request and decode output."""
 
         if 'user-agent' not in (key.lower() for key in headers):
             headers['user-agent'] = "gabbi/%s (Python httpx)" % __version__
 
-        try:
-            response, content = self.http.request(
-                url,
-                method=method,
-                headers=headers,
-                body=body,
-                redirect=redirect,
-                timeout=timeout,
-            )
-        except wsgi_intercept.WSGIAppError as exc:
-            # Extract and re-raise the wrapped exception.
-            raise exc.exception_type(exc.exception_value).with_traceback(
-                   exc.traceback) from None
+        response, content = self.http.request(
+            url,
+            method=method,
+            headers=headers,
+            body=body,
+            redirect=redirect,
+            timeout=timeout,
+        )
 
         # Set headers and location attributes for follow on requests
         self.response = response
@@ -523,6 +511,7 @@ class HTTPTestCase(unittest.TestCase):
 
         # Decode and store response
         decoded_output = utils.decode_response_content(response, content)
+        print(decoded_output)
         self.content_type = response.get('content-type', '').lower()
         loader_class = self.get_content_handler(self.content_type)
         if (decoded_output and loader_class

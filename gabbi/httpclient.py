@@ -34,7 +34,10 @@ class Http:
         self.extensions = {}
         if 'server_hostname' in kwargs:
             self.extensions['sni_hostname'] = kwargs['server_hostname']
-        self.client = httpx.Client(verify=kwargs.get('cert_validate', True))
+        transport = kwargs.get('intercept')
+        if transport:
+            transport = httpx.WSGITransport(app=transport(), script_name=kwargs.get('prefix'))
+        self.client = httpx.Client(transport=transport, verify=kwargs.get('cert_validate', True))
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
         response = self.client.request(
@@ -191,6 +194,8 @@ def get_http(
     caption='',
     cert_validate=True,
     hostname=None,
+    intercept=None,
+    prefix='',
     timeout=30,
 ):
     """Return an ``Http`` class for making requests."""
@@ -199,6 +204,8 @@ def get_http(
             server_hostname=hostname,
             timeout=timeout,
             cert_validate=cert_validate,
+            intercept=intercept,
+            prefix=prefix,
         )
 
     headers = verbose != 'body'
@@ -213,4 +220,6 @@ def get_http(
         server_hostname=hostname,
         timeout=timeout,
         cert_validate=cert_validate,
+        intercept=intercept,
+        prefix=prefix,
     )

@@ -31,16 +31,16 @@ class SimpleWsgi:
         global CURRENT_POLL
 
         request_method = environ['REQUEST_METHOD'].upper()
-        query_data = urlparse.parse_qs(environ.get('QUERY_STRING', ''))
-        request_url = environ.get('REQUEST_URI',
-                                  environ.get('RAW_URI', 'unknown'))
+        query_string = environ.get('QUERY_STRING', '')
+        query_data = urlparse.parse_qs(query_string)
+        request_url = environ.get('PATH_INFO', '')
         path_info = environ.get('PATH_INFO', '')
         accept_header = environ.get('HTTP_ACCEPT')
         content_type_header = environ.get('CONTENT_TYPE', '')
 
-        full_request_url = self._fully_qualify(environ, request_url)
+        full_request_url = self._fully_qualify(environ, request_url, query_string)
 
-        if accept_header:
+        if accept_header and accept_header != '*/*':
             response_content_type = accept_header
         else:
             # JSON doesn't need a charset but we throw one in here
@@ -147,7 +147,7 @@ class SimpleWsgi:
         return [query_output.encode('utf-8')]
 
     @staticmethod
-    def _fully_qualify(environ, url):
+    def _fully_qualify(environ, url, query_data):
         """Turn a URL path into a fully qualified URL."""
         split_url = urlparse.urlsplit(url)
         server_name = environ.get('SERVER_NAME')
@@ -159,4 +159,4 @@ class SimpleWsgi:
             netloc = server_name
 
         return urlparse.urlunsplit((server_scheme, netloc, split_url.path,
-                                    split_url.query, split_url.fragment))
+                                    query_data, split_url.fragment))
