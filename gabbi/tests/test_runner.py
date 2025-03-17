@@ -14,31 +14,64 @@
 """
 
 from io import StringIO
+import os
+import socket
+import subprocess
 import sys
+import time
 import unittest
-from uuid import uuid4
-
-from wsgi_intercept.interceptor import Urllib3Interceptor
 
 from gabbi import exception
 from gabbi.handlers import base
 from gabbi.handlers.jsonhandler import JSONHandler
 from gabbi import runner
-from gabbi.tests.simple_wsgi import SimpleWsgi
+
+
+def get_free_port():
+    sock = socket.socket()
+    sock.bind(('', 0))
+    return sock.getsockname()[1]
+
+
+class ForkedWSGIServer:
+
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+
+    def start(self):
+        self.process = subprocess.Popen(
+            [
+                "python",
+                "gabbi/tests/external_server.py",
+                self.host,
+                str(self.port)
+            ],
+            env=os.environ.update({"PYTHONPATH": "."}),
+            close_fds=True,
+        )
+        # We need to sleep a bit to let the wsgi server start.
+        # TODO(cdent): This is regrettable.
+        time.sleep(.4)
+
+    def stop(self):
+        self.process.terminate()
 
 
 class RunnerTest(unittest.TestCase):
 
+    port = get_free_port()
+
     def setUp(self):
         super(RunnerTest, self).setUp()
 
-        # NB: random host ensures that we're not accidentally connecting to an
-        #     actual server
-        host, port = (str(uuid4()), 8000)
-        self.host = host
-        self.port = port
-        self.server = lambda: Urllib3Interceptor(
-            SimpleWsgi, host=host, port=port)
+        # 0.0.0.0 is used here instead of localhost or 127.0.0.1 because it
+        # results in consistent full qualification of URLs in different testing
+        # environments.
+        self.host = "0.0.0.0"
+        self.resolved_host = socket.getfqdn()
+        self.server = ForkedWSGIServer(self.host, self.port)
+        self.server.start()
 
         self._stdin = sys.stdin
 
@@ -49,13 +82,14 @@ class RunnerTest(unittest.TestCase):
         sys.stderr = StringIO()  # swallow output to avoid confusion
 
         self._argv = sys.argv
-        sys.argv = ['gabbi-run', '%s:%s' % (host, port)]
+        sys.argv = ['gabbi-run', '%s:%s' % (self.host, self.port)]
 
     def tearDown(self):
         sys.stdin = self._stdin
         sys.stdout = self._stdout
         sys.stderr = self._stderr
         sys.argv = self._argv
+        self.server.stop()
 
     def test_input_files(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
@@ -63,27 +97,24 @@ class RunnerTest(unittest.TestCase):
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/success.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         sys.argv.append('gabbi/tests/gabbits_runner/failure.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertFailure(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertFailure(err)
 
         sys.argv.append('gabbi/tests/gabbits_runner/success_alt.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertFailure(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertFailure(err)
 
     def test_unsafe_yaml(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/nan' % (self.host, self.port)]
@@ -92,11 +123,10 @@ class RunnerTest(unittest.TestCase):
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/nan.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
     def test_target_url_parsing(self):
         sys.argv = ['gabbi-run', 'http://%s:%s/foo' % (self.host, self.port)]
@@ -108,36 +138,11 @@ class RunnerTest(unittest.TestCase):
           status: 200
           response_headers:
             x-gabbi-url: http://%s:%s/foo/baz
-        """ % (self.host, self.port))
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
-
-    def test_target_url_parsing_standard_port(self):
-        # NOTE(cdent): For reasons unclear this regularly fails in
-        # py.test and sometimes fails with testr. So there is
-        # some state that is not being properly cleard somewhere.
-        # Within SimpleWsgi, the environ thinks url_scheme is
-        # 'https'.
-        self.server = lambda: Urllib3Interceptor(
-            SimpleWsgi, host=self.host, port=80)
-        sys.argv = ['gabbi-run', 'http://%s/foo' % self.host]
-
-        sys.stdin = StringIO("""
-        tests:
-        - name: expected success
-          GET: /baz
-          status: 200
-          response_headers:
-            x-gabbi-url: http://%s/foo/baz
-        """ % self.host)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        """ % (self.resolved_host, self.port))
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
     def test_custom_response_handler(self):
         sys.stdin = StringIO("""
@@ -160,11 +165,11 @@ class RunnerTest(unittest.TestCase):
               h1: Hello World
               p: lorem ipsum dolor sit amet
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         sys.stdin = StringIO("""
         tests:
@@ -173,11 +178,11 @@ class RunnerTest(unittest.TestCase):
           response_html:
               h1: lipsum
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertFailure(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertFailure(err)
 
         sys.argv.insert(3, "-r")
         sys.argv.insert(4, "gabbi.tests.test_intercept:StubResponseHandler")
@@ -191,11 +196,11 @@ class RunnerTest(unittest.TestCase):
           response_test:
           - COWAnother line
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         sys.argv.insert(5, "-r")
         sys.argv.insert(6, "gabbi.tests.custom_response_handler")
@@ -208,11 +213,11 @@ class RunnerTest(unittest.TestCase):
           - Hello World
           - lorem ipsum dolor sit amet
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
     def test_exit_code(self):
         sys.stdin = StringIO()
@@ -225,6 +230,7 @@ class RunnerTest(unittest.TestCase):
           GET: /
           status: 666
         """)
+
         try:
             runner.run()
         except SystemExit as err:
@@ -236,11 +242,11 @@ class RunnerTest(unittest.TestCase):
           GET: /
           status: 200
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
     def test_verbose_output_formatting(self):
         """Confirm that a verbose test handles output properly."""
@@ -248,11 +254,11 @@ class RunnerTest(unittest.TestCase):
 
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/test_verbose.yaml')
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         sys.stdout.seek(0)
         output = sys.stdout.read()
@@ -270,11 +276,10 @@ class RunnerTest(unittest.TestCase):
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/test_data.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         # Compare the verbose output of tests with pretty printed
         # data.
@@ -298,21 +303,20 @@ class RunnerTest(unittest.TestCase):
           response_json_paths:
             $.items.house: blue
         """)
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
     def _run_verbosity_arg(self):
         sys.argv.append('--')
         sys.argv.append('gabbi/tests/gabbits_runner/verbosity.yaml')
 
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
 
         sys.stdout.seek(0)
         output = sys.stdout.read()
@@ -364,12 +368,13 @@ class RunnerTest(unittest.TestCase):
           status: 200
           response_headers:
             x-gabbi-url: http://%s:%s/foo/baz
-        """ % (self.host, self.port))
-        with self.server():
-            try:
-                runner.run()
-            except SystemExit as err:
-                self.assertSuccess(err)
+        """ % (self.resolved_host, self.port))
+
+        try:
+            runner.run()
+        except SystemExit as err:
+            self.assertSuccess(err)
+
         sys.stdout.seek(0)
         sys.stderr.seek(0)
         stdoutput = sys.stdout.read()

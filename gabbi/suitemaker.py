@@ -90,6 +90,8 @@ class TestMaker:
                                          caption=test['name'],
                                          cert_validate=test['cert_validate'],
                                          hostname=hostname,
+                                         intercept=self.intercept,
+                                         prefix=self.prefix,
                                          timeout=int(test["timeout"]))
         if prior_test:
             history = prior_test.history

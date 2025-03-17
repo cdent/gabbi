@@ -52,7 +52,8 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
     :param loader: The TestLoader.
     :param host: The host to test against. Do not use with ``intercept``.
     :param port: The port to test against. Used with ``host``.
-    :param intercept: WSGI app factory for wsgi-intercept.
+    :param intercept: WSGI app factory for the httpx.WSGITransport used by
+                      the httpclient.
     :param test_loader_name: Base name for test classes. Use this to align the
                              naming of the tests with other tests in a system.
     :param fixture_module: Python module containing fixture classes.
@@ -158,7 +159,7 @@ def build_tests(path, loader, host=None, port=8001, intercept=None,
 
 
 def py_test_generator(test_dir, host=None, port=8001, intercept=None,
-                      prefix=None, test_loader_name=None,
+                      prefix='', test_loader_name=None,
                       fixture_module=None, response_handlers=None,
                       content_handlers=None, require_ssl=False, url=None,
                       metafunc=None, use_prior_test=True,

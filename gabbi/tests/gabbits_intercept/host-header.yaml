@@ -1,4 +1,4 @@
-# Test, against wsgi-intercept, that SNI and host header handling behaves.
+# Test, against intercepted WSGI app, that SNI and host header handling behaves.
 
 tests:
 
