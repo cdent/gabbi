@@ -17,9 +17,9 @@ from wsgiref import simple_server
 from gabbi.tests import simple_wsgi
 
 
-def run(port):
+def run(host, port):
     server = simple_server.make_server(
-        "127.0.0.1",
+        host,
         int(port),
         simple_wsgi.SimpleWsgi(),
     )
@@ -27,5 +27,6 @@ def run(port):
 
 
 if __name__ == "__main__":
-    port = sys.argv[1]
-    run(port)
+    host = sys.argv[1]
+    port = sys.argv[2]
+    run(host, port)

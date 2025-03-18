@@ -35,14 +35,21 @@ def get_free_port():
 
 class ForkedWSGIServer:
 
-    def __init__(self, port):
+    def __init__(self, host, port):
+        self.host = host
         self.port = port
 
     def start(self):
-        self.process = subprocess.Popen([
-            "python", "gabbi/tests/external_server.py", str(self.port)],
+        self.process = subprocess.Popen(
+            [
+                "python",
+                "gabbi/tests/external_server.py",
+                self.host,
+                str(self.port)
+            ],
             env=os.environ.update({"PYTHONPATH": "."}),
-            close_fds=True)
+            close_fds=True,
+        )
         # We need to sleep a bit to let the wsgi server start.
         # TODO(cdent): This is regrettable.
         time.sleep(.4)
@@ -58,9 +65,9 @@ class RunnerTest(unittest.TestCase):
     def setUp(self):
         super(RunnerTest, self).setUp()
 
-        self.host = "localhost"
-        self.resolved_host = "1.0.0.127.in-addr.arpa"
-        self.server = ForkedWSGIServer(self.port)
+        self.host = "0.0.0.0"
+        self.resolved_host = socket.gethostname()
+        self.server = ForkedWSGIServer(self.host, self.port)
         self.server.start()
 
         self._stdin = sys.stdin
