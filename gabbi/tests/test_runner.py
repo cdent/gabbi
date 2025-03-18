@@ -356,7 +356,7 @@ class RunnerTest(unittest.TestCase):
           status: 200
           response_headers:
             x-gabbi-url: http://%s:%s/foo/baz
-        """ % (self.host, self.port))
+        """ % (self.resolved_host, self.port))
 
         try:
             runner.run()

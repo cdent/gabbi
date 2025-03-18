@@ -511,7 +511,6 @@ class HTTPTestCase(unittest.TestCase):
 
         # Decode and store response
         decoded_output = utils.decode_response_content(response, content)
-        print(decoded_output)
         self.content_type = response.get('content-type', '').lower()
         loader_class = self.get_content_handler(self.content_type)
         if (decoded_output and loader_class
