@@ -11,8 +11,6 @@ jobs:
                 include:
                 - python: 3.x
                   toxenv: pep8
-                - python: 3.8
-                  toxenv: py38
                 - python: 3.9
                   toxenv: py39
                 - python: "3.10"
@@ -25,8 +23,6 @@ jobs:
                   toxenv: py313
                 - python: pypy-3.8
                   toxenv: pypy3
-                - python: 3.8
-                  toxenv: py38-pytest
                 - python: 3.9
                   toxenv: py39-pytest
                 - python: "3.10"
