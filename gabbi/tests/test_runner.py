@@ -15,8 +15,8 @@
 
 from io import StringIO
 import os
-import subprocess
 import socket
+import subprocess
 import sys
 import time
 import unittest
@@ -32,6 +32,7 @@ def get_free_port():
     sock.bind(('', 0))
     return sock.getsockname()[1]
 
+
 class ForkedWSGIServer:
 
     def __init__(self, port):
@@ -43,7 +44,8 @@ class ForkedWSGIServer:
             env=os.environ.update({"PYTHONPATH": "."}),
             close_fds=True)
         # We need to sleep a bit to let the wsgi server start.
-        time.sleep(.2)
+        # TODO(cdent): This is regrettable.
+        time.sleep(.4)
 
     def stop(self):
         self.process.terminate()

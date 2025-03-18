@@ -37,12 +37,12 @@ jobs:
                   toxenv: py312-pytest
                 - python: "3.13"
                   toxenv: py313-pytest
-                - python: 3.9
-                  toxenv: py39-failskip
-                - python: 3.9
-                  toxenv: py39-limit
-                - python: 3.9
-                  toxenv: py39-prefix
+                - python: "3.13"
+                  toxenv: py313-failskip
+                - python: "3.13"
+                  toxenv: py313-limit
+                - python: "3.13"
+                  toxenv: py313-prefix
         name: ${{ matrix.toxenv }} on Python ${{ matrix.python }}
         steps:
         - uses: actions/checkout@v2

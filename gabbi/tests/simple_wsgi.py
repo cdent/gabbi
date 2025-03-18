@@ -30,15 +30,20 @@ class SimpleWsgi:
         global METHODS
         global CURRENT_POLL
 
+        script_name = environ.get('SCRIPT_NAME', '')
+        path_info = environ.get('PATH_INFO', '').removeprefix(script_name)
         request_method = environ['REQUEST_METHOD'].upper()
         query_string = environ.get('QUERY_STRING', '')
         query_data = urlparse.parse_qs(query_string)
-        request_url = environ.get('PATH_INFO', '')
-        path_info = environ.get('PATH_INFO', '')
+        request_url = script_name + path_info
         accept_header = environ.get('HTTP_ACCEPT')
         content_type_header = environ.get('CONTENT_TYPE', '')
 
-        full_request_url = self._fully_qualify(environ, request_url, query_string)
+        full_request_url = self._fully_qualify(
+            environ,
+            request_url,
+            query_string,
+        )
 
         if accept_header and accept_header != '*/*':
             response_content_type = accept_header
