@@ -66,7 +66,7 @@ class RunnerTest(unittest.TestCase):
         super(RunnerTest, self).setUp()
 
         self.host = "0.0.0.0"
-        self.resolved_host = socket.gethostname()
+        self.resolved_host = socket.getfqdn()
         self.server = ForkedWSGIServer(self.host, self.port)
         self.server.start()
 
