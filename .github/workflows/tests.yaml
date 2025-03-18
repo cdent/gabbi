@@ -21,7 +21,7 @@ jobs:
                   toxenv: py312
                 - python: "3.13"
                   toxenv: py313
-                - python: pypy-3.8
+                - python: pypy-3.10
                   toxenv: pypy3
                 - python: 3.9
                   toxenv: py39-pytest
