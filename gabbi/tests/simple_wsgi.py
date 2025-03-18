@@ -64,7 +64,8 @@ class SimpleWsgi:
             return []
 
         if request_method.startswith('P'):
-            body = environ['wsgi.input'].read()
+            length = int(environ.get('CONTENT_LENGTH', '0'))
+            body = environ['wsgi.input'].read(length)
             if body:
                 if not content_type_header:
                     start_response('400 Bad request', headers)
