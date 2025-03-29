@@ -5,6 +5,20 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+4.0.0
+-----
+
+* The underlying HTTP client has been changed from urllib3 to httpx.
+* wsgi-intercept functionality is replaced by WSGITransport from
+  httpx.
+* Removed support for Python 3.8.
+
+These changes are being released as a major version update because
+there are subtle differences in how the "intercepted" WSGI application
+may behave. These differences may impact existing gabbi test cases.
+The httpx implementation has a more strict implementation of WSGI
+than wsgi-intercept.
+
 3.1.0
 -----
 
