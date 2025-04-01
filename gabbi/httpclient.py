@@ -17,8 +17,8 @@ import sys
 
 import httpx
 
-from gabbi import utils
 from gabbi.handlers import jsonhandler
+from gabbi import utils
 
 logging.getLogger('httpx').setLevel(logging.WARNING)
 
@@ -42,7 +42,7 @@ class Http:
         version = int(kwargs.get("version", 1))
         self.client = httpx.Client(
             transport=transport, verify=kwargs.get("cert_validate", True),
-            http1=version==1, http2=version==2,
+            http1=(version == 1), http2=(version == 2),
         )
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
