@@ -17,8 +17,8 @@ import sys
 
 import httpx
 
-from gabbi.handlers import jsonhandler
 from gabbi import utils
+from gabbi.handlers import jsonhandler
 
 logging.getLogger('httpx').setLevel(logging.WARNING)
 
@@ -39,8 +39,10 @@ class Http:
             transport = httpx.WSGITransport(
                 app=transport(), script_name=kwargs.get("prefix", "")
             )
+        version = int(kwargs.get("version", 1))
         self.client = httpx.Client(
-            transport=transport, verify=kwargs.get("cert_validate", True)
+            transport=transport, verify=kwargs.get("cert_validate", True),
+            http1=version==1, http2=version==2,
         )
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
@@ -201,6 +203,7 @@ def get_http(
     intercept=None,
     prefix='',
     timeout=30,
+    version=1,
 ):
     """Return an ``Http`` class for making requests."""
     if not verbose:
@@ -210,6 +213,7 @@ def get_http(
             cert_validate=cert_validate,
             intercept=intercept,
             prefix=prefix,
+            version=version,
         )
 
     headers = verbose != 'body'
@@ -226,4 +230,5 @@ def get_http(
         cert_validate=cert_validate,
         intercept=intercept,
         prefix=prefix,
+        version=version,
     )
