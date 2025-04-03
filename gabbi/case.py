@@ -21,6 +21,7 @@ from collections import OrderedDict
 import copy
 import functools
 from http import cookies
+import numbers
 import os
 import re
 import sys
@@ -558,7 +559,7 @@ class HTTPTestCase(unittest.TestCase):
             test['name'], test['response_headers'])
 
         method = test['method'].upper()
-        headers = test['request_headers']
+        headers = self._format_headers_for_httpx(test['request_headers'])
 
         if test['data'] != '':
             body = self._test_data_to_string(
@@ -730,3 +731,13 @@ class HTTPTestCase(unittest.TestCase):
             self.fail(msg)
         else:
             self.assertIn(expected, iterable)
+
+    def _format_headers_for_httpx(self, headers):
+        """`httpx` requires request headers to be strings"""
+        new_headers = {}
+        for key, val in headers.items():
+            if isinstance(val, numbers.Number):
+                new_headers[key] = str(val)
+            else:
+                new_headers[key] = val
+        return new_headers

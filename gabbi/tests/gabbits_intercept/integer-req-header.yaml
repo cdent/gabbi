@@ -1,0 +1,5 @@
+tests:
+  - name: request with integer header value
+    url: /foo
+    request_headers:
+      integer: 13
