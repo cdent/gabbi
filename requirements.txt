@@ -1,7 +1,7 @@
 pbr
 pytest
 PyYAML
-httpx
+httpx[http2]
 certifi
 jsonpath-rw-ext>=1.0.0
 colorama

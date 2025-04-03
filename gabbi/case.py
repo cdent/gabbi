@@ -78,6 +78,7 @@ BASE_TEST = {
     'use_prior_test': True,
     'disable_response_handler': False,
     'timeout': 30,
+    "http_version": 1,
 }
 
 

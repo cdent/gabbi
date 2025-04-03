@@ -232,3 +232,16 @@ tests:
       response_json_paths:
           $.name: $RESPONSE['$.name']
           $.abode: $RESPONSE['$.abode']
+
+# Test HTTP calls using different HTTP protocol versions
+
+    - name: HTTP/1.1 test
+      GET: /
+      response_headers:
+        http_protocol_version: HTTP/1.1
+
+    - name: HTTP/2 test
+      GET: /
+      http_version: 2
+      response_headers:
+        http_protocol_version: HTTP/2

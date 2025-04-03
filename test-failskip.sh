@@ -4,7 +4,7 @@
 
 # this would be somewhat less complex in bash4..
 shopt -s nocasematch
-[[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=12 || SKIP=2
+[[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && SKIP=14 || SKIP=2
 [[ "${GABBI_SKIP_NETWORK:-false}" == "true" ]] && FAILS=15 || FAILS=16
 shopt -u nocasematch
 

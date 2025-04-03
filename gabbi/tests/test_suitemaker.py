@@ -159,3 +159,41 @@ class SuiteMakerTest(unittest.TestCase):
             handlers=handler_objects)
         response_handlers = file_suite._tests[0].response_handlers
         self.assertIn(ydlj_handler_object, response_handlers)
+
+    def test_http_protocol_version(self):
+        test_yaml = {
+            "tests": [
+                {
+                    "name": "http 1.1 protocol",
+                    "desc": "Response should be 'HTTP/1.1'",
+                    "GET": "/foo",
+                    "status": 200,
+                    "response_headers": {"http_protocol_version": "HTTP/1.1"},
+                },
+                {
+                    "name": "http 2 protocol",
+                    "desc": "Response should be 'HTTP/2'",
+                    "GET": "/foo",
+                    "status": 200,
+                    "http_version": 2,
+                    "response_headers": {"http_protocol_version": "HTTP/2"},
+                },
+            ]
+        }
+        ydlj_handler_object = ydlj_handler.YAMLDiskLoadingJSONHandler()
+        handler_objects = [ydlj_handler_object]
+        for handler in handlers.RESPONSE_HANDLERS:
+            handler_objects.append(handler())
+        file_suite = suitemaker.test_suite_from_dict(
+            self.loader,
+            "foo",
+            test_yaml,
+            ".",
+            "localhost",
+            80,
+            None,
+            None,
+            handlers=handler_objects,
+        )
+        response_handlers = file_suite._tests[0].response_handlers
+        self.assertIn(ydlj_handler_object, response_handlers)

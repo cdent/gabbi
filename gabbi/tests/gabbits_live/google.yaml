@@ -29,3 +29,16 @@ tests:
   url: https://google.com
   redirects: True
   status: 200
+
+- name: google with HTTP/1.1
+  desc: Test that Google replies with HTTP/1.1
+  url: https://www.google.com/
+  response_headers:
+    http_protocol_version: HTTP/1.1
+
+- name: google with HTTP/2
+  desc: Test that Google replies with HTTP/2
+  url: https://www.google.com/
+  http_version: 2
+  response_headers:
+    http_protocol_version: HTTP/2
