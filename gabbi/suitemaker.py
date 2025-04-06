@@ -92,7 +92,8 @@ class TestMaker:
                                          hostname=hostname,
                                          intercept=self.intercept,
                                          prefix=self.prefix,
-                                         timeout=int(test["timeout"]))
+                                         timeout=int(test["timeout"]),
+                                         version=int(test["http_version"]))
         if prior_test:
             history = prior_test.history
         else:
