@@ -85,7 +85,7 @@ Metadata
      - defaults to ``False``
    * - ``http_version``
      - Sets the protocol version of the HTTP request.
-     - default to ``1``
+     - defaults to ``1``
      - If ``2``, the HTTP request will be made using HTTP/2.  Note: HTTP/3 is
        not yet supported.
 

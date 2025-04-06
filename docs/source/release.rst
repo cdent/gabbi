@@ -5,6 +5,15 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+4.1.0
+-----
+
+* Enable support for making and verifying requests using HTTP/2.
+
+Thanks to Scott Wallace for the majority of the work integrating
+httpx, which enables this support.
+
+
 4.0.0
 -----
 
