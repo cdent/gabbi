@@ -1,5 +1,5 @@
 # simple Makefile for some common tasks
-.PHONY: clean test dist release pypi tagv docs
+.PHONY: clean test dist release pypi tagv docs gh
 
 gabbi-version := $(shell python -c 'import gabbi; print(gabbi.__version__)')
 
@@ -36,7 +36,10 @@ test:
 dist: test
 	python3 setup.py sdist bdist_wheel
 
-release: clean test cleanagain tagv pypi
+release: clean test cleanagain tagv pypi gh
+
+gh:
+	gh release create ${gabbi-version} --generate-notes dist/*
 
 pypi:
 	python3 setup.py sdist bdist_wheel
