@@ -1,0 +1,26 @@
+# Use double of the same formatter, some with mixed quotes
+
+tests:
+- name: post some json
+  url: /posterchild
+  request_headers:
+      content-type: application/json
+  data:
+    baseURL: $SCHEME://$NETLOC/posterchild
+  method: POST
+  response_json_paths:
+    baseURL: $SCHEME://$NETLOC/posterchild
+
+- name: generate that url
+  desc: This would fail because of regex issues without post 4.1.0 changes
+  verbose: true
+  GET: $RESPONSE['$.baseURL']$RESPONSE['$.baseURL']
+
+- name: generate another url
+  desc: This would fail because of regex issues without post 4.1.0 changes
+  verbose: true
+  GET: $HISTORY['post some json'].$RESPONSE["$.baseURL"]$HISTORY['post some json'].$RESPONSE["$.baseURL"]
+
+- name: generate yet another url
+  verbose: true
+  GET: $HISTORY["post some json"].$RESPONSE['$.baseURL']$HISTORY['post some json'].$RESPONSE["$.baseURL"]
