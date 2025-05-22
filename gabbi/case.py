@@ -21,6 +21,7 @@ from collections import OrderedDict
 import copy
 import functools
 from http import cookies
+import httpx
 import numbers
 import os
 import re
@@ -592,7 +593,11 @@ class HTTPTestCase(unittest.TestCase):
                     self._assert_response()
                     failure = None
                     break
-                except (AssertionError, utils.ConnectionRefused) as exc:
+                except (
+                    AssertionError,
+                    utils.ConnectionRefused,
+                    httpx.ReadTimeout
+                ) as exc:
                     failure = exc
 
                 count -= 1

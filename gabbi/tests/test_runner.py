@@ -13,6 +13,7 @@
 """Test that the CLI works as expected
 """
 
+import httpx
 from io import StringIO
 import os
 import socket
@@ -20,6 +21,7 @@ import subprocess
 import sys
 import time
 import unittest
+from unittest import mock
 
 from gabbi import exception
 from gabbi.handlers import base
@@ -381,6 +383,31 @@ class RunnerTest(unittest.TestCase):
         stderror = sys.stderr.read()
         self.assertEqual('', stdoutput)
         self.assertEqual('', stderror)
+
+    def test_poll_with_timeout(self):
+        """Confirm poll works with a HTTP timeout"""
+        sys.stdin = StringIO(
+            """
+        tests:
+        - name: expected success after multiple attempts
+          POST: /
+          poll:
+            count: 3
+        """
+        )
+
+        with mock.patch(
+            "httpx.Client.request",
+            side_effect=[
+                httpx.ReadTimeout("Read timeout"),
+                httpx.ReadTimeout("Read timeout"),
+                httpx.Response(200),
+            ],
+        ):
+            try:
+                runner.run()
+            except SystemExit as err:
+                self.assertSuccess(err)
 
     def assertSuccess(self, exitError):
         errors = exitError.args[0]
