@@ -277,7 +277,7 @@ class HTTPTestCase(unittest.TestCase):
         Let KeyError raise if variable not present. Capture
         the 'cast' if any.
         """
-        environ_name = match.group('arg')
+        environ_name = match.group('arg1') or match.group('arg2')
         self.cast = match.group('cast')
         return os.environ[environ_name]
 
@@ -293,7 +293,7 @@ class HTTPTestCase(unittest.TestCase):
 
     def _cookie_replacer(self, match):
         """Replace a regex match with the cookie of a previous response."""
-        case = match.group('case')
+        case = match.group('case1') or match.group('case2')
         if case:
             referred_case = self.history[case]
         else:
@@ -316,8 +316,8 @@ class HTTPTestCase(unittest.TestCase):
 
     def _header_replacer(self, match):
         """Replace a regex match with the value of a prior header."""
-        header_key = match.group('arg')
-        case = match.group('case')
+        header_key = match.group('arg1') or match.group('arg2')
+        case = match.group('case1') or match.group('case2')
         if case:
             referred_case = self.history[case]
         else:
@@ -346,7 +346,7 @@ class HTTPTestCase(unittest.TestCase):
 
     def _url_replacer(self, match):
         """Replace a regex match with the value of a previous url."""
-        case = match.group('case')
+        case = match.group('case1') or match.group('case2')
         if case:
             referred_case = self.history[case]
         else:
@@ -365,7 +365,7 @@ class HTTPTestCase(unittest.TestCase):
 
     def _location_replacer(self, match):
         """Replace a regex match with the value of a previous location."""
-        case = match.group('case')
+        case = match.group('case1') or match.group('case2')
         if case:
             referred_case = self.history[case]
         else:
@@ -424,7 +424,13 @@ class HTTPTestCase(unittest.TestCase):
                                     parsed_url.path, query_string, ''))
 
     _history_regex = (
-        r"(?:\$HISTORY\[(?P<quote1>['\"])(?P<case>.+?)(?P=quote1)\]\.)??"
+        r"(?:\$HISTORY"
+        r"("
+        r"\['(?P<case1>[^']+?)'\]"
+        "|"
+        r'\["(?P<case2>[^"]+?)"\]'
+        r")"
+        r"\.)??"
     )
 
     @staticmethod
@@ -433,7 +439,11 @@ class HTTPTestCase(unittest.TestCase):
         case = HTTPTestCase._history_regex
         return (
             r"%s\$%s(:(?P<cast>\w+))?"
-            r"\[(?P<quote>['\"])(?P<arg>.+?)(?P=quote)\]"
+            r"("
+            r"\['(?P<arg1>[^']+?)'\]"
+            "|"
+            r'\["(?P<arg2>[^"]+?)"\]'
+            r")"
             % (case, key))
 
     @staticmethod
@@ -459,8 +469,8 @@ class HTTPTestCase(unittest.TestCase):
 
     def _response_replacer(self, match, preserve=False):
         """Replace a regex match with the value from a previous response."""
-        response_path = match.group('arg')
-        case = match.group('case')
+        response_path = match.group('arg1') or match.group('arg2')
+        case = match.group('case1') or match.group('case2')
         self.cast = match.group('cast')
         if not preserve and self.cast:
             raise RuntimeError(
