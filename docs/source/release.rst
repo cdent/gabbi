@@ -5,6 +5,12 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+4.1.1
+-----
+
+* Correctly handle request timeouts in polling tests.
+* Handle two jsonpath using formatters in one evaluation.
+
 4.1.0
 -----
 
