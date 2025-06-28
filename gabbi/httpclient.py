@@ -34,16 +34,28 @@ class Http:
         self.extensions = {}
         if 'server_hostname' in kwargs:
             self.extensions['sni_hostname'] = kwargs['server_hostname']
-        transport = kwargs.get('intercept')
+        self._transport = kwargs.get('intercept')
+        self._version = int(kwargs.get("version", 1))
+        self._script_name = kwargs.get("prefix", "")
+        self._verify = kwargs.get("cert_validate", True)
+        self._client = None
+
+    @property
+    def client(self):
+        if self._client:
+            return self._client
+        transport = self._transport
         if transport:
             transport = httpx.WSGITransport(
-                app=transport(), script_name=kwargs.get("prefix", "")
+                app=transport(), script_name=self._script_name
             )
-        version = int(kwargs.get("version", 1))
-        self.client = httpx.Client(
-            transport=transport, verify=kwargs.get("cert_validate", True),
-            http1=(version == 1), http2=(version == 2),
+        self._client = httpx.Client(
+            transport=transport,
+            verify=self._verify,
+            http1=(self._version == 1),
+            http2=(self._version == 2),
         )
+        return self._client
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
         response = self.client.request(
