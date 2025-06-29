@@ -56,7 +56,7 @@ class TestMaker:
         self.content_handlers = content_handlers
         self.response_handlers = response_handlers
 
-    def make_one_test(self, test_dict, prior_test):
+    def make_one_test(self, test_dict, prior_test, file_suite):
         """Create one single HTTPTestCase.
 
         The returned HTTPTestCase is added to the TestSuite currently
@@ -93,7 +93,8 @@ class TestMaker:
                                          intercept=self.intercept,
                                          prefix=self.prefix,
                                          timeout=int(test["timeout"]),
-                                         version=int(test["http_version"]))
+                                         version=int(test["http_version"]),
+                                         suite=file_suite)
         if prior_test:
             history = prior_test.history
         else:
@@ -124,6 +125,7 @@ class TestMaker:
                              'prior': prior_test,
                              'history': history,
                              'test_base_name': self.test_base_name,
+                             'suite': file_suite,
                              test_method_name: do_test,
                              })
         # We've been asked to, make this test class think it comes
@@ -259,7 +261,7 @@ def test_suite_from_dict(loader, test_base_name, suite_dict, test_directory,
     file_suite = suite.GabbiSuite()
     prior_test = None
     for test_dict in test_data:
-        this_test = test_maker.make_one_test(test_dict, prior_test)
+        this_test = test_maker.make_one_test(test_dict, prior_test, file_suite)
         file_suite.addTest(this_test)
         prior_test = this_test
 

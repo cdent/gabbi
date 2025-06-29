@@ -37,6 +37,10 @@ class GabbiSuite(unittest.TestSuite):
     tests in this suite will be skipped.
     """
 
+    def __init__(self, *args, **kwargs):
+        self.client = None
+        super().__init__(*args, **kwargs)
+
     def run(self, result, debug=False):
         """Override TestSuite run to start suite-level fixtures.
 

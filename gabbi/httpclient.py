@@ -22,6 +22,8 @@ from gabbi import utils
 
 logging.getLogger('httpx').setLevel(logging.WARNING)
 
+client_count = 0
+
 
 class Http:
     """A class to munge the HTTP response.
@@ -33,29 +35,32 @@ class Http:
     def __init__(self, **kwargs):
         self.extensions = {}
         if 'server_hostname' in kwargs:
-            self.extensions['sni_hostname'] = kwargs['server_hostname']
-        self._transport = kwargs.get('intercept')
+            self.extensions["sni_hostname"] = kwargs["server_hostname"]
+        self._transport = kwargs.get("intercept")
         self._version = int(kwargs.get("version", 1))
         self._script_name = kwargs.get("prefix", "")
         self._verify = kwargs.get("cert_validate", True)
-        self._client = None
+        self._suite = kwargs.get("suite")
 
     @property
     def client(self):
-        if self._client:
-            return self._client
+        global client_count
+        if self._suite.client:
+            return self._suite.client
+        client_count += 1
+        print(f"###### CREATING NEW CLIENT {client_count}")
         transport = self._transport
         if transport:
             transport = httpx.WSGITransport(
                 app=transport(), script_name=self._script_name
             )
-        self._client = httpx.Client(
+        self._suite.client = httpx.Client(
             transport=transport,
             verify=self._verify,
             http1=(self._version == 1),
             http2=(self._version == 2),
         )
-        return self._client
+        return self._suite.client
 
     def request(self, absolute_uri, method, body, headers, redirect, timeout):
         response = self.client.request(
@@ -216,6 +221,7 @@ def get_http(
     prefix='',
     timeout=30,
     version=1,
+    suite=None,
 ):
     """Return an ``Http`` class for making requests."""
     if not verbose:
@@ -226,6 +232,7 @@ def get_http(
             intercept=intercept,
             prefix=prefix,
             version=version,
+            suite=suite,
         )
 
     headers = verbose != 'body'
@@ -243,4 +250,5 @@ def get_http(
         intercept=intercept,
         prefix=prefix,
         version=version,
+        suite=suite,
     )
