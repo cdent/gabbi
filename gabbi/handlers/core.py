@@ -30,7 +30,7 @@ class StringResponseHandler(base.ResponseHandler):
             expected = expected[1:-1]
             test.assertRegex(
                 test.output, expected,
-                'Expect resonse body %s to match /%s/' %
+                'Expect response body %s to match /%s/' %
                 (test.output, expected))
         else:
             test.assert_in_or_print_output(expected, test.output)

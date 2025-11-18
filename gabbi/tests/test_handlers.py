@@ -428,7 +428,7 @@ class HandlersTest(unittest.TestCase):
         self.assertIn("'location' header not present in response:",
                       str(failure.exception))
 
-    def test_resonse_headers_stringify(self):
+    def test_response_headers_stringify(self):
         handler = core.HeadersResponseHandler()
         self.test.test_data = {'response_headers': {
             'x-alpha-beta': 2.0,
