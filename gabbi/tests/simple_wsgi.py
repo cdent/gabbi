@@ -27,7 +27,6 @@ class SimpleWsgi:
     """A simple wsgi application to use in tests."""
 
     def __call__(self, environ, start_response):
-        global METHODS
         global CURRENT_POLL
 
         script_name = environ.get('SCRIPT_NAME', '')
