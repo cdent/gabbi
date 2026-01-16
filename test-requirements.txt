@@ -1,5 +1,4 @@
-mock ; python_version < '3.3'
-stestr>4.0.0
+stestr>4.0.0; platform_python_implementation == "CPython"
 coverage
 pytest-cov
 hacking
