@@ -31,7 +31,7 @@ docs:
 	cd docs ; $(MAKE) html
 
 test:
-	tox --skip-missing-interpreters
+	python3 -m tox --skip-missing-interpreters
 
 dist: test
 	python3 setup.py sdist bdist_wheel
@@ -43,7 +43,7 @@ gh:
 
 pypi:
 	python3 setup.py sdist bdist_wheel
-	twine upload dist/*
+	twine upload --repository gabbi dist/*
 
 docker:
 	docker build --build-arg GABBI_VERSION=${gabbi-version} -t gabbi:${gabbi-version} .
