@@ -1,4 +1,5 @@
-#!/bin/bash -ex
+#!/usr/bin/env bash
+set -ex
 # Run the tests and confirm that the stuff we expect to skip or fail
 # does.
 

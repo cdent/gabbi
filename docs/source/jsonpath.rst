@@ -6,8 +6,7 @@ JSONPath
 Gabbi supports JSONPath both for validating JSON response bodies and within
 :ref:`substitutions <state-substitution>`.
 
-JSONPath expressions are provided by `jsonpath_rw`_, with
-`jsonpath_rw_ext`_ custom extensions to address common requirements:
+JSONPath expressions are provided by `jsonpath-ng`_:
 
 #. Sorting via ``sorted`` and ``[/property]``.
 #. Filtering via ``[?property = value]``.
@@ -135,7 +134,7 @@ be overlooked before implementing this technique.
 Examples like this can be found in one of gabbi's `yaml-from-disk tests`_.
 
 There are more JSONPath examples in :doc:`example` and in the
-`jsonpath_rw`_ and `jsonpath_rw_ext`_ documentation.
+`jsonpath-ng`_ documentation.
 
 .. _json-subs:
 
@@ -162,7 +161,6 @@ parser. The test author should write::
 
 to quote the result of the substitution.
 
-.. _jsonpath_rw: http://jsonpath-rw.readthedocs.io/en/latest/
-.. _jsonpath_rw_ext: https://python-jsonpath-rw-ext.readthedocs.io/en/latest/
+.. _jsonpath-ng: https://github.com/h2non/jsonpath-ng
 .. _own tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_intercept/data.yaml
 .. _yaml-from-disk tests: https://github.com/cdent/gabbi/blob/master/gabbi/tests/gabbits_handlers/yaml-from-disk.yaml

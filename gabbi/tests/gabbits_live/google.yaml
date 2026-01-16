@@ -22,7 +22,7 @@ tests:
 
 - name: google russia
   desc: Test handling of non-utf-8 encoding
-  url: https://www.google.ru/
+  url: https://www.google.com/?hl=ru
 
 - name: follow redirects full url
   desc: Confirm redirects are followed when we ask
