@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -ex
 # Run a test which is limited to just one request from a file that
 # contains many requests and confirm that only one was run and that
 # it did actually run.

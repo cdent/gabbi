@@ -16,7 +16,7 @@ import json
 
 from gabbi.exception import GabbiDataLoadError
 from gabbi.handlers import base
-from gabbi import json_parser
+import jsonpath_ng.ext as json_parser
 
 
 class JSONHandler(base.ContentHandler):
