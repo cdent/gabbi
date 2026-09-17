@@ -15,5 +15,4 @@
 
 import setuptools
 
-with open("requirements.txt", "r", encoding="utf-8") as file:
-    setuptools.setup(install_requires=file.read().splitlines())
+setuptools.setup()
