@@ -5,6 +5,11 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+4.2.1
+-----
+
+* Allow building wheel from isolated sdist.
+
 4.2.0
 -----
 
