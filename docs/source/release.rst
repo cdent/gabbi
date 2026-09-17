@@ -5,13 +5,23 @@ These are informal release notes for gabbi since version 1.0.0,
 highlighting major features and changes. For more detail see
 the `commit logs`_ on GitHub.
 
+4.2.3
+-----
+
+* Deal with lost metadata and entrypoints resulting from removal
+  of pbr.
+
 4.2.2
 -----
+
+YANKED. Used 4.2.3
 
 * Return long description to packaged files.
 
 4.2.1
 -----
+
+YANKED. Used 4.2.3
 
 * Allow building wheel from isolated sdist.
 
